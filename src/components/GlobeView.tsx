@@ -141,6 +141,64 @@ function drawGeoJson(
   }
 }
 
+function createSurfaceTexture(landGeo: GeoJSON.FeatureCollection): THREE.CanvasTexture {
+  const width = 2048;
+  const height = 1024;
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    const fallback = new THREE.CanvasTexture(canvas);
+    fallback.needsUpdate = true;
+    return fallback;
+  }
+
+  // Water is slightly lighter black-blue; land remains darker.
+  ctx.fillStyle = "#122033";
+  ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = "#070d18";
+
+  const project = (lng: number, lat: number) => ({
+    x: ((lng + 180) / 360) * width,
+    y: ((90 - lat) / 180) * height,
+  });
+
+  for (const feature of landGeo.features) {
+    const geom = feature.geometry;
+    if (!geom) continue;
+    const polygons =
+      geom.type === "Polygon"
+        ? [geom.coordinates]
+        : geom.type === "MultiPolygon"
+        ? geom.coordinates
+        : [];
+    if (polygons.length === 0) continue;
+
+    ctx.beginPath();
+    for (const polygon of polygons) {
+      for (const ring of polygon) {
+        if (ring.length === 0) continue;
+        const start = project(ring[0][0], ring[0][1]);
+        ctx.moveTo(start.x, start.y);
+        for (let i = 1; i < ring.length; i += 1) {
+          const p = project(ring[i][0], ring[i][1]);
+          ctx.lineTo(p.x, p.y);
+        }
+        ctx.closePath();
+      }
+    }
+    ctx.fill("evenodd");
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.generateMipmaps = false;
+  texture.needsUpdate = true;
+  return texture;
+}
+
 export function GlobeView({
   alerts,
   selectedId,
@@ -217,7 +275,7 @@ export function GlobeView({
     // --- Ocean sphere ---
     const oceanGeo = new THREE.SphereGeometry(0.995, 64, 64);
     const oceanMat = new THREE.MeshPhongMaterial({
-      color: 0x070d18,
+      color: 0xffffff,
       emissive: 0x050a14,
       shininess: 5,
     });
@@ -283,6 +341,7 @@ export function GlobeView({
     scene.add(pLight2);
 
     // --- Load world map (country boundaries) ---
+    let surfaceTexture: THREE.CanvasTexture | null = null;
     fetch(WORLD_TOPO_URL)
       .then((r) => r.json())
       .then((topoData: any) => {
@@ -305,6 +364,9 @@ export function GlobeView({
             topoData,
             topoData.objects.land
           ) as unknown as GeoJSON.FeatureCollection;
+          surfaceTexture = createSurfaceTexture(land);
+          oceanMat.map = surfaceTexture;
+          oceanMat.needsUpdate = true;
           const coastMat = new THREE.LineBasicMaterial({
             color: 0x2488cc,
             transparent: true,
@@ -552,6 +614,7 @@ export function GlobeView({
       container.removeChild(el);
       renderer.dispose();
       glowTexture.dispose();
+      surfaceTexture?.dispose();
       usStateMat.dispose();
     };
   }, [alerts, onSelect]);
