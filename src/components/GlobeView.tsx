@@ -648,8 +648,8 @@ export function GlobeView({
     const resizeObs = new ResizeObserver(onResize);
     resizeObs.observe(container);
 
-    // --- Mouse drag to rotate ---
-    const onDown = (e: MouseEvent) => {
+    // --- Pointer drag to rotate (mouse + touch + pen) ---
+    const onDown = (e: PointerEvent) => {
       mouseRef.current = {
         isDown: true,
         prevX: e.clientX,
@@ -660,8 +660,13 @@ export function GlobeView({
       };
       rotationRef.current.interacting = true;
       rotationRef.current.ambientBlend = 0;
+      try {
+        (e.currentTarget as Element).setPointerCapture?.(e.pointerId);
+      } catch {
+        // Ignore capture errors on unsupported environments.
+      }
     };
-    const onMove = (e: MouseEvent) => {
+    const onMove = (e: PointerEvent) => {
       if (!mouseRef.current.isDown) return;
       const zoomNorm = Math.max(
         0,
@@ -813,10 +818,12 @@ export function GlobeView({
     };
 
     const el = renderer.domElement;
-    el.addEventListener("mousedown", onDown);
-    el.addEventListener("mousemove", onMove);
-    el.addEventListener("mouseup", onUp);
-    el.addEventListener("mouseleave", onUp);
+    el.style.touchAction = "none";
+    el.addEventListener("pointerdown", onDown);
+    el.addEventListener("pointermove", onMove);
+    el.addEventListener("pointerup", onUp);
+    el.addEventListener("pointercancel", onUp);
+    el.addEventListener("pointerleave", onUp);
     el.addEventListener("click", onClk);
     el.addEventListener("wheel", onWheel, { passive: false });
     container.addEventListener("wheel", onWheel, { passive: false });
@@ -824,10 +831,11 @@ export function GlobeView({
     return () => {
       cancelAnimationFrame(frameRef.current);
       resizeObs.disconnect();
-      el.removeEventListener("mousedown", onDown);
-      el.removeEventListener("mousemove", onMove);
-      el.removeEventListener("mouseup", onUp);
-      el.removeEventListener("mouseleave", onUp);
+      el.removeEventListener("pointerdown", onDown);
+      el.removeEventListener("pointermove", onMove);
+      el.removeEventListener("pointerup", onUp);
+      el.removeEventListener("pointercancel", onUp);
+      el.removeEventListener("pointerleave", onUp);
       el.removeEventListener("click", onClk);
       el.removeEventListener("wheel", onWheel);
       container.removeEventListener("wheel", onWheel);

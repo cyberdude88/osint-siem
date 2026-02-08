@@ -12,6 +12,7 @@ export default function App() {
   const [regionFilter, setRegionFilter] = useState<string>("all");
   const [visibleAlertIds, setVisibleAlertIds] = useState<string[]>([]);
   const [mobilePane, setMobilePane] = useState<"map" | "stack">("map");
+  const [isDesktopFeedOpen, setIsDesktopFeedOpen] = useState(true);
   const panelRef = useRef<HTMLDivElement>(null);
   const selectedAlert = selectedId
     ? alerts.find((a) => a.alert_id === selectedId) ?? null
@@ -70,12 +71,34 @@ export default function App() {
 
       {/* Main Content */}
       <div className="flex flex-1 min-h-0 relative">
+        {!isDesktopFeedOpen && (
+          <button
+            type="button"
+            onClick={() => setIsDesktopFeedOpen(true)}
+            className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-10 items-center gap-1 rounded-md border border-siem-border bg-siem-panel/85 px-2 py-1.5 text-[10px] font-mono uppercase tracking-wider text-siem-text hover:bg-siem-accent/12 hover:text-siem-accent transition-colors"
+          >
+            &#8250; Stack
+          </button>
+        )}
         {/* Left Panel: Alert Feed */}
         <div
           className={`${
             mobilePane === "stack" ? "flex" : "hidden"
-          } md:flex w-full md:w-[340px] md:min-w-[300px] border-r border-siem-border bg-siem-panel flex-col min-h-0`}
+          } md:flex w-full ${
+            isDesktopFeedOpen
+              ? "md:w-[340px] md:min-w-[300px] md:border-r md:border-siem-border"
+              : "md:w-0 md:min-w-0 md:border-r-0"
+          } bg-siem-panel flex-col min-h-0 overflow-hidden transition-[width] duration-300 relative`}
         >
+          {isDesktopFeedOpen && (
+            <button
+              type="button"
+              onClick={() => setIsDesktopFeedOpen(false)}
+              className="hidden md:flex absolute right-2 top-2 z-10 rounded border border-siem-border bg-white/5 px-1.5 py-1 text-[10px] font-mono uppercase tracking-wider text-siem-muted hover:bg-siem-accent/12 hover:text-siem-accent transition-colors"
+            >
+              Hide &#8249;
+            </button>
+          )}
           {isLoading ? (
             <div className="flex-1 flex items-center justify-center text-siem-muted text-sm">
               Loading live feed...
