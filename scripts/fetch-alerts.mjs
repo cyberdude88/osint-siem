@@ -215,6 +215,8 @@ const COUNTRY_CENTROIDS = {
   usa: [39.8283, -98.5795],
   brazil: [-14.235, -51.9253],
   india: [20.5937, 78.9629],
+  china: [35.8617, 104.1954],
+  russia: [61.524, 105.3188],
   japan: [36.2048, 138.2529],
   colombia: [4.5709, -74.2973],
   "south korea": [35.9078, 127.7669],
@@ -444,6 +446,7 @@ const sources = [
       base_url: "https://www.interpol.int",
     },
     feed_url: "https://ws-public.interpol.int/notices/v1/red?resultPerPage=200",
+    max_items: 120,
     category: "wanted_suspect",
     region_tag: "INT",
     lat: 45.76,
@@ -466,10 +469,80 @@ const sources = [
       base_url: "https://www.interpol.int",
     },
     feed_url: "https://ws-public.interpol.int/notices/v1/yellow?resultPerPage=200",
+    max_items: 120,
     category: "missing_person",
     region_tag: "INT",
     lat: 45.76,
     lng: 4.84,
+    reporting: {
+      label: "Contact INTERPOL",
+      url: "https://www.interpol.int/Contacts",
+      notes: "Use official national police channels for emergencies.",
+    },
+  },
+  {
+    type: "interpol-red-json",
+    source: {
+      source_id: "interpol-red-cn",
+      authority_name: "INTERPOL Red Notices (China-linked)",
+      country: "China",
+      country_code: "CN",
+      region: "Asia",
+      authority_type: "police",
+      base_url: "https://www.interpol.int",
+    },
+    feed_url: "https://ws-public.interpol.int/notices/v1/red?resultPerPage=200&nationality=cn",
+    max_items: 80,
+    category: "wanted_suspect",
+    region_tag: "CN",
+    lat: 35.86,
+    lng: 104.20,
+    reporting: {
+      label: "Contact INTERPOL",
+      url: "https://www.interpol.int/Contacts",
+      notes: "Use official national police channels for emergencies.",
+    },
+  },
+  {
+    type: "interpol-red-json",
+    source: {
+      source_id: "interpol-red-ru",
+      authority_name: "INTERPOL Red Notices (Russia-linked)",
+      country: "Russia",
+      country_code: "RU",
+      region: "Europe",
+      authority_type: "police",
+      base_url: "https://www.interpol.int",
+    },
+    feed_url: "https://ws-public.interpol.int/notices/v1/red?resultPerPage=200&nationality=ru",
+    max_items: 80,
+    category: "wanted_suspect",
+    region_tag: "RU",
+    lat: 55.76,
+    lng: 37.62,
+    reporting: {
+      label: "Contact INTERPOL",
+      url: "https://www.interpol.int/Contacts",
+      notes: "Use official national police channels for emergencies.",
+    },
+  },
+  {
+    type: "interpol-red-json",
+    source: {
+      source_id: "interpol-red-in",
+      authority_name: "INTERPOL Red Notices (India-linked)",
+      country: "India",
+      country_code: "IN",
+      region: "Asia",
+      authority_type: "police",
+      base_url: "https://www.interpol.int",
+    },
+    feed_url: "https://ws-public.interpol.int/notices/v1/red?resultPerPage=200&nationality=in",
+    max_items: 80,
+    category: "wanted_suspect",
+    region_tag: "IN",
+    lat: 28.61,
+    lng: 77.21,
     reporting: {
       label: "Contact INTERPOL",
       url: "https://www.interpol.int/Contacts",
@@ -2480,6 +2553,7 @@ async function fetchFeedWithFallback(urls, followRedirects = false) {
 }
 
 async function fetchRss(meta, now) {
+  const limit = Math.max(1, Number(meta?.max_items ?? MAX_PER_SOURCE));
   const { xml } = await fetchFeedWithFallback(
     meta.feed_urls ?? [meta.feed_url],
     meta.followRedirects
@@ -2487,7 +2561,7 @@ async function fetchRss(meta, now) {
   let items = parseItems(xml)
     .filter((item) => item.title && item.link)
     .filter((item) => !isBlogContent(item))
-    .slice(0, MAX_PER_SOURCE);
+    .slice(0, limit);
 
   // Auto-translate non-English titles
   items = await translateBatch(items);
@@ -2524,6 +2598,7 @@ async function fetchRss(meta, now) {
 }
 
 async function fetchKev(meta) {
+  const limit = Math.max(1, Number(meta?.max_items ?? MAX_PER_SOURCE));
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 15000);
   let response;
@@ -2546,12 +2621,13 @@ async function fetchKev(meta) {
   // Sort by dateAdded descending (newest first) then take top N
   vulnerabilities.sort((a, b) => new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime());
   return vulnerabilities
-    .slice(0, MAX_PER_SOURCE)
+    .slice(0, limit)
     .map((entry) => kevItemToAlert(entry, meta))
     .filter(Boolean);
 }
 
 async function fetchInterpolNotices(meta, now) {
+  const limit = Math.max(1, Number(meta?.max_items ?? MAX_PER_SOURCE));
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 15000);
   let response;
@@ -2572,7 +2648,7 @@ async function fetchInterpolNotices(meta, now) {
   const data = await response.json();
   const notices = Array.isArray(data?._embedded?.notices) ? data._embedded.notices : [];
 
-  return notices.slice(0, MAX_PER_SOURCE).map((notice) => {
+  return notices.slice(0, limit).map((notice) => {
     const forename = String(notice.forename ?? "").trim();
     const name = String(notice.name ?? "").trim();
     const label = [forename, name].filter(Boolean).join(" ");
@@ -2628,8 +2704,16 @@ async function buildAlerts() {
   }
 
   const sanitized = alerts.filter((a) => !isBlogAlert(a));
-  sanitized.sort((a, b) => new Date(b.first_seen).getTime() - new Date(a.first_seen).getTime());
-  return sanitized;
+  const deduped = [];
+  const seen = new Set();
+  for (const alert of sanitized) {
+    const key = `${alert.canonical_url}|${alert.title}`.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    deduped.push(alert);
+  }
+  deduped.sort((a, b) => new Date(b.first_seen).getTime() - new Date(a.first_seen).getTime());
+  return deduped;
 }
 
 async function writeAlerts(alerts) {
