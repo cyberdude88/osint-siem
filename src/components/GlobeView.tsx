@@ -73,7 +73,7 @@ export function GlobeView({ alerts, selectedId, onSelect }: Props) {
   const pointMeshesRef = useRef<Map<string, THREE.Mesh>>(new Map());
   const frameRef = useRef<number>(0);
   const mouseRef = useRef({ isDown: false, prevX: 0, prevY: 0 });
-  const rotationRef = useRef({ autoRotate: true });
+  const rotationRef = useRef({ autoRotate: true, x: 0.35, y: 0 });
 
   useEffect(() => {
     const container = containerRef.current;
@@ -268,17 +268,24 @@ export function GlobeView({ alerts, selectedId, onSelect }: Props) {
       });
     });
 
-    // --- Initial tilt ---
-    globeGroup.rotation.x = 0.35;
+    // --- Initial tilt (persisted) ---
+    globeGroup.rotation.x = rotationRef.current.x;
+    globeGroup.rotation.y = rotationRef.current.y;
 
     // --- Animate ---
     let t = 0;
+    let last = performance.now();
     const animate = () => {
       frameRef.current = requestAnimationFrame(animate);
-      t += 0.016;
+      const now = performance.now();
+      const delta = (now - last) / 1000;
+      last = now;
+      t += delta;
       if (rotationRef.current.autoRotate) {
-        globeGroup.rotation.y += 0.0012;
+        globeGroup.rotation.y += 0.072 * delta;
       }
+      rotationRef.current.x = globeGroup.rotation.x;
+      rotationRef.current.y = globeGroup.rotation.y;
 
       // Breathing glow halos
       glowMeshes.forEach((gm) => {
@@ -343,9 +350,7 @@ export function GlobeView({ alerts, selectedId, onSelect }: Props) {
     };
     const onUp = () => {
       mouseRef.current.isDown = false;
-      setTimeout(() => {
-        rotationRef.current.autoRotate = true;
-      }, 3000);
+      rotationRef.current.autoRotate = true;
     };
 
     // --- Click raycasting ---
