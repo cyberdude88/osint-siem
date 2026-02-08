@@ -143,6 +143,67 @@ const US_STATE_ALT_TOKENS = {
   "w va": "west virginia",
 };
 
+const COUNTRY_CENTROIDS = {
+  france: [46.2276, 2.2137],
+  germany: [51.1657, 10.4515],
+  netherlands: [52.1326, 5.2913],
+  belgium: [50.5039, 4.4699],
+  spain: [40.4637, -3.7492],
+  italy: [41.8719, 12.5674],
+  sweden: [60.1282, 18.6435],
+  poland: [51.9194, 19.1451],
+  bulgaria: [42.7339, 25.4858],
+  romania: [45.9432, 24.9668],
+  greece: [39.0742, 21.8243],
+  portugal: [39.3999, -8.2245],
+  ireland: [53.1424, -7.6921],
+  switzerland: [46.8182, 8.2275],
+  austria: [47.5162, 14.5501],
+  ukraine: [48.3794, 31.1656],
+  turkey: [38.9637, 35.2433],
+  "united kingdom": [55.3781, -3.436],
+  england: [52.3555, -1.1743],
+  scotland: [56.4907, -4.2026],
+  wales: [52.1307, -3.7837],
+  "new zealand": [-41.5, 172.8],
+  australia: [-25.2744, 133.7751],
+  canada: [56.1304, -106.3468],
+  "united states": [39.8283, -98.5795],
+  usa: [39.8283, -98.5795],
+  brazil: [-14.235, -51.9253],
+  india: [20.5937, 78.9629],
+  japan: [36.2048, 138.2529],
+};
+
+const CITY_CENTROIDS = {
+  auckland: [-36.8485, 174.7633],
+  wellington: [-41.2865, 174.7762],
+  christchurch: [-43.5321, 172.6362],
+  hamilton: [-37.787, 175.2793],
+  tauranga: [-37.6878, 176.1651],
+  dunedin: [-45.8788, 170.5028],
+  queenstown: [-45.0312, 168.6626],
+  whangarei: [-35.7251, 174.3237],
+  taupo: [-38.6869, 176.0702],
+  "raumati beach": [-40.9398, 174.9768],
+  lyon: [45.764, 4.8357],
+  paris: [48.8566, 2.3522],
+  london: [51.5072, -0.1276],
+  amsterdam: [52.3676, 4.9041],
+  brussels: [50.8503, 4.3517],
+  sofia: [42.6977, 23.3219],
+  warsaw: [52.2297, 21.0122],
+  stockholm: [59.3293, 18.0686],
+  berlin: [52.52, 13.405],
+  madrid: [40.4168, -3.7038],
+  rome: [41.9028, 12.4964],
+  vienna: [48.2082, 16.3738],
+  dublin: [53.3498, -6.2603],
+  sydney: [-33.8688, 151.2093],
+  melbourne: [-37.8136, 144.9631],
+  tokyo: [35.6762, 139.6503],
+};
+
 // ─── AGENCY FEEDS ───────────────────────────────────────────────
 // Organized by: CISA | FBI | INTERPOL | EUROPOL | NCSC | POLICE (region) | PUBLIC SAFETY
 // Only confirmed-working feeds are included.
@@ -577,11 +638,39 @@ function inferUSStateCoords(text) {
   return null;
 }
 
+function inferCityCoords(text) {
+  const haystack = ` ${String(text ?? "").toLowerCase().replace(/\./g, " ")} `;
+  const entries = Object.entries(CITY_CENTROIDS).sort((a, b) => b[0].length - a[0].length);
+  for (const [name, [lat, lng]] of entries) {
+    const pattern = new RegExp(`\\b${escapeRegex(name).replace(/\s+/g, "\\s+")}\\b`, "i");
+    if (pattern.test(haystack)) return { lat, lng };
+  }
+  return null;
+}
+
+function inferCountryCoords(text) {
+  const haystack = ` ${String(text ?? "").toLowerCase()} `;
+  const entries = Object.entries(COUNTRY_CENTROIDS).sort((a, b) => b[0].length - a[0].length);
+  for (const [name, [lat, lng]] of entries) {
+    const pattern = new RegExp(`\\b${escapeRegex(name).replace(/\s+/g, "\\s+")}\\b`, "i");
+    if (pattern.test(haystack)) return { lat, lng };
+  }
+  return null;
+}
+
 function resolveCoords(meta, text, seed) {
   const inferredUS =
     meta.source.country_code === "US" ? inferUSStateCoords(text) : null;
   if (inferredUS) {
     return jitterCoords(inferredUS.lat, inferredUS.lng, seed, 10, 35);
+  }
+  const inferredCity = inferCityCoords(text);
+  if (inferredCity) {
+    return jitterCoords(inferredCity.lat, inferredCity.lng, seed, 5, 24);
+  }
+  const inferredCountry = inferCountryCoords(text);
+  if (inferredCountry) {
+    return jitterCoords(inferredCountry.lat, inferredCountry.lng, seed, 12, 52);
   }
   return jitterCoords(meta.lat, meta.lng, seed);
 }
