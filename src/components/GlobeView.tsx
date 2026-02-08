@@ -8,8 +8,9 @@ const WORLD_TOPO_URL =
   "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 const US_STATES_GEOJSON_URL =
   "https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json";
-const AUTO_ROTATE_SPEED = 0.0003;
-const AUTO_ROTATE_EASE = 2.8;
+const AUTO_ROTATE_SPEED = (Math.PI * 2) / 3600; // ~1 full rotation per hour
+const AUTO_RESUME_EASE = 1.6;
+const MOMENTUM_FRICTION = 2.6;
 const ZOOM_MIN = 1.03;
 const ZOOM_MAX = 4.6;
 const ZOOM_STEP = 0.06;
@@ -20,6 +21,7 @@ const DRAG_SENSITIVITY_MAX = 0.005;
 const HOTSPOT_RADIUS_KM = 260;
 const HOTSPOT_MIN_ALERTS = 2;
 const HOTSPOT_PIXEL_RADIUS = 22;
+const CLICK_DRAG_THRESHOLD_PX = 4;
 
 interface Props {
   alerts: Alert[];
@@ -282,13 +284,23 @@ export function GlobeView({
   const oceanRef = useRef<THREE.Mesh | null>(null);
   const pointMeshesRef = useRef<Map<string, THREE.Mesh>>(new Map());
   const frameRef = useRef<number>(0);
-  const mouseRef = useRef({ isDown: false, prevX: 0, prevY: 0 });
+  const mouseRef = useRef({
+    isDown: false,
+    prevX: 0,
+    prevY: 0,
+    prevT: 0,
+    dragDistance: 0,
+    moved: false,
+  });
   const zoomRef = useRef({ current: 3.2, target: 3.2 });
   const rotationRef = useRef({
     autoRotate: true,
     x: INITIAL_TILT_X,
     y: 0,
-    currentSpeed: AUTO_ROTATE_SPEED,
+    velX: 0,
+    velY: 0,
+    interacting: false,
+    ambientBlend: 1,
   });
   const regionFilterRef = useRef(regionFilter);
   const selectedIdRef = useRef<string | null>(selectedId);
@@ -558,11 +570,17 @@ export function GlobeView({
       const delta = (now - last) / 1000;
       last = now;
       t += delta;
-      const targetSpeed = rotationRef.current.autoRotate ? AUTO_ROTATE_SPEED : 0;
-      const ease = Math.min(1, delta * AUTO_ROTATE_EASE);
-      rotationRef.current.currentSpeed +=
-        (targetSpeed - rotationRef.current.currentSpeed) * ease;
-      globeGroup.rotation.y += rotationRef.current.currentSpeed * delta;
+      if (!rotationRef.current.interacting) {
+        const damping = Math.exp(-MOMENTUM_FRICTION * delta);
+        rotationRef.current.velX *= damping;
+        rotationRef.current.velY *= damping;
+        rotationRef.current.ambientBlend +=
+          (1 - rotationRef.current.ambientBlend) * Math.min(1, delta * AUTO_RESUME_EASE);
+        const ambient = AUTO_ROTATE_SPEED * rotationRef.current.ambientBlend;
+        globeGroup.rotation.x += rotationRef.current.velX * delta;
+        globeGroup.rotation.y += (rotationRef.current.velY + ambient) * delta;
+      }
+      globeGroup.rotation.x = Math.max(-1.2, Math.min(1.2, globeGroup.rotation.x));
       const zoomEase = Math.min(1, delta * ZOOM_EASE);
       zoomRef.current.current +=
         (zoomRef.current.target - zoomRef.current.current) * zoomEase;
@@ -633,8 +651,16 @@ export function GlobeView({
 
     // --- Mouse drag to rotate ---
     const onDown = (e: MouseEvent) => {
-      mouseRef.current = { isDown: true, prevX: e.clientX, prevY: e.clientY };
-      rotationRef.current.autoRotate = false;
+      mouseRef.current = {
+        isDown: true,
+        prevX: e.clientX,
+        prevY: e.clientY,
+        prevT: performance.now(),
+        dragDistance: 0,
+        moved: false,
+      };
+      rotationRef.current.interacting = true;
+      rotationRef.current.ambientBlend = 0;
     };
     const onMove = (e: MouseEvent) => {
       if (!mouseRef.current.isDown) return;
@@ -645,18 +671,34 @@ export function GlobeView({
       const dragSensitivity =
         DRAG_SENSITIVITY_MIN +
         zoomNorm * (DRAG_SENSITIVITY_MAX - DRAG_SENSITIVITY_MIN);
-      globeGroup.rotation.y += (e.clientX - mouseRef.current.prevX) * dragSensitivity;
-      globeGroup.rotation.x += (e.clientY - mouseRef.current.prevY) * dragSensitivity;
+      const dx = e.clientX - mouseRef.current.prevX;
+      const dy = e.clientY - mouseRef.current.prevY;
+      const now = performance.now();
+      const dt = Math.max(0.001, (now - mouseRef.current.prevT) / 1000);
+      const rotY = dx * dragSensitivity;
+      const rotX = dy * dragSensitivity;
+      globeGroup.rotation.y += rotY;
+      globeGroup.rotation.x += rotX;
       globeGroup.rotation.x = Math.max(
         -1.2,
         Math.min(1.2, globeGroup.rotation.x)
       );
+      const step = Math.hypot(dx, dy);
+      mouseRef.current.dragDistance += step;
+      if (mouseRef.current.dragDistance > CLICK_DRAG_THRESHOLD_PX) {
+        mouseRef.current.moved = true;
+      }
+      const vY = rotY / dt;
+      const vX = rotX / dt;
+      rotationRef.current.velY = rotationRef.current.velY * 0.6 + vY * 0.4;
+      rotationRef.current.velX = rotationRef.current.velX * 0.6 + vX * 0.4;
       mouseRef.current.prevX = e.clientX;
       mouseRef.current.prevY = e.clientY;
+      mouseRef.current.prevT = now;
     };
     const onUp = () => {
       mouseRef.current.isDown = false;
-      rotationRef.current.autoRotate = true;
+      rotationRef.current.interacting = false;
     };
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
@@ -684,6 +726,10 @@ export function GlobeView({
     const raycaster = new THREE.Raycaster();
     const mv = new THREE.Vector2();
     const onClk = (e: MouseEvent) => {
+      if (mouseRef.current.moved) {
+        mouseRef.current.moved = false;
+        return;
+      }
       const rect = container.getBoundingClientRect();
       mv.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       mv.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
