@@ -8,7 +8,7 @@ import {
   categoryBadge,
   freshnessLabel,
 } from "@/lib/severity";
-import { Clock, Building2, ChevronDown, Globe } from "lucide-react";
+import { Clock, Building2, ChevronDown, ChevronRight, Globe } from "lucide-react";
 
 interface Props {
   alerts: Alert[];
@@ -28,6 +28,7 @@ export function AlertFeed({
   const [actionableOnly, setActionableOnly] = useState(true);
   const [categoryFilter, setCategoryFilter] = useState<AlertCategory | "all">("all");
   const [severityFilter, setSeverityFilter] = useState<Severity | "all">("all");
+  const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set());
   const [isRefreshingList, setIsRefreshingList] = useState(false);
   const [newAlertIds, setNewAlertIds] = useState<Set<string>>(new Set());
   const knownAlertIdsRef = useRef<Set<string>>(new Set());
@@ -190,6 +191,18 @@ export function AlertFeed({
     );
   };
 
+  const toggleSection = (key: string) => {
+    setCollapsedSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+  };
+
   return (
     <div className="flex flex-col h-full">
       <div className="px-3 py-3 border-b border-siem-border bg-siem-panel/95 space-y-2.5">
@@ -285,34 +298,60 @@ export function AlertFeed({
             key={group.category}
             className="rounded-lg border border-siem-border bg-siem-panel/35 overflow-hidden"
           >
-            <div className="flex items-center justify-between px-3 py-2 border-b border-siem-border bg-siem-panel/70">
+            <button
+              type="button"
+              onClick={() => toggleSection(group.category)}
+              className="w-full flex items-center justify-between px-3 py-2 border-b border-siem-border bg-siem-panel/70 hover:bg-siem-accent/10 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                {collapsedSections.has(group.category) ? (
+                  <ChevronRight size={12} className="text-siem-muted" />
+                ) : (
+                  <ChevronDown size={12} className="text-siem-muted" />
+                )}
               <span
                 className={`inline-flex items-center px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded border ${categoryBadge[group.category]}`}
               >
                 {categoryLabels[group.category]}
               </span>
+              </div>
               <span className="text-[10px] text-siem-muted font-mono uppercase tracking-wide">
                 {group.alerts.length}
               </span>
-            </div>
-            <div className="p-2 space-y-2">
-              {group.alerts.map((alert, idx) => renderAlertCard(alert, "Stack", idx))}
-            </div>
+            </button>
+            {!collapsedSections.has(group.category) && (
+              <div className="p-2 space-y-2">
+                {group.alerts.map((alert, idx) => renderAlertCard(alert, "Stack", idx))}
+              </div>
+            )}
           </section>
         ))}
         {infoAlerts.length > 0 && (
           <section className="rounded-lg border border-siem-border bg-siem-panel/35 overflow-hidden">
-            <div className="flex items-center justify-between px-3 py-2 border-b border-siem-border bg-siem-panel/70">
-              <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded border bg-cyan-500/15 text-cyan-300 border-cyan-500/30">
-                Informational / Traffic
-              </span>
+            <button
+              type="button"
+              onClick={() => toggleSection("informational")}
+              className="w-full flex items-center justify-between px-3 py-2 border-b border-siem-border bg-siem-panel/70 hover:bg-siem-accent/10 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                {collapsedSections.has("informational") ? (
+                  <ChevronRight size={12} className="text-siem-muted" />
+                ) : (
+                  <ChevronDown size={12} className="text-siem-muted" />
+                )}
+                <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded border bg-cyan-500/15 text-cyan-300 border-cyan-500/30">
+                  Informational / Traffic
+                </span>
+              </div>
               <span className="text-[10px] text-siem-muted font-mono uppercase tracking-wide">
                 {infoAlerts.length}
               </span>
-            </div>
-            <div className="p-2 space-y-2">
-              {infoAlerts.map((alert, idx) => renderAlertCard(alert, "Stack", idx))}
-            </div>
+            </button>
+            {!collapsedSections.has("informational") && (
+              <div className="p-2 space-y-2">
+                {infoAlerts.map((alert, idx) => renderAlertCard(alert, "Stack", idx))}
+              </div>
+            )}
           </section>
         )}
         {facetFiltered.length === 0 && (
