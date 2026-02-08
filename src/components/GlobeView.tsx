@@ -669,8 +669,14 @@ export function GlobeView({
       const normalized = e.deltaY * deltaScale;
       if (normalized === 0) return;
       const dir = normalized > 0 ? 1 : -1;
-      const intensity = Math.max(0.25, Math.min(1.2, Math.abs(normalized) / 140));
-      adjustZoom(dir * ZOOM_STEP * intensity);
+      const baseIntensity = Math.max(0.25, Math.min(1.2, Math.abs(normalized) / 140));
+      const zoomNorm = Math.max(
+        0,
+        Math.min(1, (zoomRef.current.current - ZOOM_MIN) / (ZOOM_MAX - ZOOM_MIN))
+      );
+      // Zoom sensitivity: high when zoomed out, fine-grained when zoomed in.
+      const zoomSensitivity = 0.35 + zoomNorm * 1.35;
+      adjustZoom(dir * ZOOM_STEP * baseIntensity * zoomSensitivity);
     };
 
     // --- Click raycasting ---
