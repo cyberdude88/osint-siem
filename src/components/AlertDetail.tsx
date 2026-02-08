@@ -23,16 +23,7 @@ interface Props {
 }
 
 export function AlertDetail({ alert, onClose }: Props) {
-  if (!alert) {
-    return (
-      <div className="flex items-center justify-center h-full text-siem-muted text-sm">
-        <div className="text-center">
-          <Shield size={32} className="mx-auto mb-2 opacity-30" />
-          <p>Select an alert to view details</p>
-        </div>
-      </div>
-    );
-  }
+  if (!alert) return null;
 
   const fresh = freshnessConfidence(alert.freshness_hours);
 

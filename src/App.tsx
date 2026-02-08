@@ -25,8 +25,8 @@ export default function App() {
       <Header />
       <StatsBar alerts={alerts} />
 
-      {/* Main Content: 3-column layout */}
-      <div className="flex flex-1 min-h-0">
+      {/* Main Content */}
+      <div className="flex flex-1 min-h-0 relative">
         {/* Left Panel: Alert Feed */}
         <div className="w-[340px] min-w-[300px] border-r border-siem-border bg-siem-panel flex flex-col">
           {isLoading ? (
@@ -42,7 +42,7 @@ export default function App() {
           )}
         </div>
 
-        {/* Center: Globe */}
+        {/* Center: Globe (full remaining width) */}
         <div className="flex-1 relative bg-siem-bg">
           <GlobeView
             alerts={alerts}
@@ -51,13 +51,22 @@ export default function App() {
           />
         </div>
 
-        {/* Right Panel: Alert Detail */}
-        <div className="w-[360px] min-w-[320px] border-l border-siem-border bg-siem-panel flex flex-col">
-          <AlertDetail
-            alert={selectedAlert}
-            onClose={() => setSelectedId(null)}
-          />
-        </div>
+        {/* Right Panel: Slide-out Alert Detail */}
+        {selectedAlert && (
+          <div className="absolute top-0 right-0 h-full z-20 flex">
+            {/* Backdrop click to close */}
+            <div
+              className="w-8 cursor-pointer bg-gradient-to-r from-transparent to-black/30"
+              onClick={() => setSelectedId(null)}
+            />
+            <div className="w-[380px] bg-siem-panel border-l border-siem-border flex flex-col shadow-2xl shadow-black/50 animate-slide-in">
+              <AlertDetail
+                alert={selectedAlert}
+                onClose={() => setSelectedId(null)}
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Bottom Status Bar */}

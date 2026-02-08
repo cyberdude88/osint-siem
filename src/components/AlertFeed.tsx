@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react";
 import type { Alert } from "@/types/alert";
 import {
   severityBg,
@@ -7,7 +8,7 @@ import {
   categoryBadge,
   freshnessLabel,
 } from "@/lib/severity";
-import { ExternalLink, Clock, Building2 } from "lucide-react";
+import { Clock, Building2, ChevronDown, Globe } from "lucide-react";
 
 interface Props {
   alerts: Alert[];
@@ -16,7 +17,22 @@ interface Props {
 }
 
 export function AlertFeed({ alerts, selectedId, onSelect }: Props) {
-  const sorted = [...alerts].sort((a, b) => {
+  const [regionFilter, setRegionFilter] = useState<string>("all");
+
+  const regions = useMemo(() => {
+    const set = new Map<string, number>();
+    alerts.forEach((a) => {
+      const r = a.source.region;
+      set.set(r, (set.get(r) ?? 0) + 1);
+    });
+    return [...set.entries()].sort((a, b) => b[1] - a[1]);
+  }, [alerts]);
+
+  const filtered = regionFilter === "all"
+    ? alerts
+    : alerts.filter((a) => a.source.region === regionFilter);
+
+  const sorted = [...filtered].sort((a, b) => {
     const sev = ["critical", "high", "medium", "low", "info"];
     const diff = sev.indexOf(a.severity) - sev.indexOf(b.severity);
     if (diff !== 0) return diff;
@@ -32,13 +48,32 @@ export function AlertFeed({ alerts, selectedId, onSelect }: Props) {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="px-4 py-3 border-b border-siem-border">
-        <h2 className="text-sm font-bold uppercase tracking-wider text-siem-muted">
-          Alert Feed
-        </h2>
-        <p className="text-xs text-siem-muted mt-0.5">
-          {alerts.length} authority bulletins
-        </p>
+      <div className="px-4 py-3 border-b border-siem-border space-y-2">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-siem-muted">
+            Alert Feed
+          </h2>
+          <span className="text-[10px] text-siem-muted font-mono">
+            {filtered.length}/{alerts.length}
+          </span>
+        </div>
+        {/* Region Filter Dropdown */}
+        <div className="relative">
+          <Globe size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-siem-muted pointer-events-none" />
+          <select
+            value={regionFilter}
+            onChange={(e) => setRegionFilter(e.target.value)}
+            className="w-full appearance-none bg-white/5 border border-siem-border rounded-md pl-7 pr-8 py-1.5 text-xs text-siem-text cursor-pointer hover:bg-white/10 transition-colors focus:outline-none focus:ring-1 focus:ring-siem-accent"
+          >
+            <option value="all">All Regions ({alerts.length})</option>
+            {regions.map(([region, count]) => (
+              <option key={region} value={region}>
+                {region} ({count})
+              </option>
+            ))}
+          </select>
+          <ChevronDown size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-siem-muted pointer-events-none" />
+        </div>
       </div>
       <div className="flex-1 overflow-y-auto">
         {grouped.map((group) => (
@@ -72,17 +107,18 @@ export function AlertFeed({ alerts, selectedId, onSelect }: Props) {
               <p className="text-sm text-siem-text leading-snug line-clamp-2 mb-1.5">
                 {alert.title}
               </p>
-                  <div className="flex items-center gap-3 text-[11px] text-siem-muted">
+                  <div className="flex items-center gap-2 text-[11px] text-siem-muted flex-wrap">
                     <span className="flex items-center gap-1">
                       <Building2 size={10} />
                       {alert.source.authority_name}
                     </span>
                     <span className="flex items-center gap-1">
-                  <Clock size={10} />
-                  {freshnessLabel(alert.freshness_hours)}
-                </span>
-                    <span className="px-1.5 py-0.5 bg-white/5 rounded text-[10px]">
-                      {categoryLabels[alert.category]}
+                      <Clock size={10} />
+                      {freshnessLabel(alert.freshness_hours)}
+                    </span>
+                    <span className="flex items-center gap-1 px-1.5 py-0.5 bg-siem-accent/10 rounded text-[10px] text-siem-accent">
+                      <Globe size={9} />
+                      {alert.source.region}
                     </span>
                   </div>
                 </button>

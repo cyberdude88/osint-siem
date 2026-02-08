@@ -42,3 +42,25 @@ body {
   background: var(--color-siem-border);
   border-radius: 3px;
 }
+
+/* Slide-in animation for detail panel */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in-right 0.25s ease-out;
+}
+
+/* Style the region dropdown options */
+select option {
+  background: #111827;
+  color: #e2e8f0;
+}
