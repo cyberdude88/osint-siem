@@ -9,6 +9,7 @@ import { useAlerts } from "@/hooks/useAlerts";
 export default function App() {
   const { alerts, isLive, isLoading, sourceCount } = useAlerts();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [regionFilter, setRegionFilter] = useState<string>("all");
   const panelRef = useRef<HTMLDivElement>(null);
   const selectedAlert = selectedId
     ? alerts.find((a) => a.alert_id === selectedId) ?? null
@@ -48,6 +49,8 @@ export default function App() {
               alerts={alerts}
               selectedId={selectedId}
               onSelect={setSelectedId}
+              regionFilter={regionFilter}
+              onRegionChange={setRegionFilter}
             />
           )}
         </div>
@@ -58,6 +61,8 @@ export default function App() {
             alerts={alerts}
             selectedId={selectedId}
             onSelect={setSelectedId}
+            regionFilter={regionFilter}
+            onRegionChange={setRegionFilter}
           />
         </div>
 

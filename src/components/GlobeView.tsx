@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import * as topojson from "topojson-client";
 import type { Alert } from "@/types/alert";
@@ -11,6 +11,8 @@ interface Props {
   alerts: Alert[];
   selectedId: string | null;
   onSelect: (id: string) => void;
+  regionFilter: string;
+  onRegionChange: (region: string) => void;
 }
 
 function latLngToVector3(
@@ -66,7 +68,21 @@ function drawGeoJson(
   }
 }
 
-export function GlobeView({ alerts, selectedId, onSelect }: Props) {
+export function GlobeView({
+  alerts,
+  selectedId,
+  onSelect,
+  regionFilter,
+  onRegionChange,
+}: Props) {
+  const regions = useMemo(() => {
+    const counts = new Map<string, number>();
+    alerts.forEach((a) => {
+      const r = a.source.region;
+      counts.set(r, (counts.get(r) ?? 0) + 1);
+    });
+    return [...counts.entries()].sort((a, b) => b[1] - a[1]);
+  }, [alerts]);
   const containerRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const globeGroupRef = useRef<THREE.Group | null>(null);
@@ -74,6 +90,11 @@ export function GlobeView({ alerts, selectedId, onSelect }: Props) {
   const frameRef = useRef<number>(0);
   const mouseRef = useRef({ isDown: false, prevX: 0, prevY: 0 });
   const rotationRef = useRef({ autoRotate: true, x: 0.35, y: 0 });
+  const regionFilterRef = useRef(regionFilter);
+
+  useEffect(() => {
+    regionFilterRef.current = regionFilter;
+  }, [regionFilter]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -219,10 +240,10 @@ export function GlobeView({ alerts, selectedId, onSelect }: Props) {
 
       // Core dot
       const dotGeo = new THREE.SphereGeometry(size, 16, 16);
-      const dotMat = new THREE.MeshBasicMaterial({ color });
+      const dotMat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 1 });
       const dotMesh = new THREE.Mesh(dotGeo, dotMat);
       dotMesh.position.copy(pos);
-      dotMesh.userData = { alertId: alert.alert_id };
+      dotMesh.userData = { alertId: alert.alert_id, region: alert.source.region };
       globeGroup.add(dotMesh);
       pointMeshes.set(alert.alert_id, dotMesh);
       allDotMeshes.push({ mesh: dotMesh, baseSize: 1, severity: alert.severity });
@@ -236,14 +257,14 @@ export function GlobeView({ alerts, selectedId, onSelect }: Props) {
       });
       const gm = new THREE.Mesh(glowG, glowM);
       gm.position.copy(pos);
-      gm.userData = { phase: idx * 0.8 };
+      gm.userData = { phase: idx * 0.8, region: alert.source.region };
       globeGroup.add(gm);
       glowMeshes.push(gm);
     });
     pointMeshesRef.current = pointMeshes;
 
     // --- Pulse rings for ALL alerts (bigger + faster for critical/high) ---
-    const ringMeshes: { mesh: THREE.Mesh; speed: number; maxScale: number }[] = [];
+    const ringMeshes: { mesh: THREE.Mesh; speed: number; maxScale: number; region: string }[] = [];
     alerts.forEach((alert, idx) => {
       const pos = latLngToVector3(alert.lat, alert.lng, 1.025);
       const isCritHigh = alert.severity === "critical" || alert.severity === "high";
@@ -265,6 +286,7 @@ export function GlobeView({ alerts, selectedId, onSelect }: Props) {
         mesh: rMesh,
         speed: isCritHigh ? 3.0 : 1.8,
         maxScale: isCritHigh ? 2.5 : 1.8,
+        region: alert.source.region,
       });
     });
 
@@ -287,13 +309,17 @@ export function GlobeView({ alerts, selectedId, onSelect }: Props) {
       rotationRef.current.x = globeGroup.rotation.x;
       rotationRef.current.y = globeGroup.rotation.y;
 
+      const activeRegion = regionFilterRef.current;
+
       // Breathing glow halos
       glowMeshes.forEach((gm) => {
         const phase = (gm.userData as { phase: number }).phase;
         const breath = 1 + Math.sin(t * 1.5 + phase) * 0.35;
         gm.scale.set(breath, breath, breath);
-        (gm.material as THREE.MeshBasicMaterial).opacity =
-          0.12 + Math.sin(t * 1.5 + phase) * 0.08;
+        const base = 0.12 + Math.sin(t * 1.5 + phase) * 0.08;
+        const region = (gm.userData as { region?: string }).region;
+        const dim = activeRegion === "all" || !region || region === activeRegion ? 1 : 0.15;
+        (gm.material as THREE.MeshBasicMaterial).opacity = base * dim;
       });
 
       // Dot breathing (subtle scale pulse)
@@ -304,17 +330,21 @@ export function GlobeView({ alerts, selectedId, onSelect }: Props) {
             : entry.severity === "high"
             ? 1 + Math.sin(t * 2.2 + i * 1.1) * 0.2
             : 1 + Math.sin(t * 1.4 + i * 1.3) * 0.12;
+        const region = (entry.mesh.userData as { region?: string }).region;
+        const dim = activeRegion === "all" || !region || region === activeRegion ? 1 : 0.15;
         entry.mesh.scale.set(pulse, pulse, pulse);
+        (entry.mesh.material as THREE.MeshBasicMaterial).opacity = dim;
       });
 
       // Expanding ring waves
-      ringMeshes.forEach(({ mesh, speed, maxScale }) => {
+      ringMeshes.forEach(({ mesh, speed, maxScale, region }) => {
         const phase = (mesh.userData as { phase: number }).phase;
         const cycle = ((t * speed + phase) % (Math.PI * 2)) / (Math.PI * 2);
         const s = 1 + cycle * (maxScale - 1);
         mesh.scale.set(s, s, 1);
+        const dim = activeRegion === "all" || region === activeRegion ? 1 : 0.1;
         (mesh.material as THREE.MeshBasicMaterial).opacity =
-          0.7 * Math.max(0, 1 - cycle);
+          0.7 * Math.max(0, 1 - cycle) * dim;
       });
 
       renderer.render(scene, camera);
@@ -431,6 +461,31 @@ export function GlobeView({ alerts, selectedId, onSelect }: Props) {
       </div>
       <div className="absolute top-4 left-1/2 -translate-x-1/2 text-[10px] text-siem-muted/50 uppercase tracking-widest pointer-events-none">
         Drag to rotate &middot; Click alert points
+      </div>
+      <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-siem-panel/80 backdrop-blur-sm px-2.5 py-2 rounded-lg border border-siem-border">
+        <button
+          onClick={() => onRegionChange("all")}
+          className={`px-2 py-1 text-[10px] uppercase tracking-wider rounded border ${
+            regionFilter === "all"
+              ? "bg-siem-accent/20 text-siem-accent border-siem-accent/40"
+              : "bg-white/5 text-siem-muted border-siem-border"
+          }`}
+        >
+          All
+        </button>
+        {regions.map(([region]) => (
+          <button
+            key={region}
+            onClick={() => onRegionChange(region)}
+            className={`px-2 py-1 text-[10px] uppercase tracking-wider rounded border ${
+              regionFilter === region
+                ? "bg-siem-accent/20 text-siem-accent border-siem-accent/40"
+                : "bg-white/5 text-siem-muted border-siem-border"
+            }`}
+          >
+            {region}
+          </button>
+        ))}
       </div>
     </div>
   );
