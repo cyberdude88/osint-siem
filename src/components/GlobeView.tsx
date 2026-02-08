@@ -10,7 +10,7 @@ const US_STATES_GEOJSON_URL =
   "https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json";
 const AUTO_ROTATE_SPEED = 0.0003;
 const AUTO_ROTATE_EASE = 2.8;
-const ZOOM_MIN = 1.34;
+const ZOOM_MIN = 1.03;
 const ZOOM_MAX = 4.6;
 const ZOOM_STEP = 0.06;
 const ZOOM_EASE = 7.5;
@@ -267,7 +267,7 @@ export function GlobeView({
     const camera = new THREE.PerspectiveCamera(
       45,
       container.clientWidth / container.clientHeight,
-      0.1,
+      0.005,
       1000
     );
     camera.position.z = zoomRef.current.current;
