@@ -15,6 +15,8 @@ const ZOOM_MAX = 4.6;
 const ZOOM_STEP = 0.06;
 const ZOOM_EASE = 7.5;
 const INITIAL_TILT_X = 0.06;
+const DRAG_SENSITIVITY_MIN = 0.0016;
+const DRAG_SENSITIVITY_MAX = 0.005;
 
 interface Props {
   alerts: Alert[];
@@ -532,7 +534,8 @@ export function GlobeView({
         Math.min(1, (zoomLevel - ZOOM_MIN) / (ZOOM_MAX - ZOOM_MIN))
       );
       const dotScaleBase = 0.42 + zoomNorm * 0.68; // smaller when zoomed in
-      const glowScaleBase = 0.38 + zoomNorm * 0.62; // tighter glow when zoomed in
+      const glowScaleBase = 0.22 + Math.pow(zoomNorm, 1.4) * 0.78; // stronger shrink when zoomed in
+      const glowOpacityScale = 0.35 + zoomNorm * 0.65;
 
       // Keep surface glows static so they read as city lights, not VFX
       glowMeshes.forEach((gm) => {
@@ -547,7 +550,7 @@ export function GlobeView({
         const base = 0.13;
         const region = (gm.userData as { region?: string }).region;
         const dim = activeRegion === "all" || !region || region === activeRegion ? 1 : 0.15;
-        (gm.material as THREE.MeshBasicMaterial).opacity = base * dim;
+        (gm.material as THREE.MeshBasicMaterial).opacity = base * dim * glowOpacityScale;
       });
 
       // Keep dots stable (no visible pulsing)
@@ -590,8 +593,15 @@ export function GlobeView({
     };
     const onMove = (e: MouseEvent) => {
       if (!mouseRef.current.isDown) return;
-      globeGroup.rotation.y += (e.clientX - mouseRef.current.prevX) * 0.005;
-      globeGroup.rotation.x += (e.clientY - mouseRef.current.prevY) * 0.005;
+      const zoomNorm = Math.max(
+        0,
+        Math.min(1, (zoomRef.current.current - ZOOM_MIN) / (ZOOM_MAX - ZOOM_MIN))
+      );
+      const dragSensitivity =
+        DRAG_SENSITIVITY_MIN +
+        zoomNorm * (DRAG_SENSITIVITY_MAX - DRAG_SENSITIVITY_MIN);
+      globeGroup.rotation.y += (e.clientX - mouseRef.current.prevX) * dragSensitivity;
+      globeGroup.rotation.x += (e.clientY - mouseRef.current.prevY) * dragSensitivity;
       globeGroup.rotation.x = Math.max(
         -1.2,
         Math.min(1.2, globeGroup.rotation.x)
