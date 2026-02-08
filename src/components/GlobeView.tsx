@@ -261,10 +261,10 @@ export function GlobeView({
       const pos = latLngToVector3(alert.lat, alert.lng, 1.02);
       const size =
         alert.severity === "critical"
-          ? 0.032
+          ? 0.018
           : alert.severity === "high"
-          ? 0.026
-          : 0.018;
+          ? 0.014
+          : 0.011;
       const color = new THREE.Color(severityColors[alert.severity]);
 
       // Core dot
@@ -278,11 +278,11 @@ export function GlobeView({
       allDotMeshes.push({ mesh: dotMesh, baseSize: 1, severity: alert.severity });
 
       // Outer glow halo (breathes)
-      const glowG = new THREE.SphereGeometry(size * 4, 16, 16);
+      const glowG = new THREE.SphereGeometry(size * 7, 20, 20);
       const glowM = new THREE.MeshBasicMaterial({
         color,
         transparent: true,
-        opacity: 0.18,
+        opacity: 0.12,
       });
       const gm = new THREE.Mesh(glowG, glowM);
       gm.position.copy(pos);
@@ -297,8 +297,8 @@ export function GlobeView({
     alerts.forEach((alert, idx) => {
       const pos = latLngToVector3(alert.lat, alert.lng, 1.025);
       const isCritHigh = alert.severity === "critical" || alert.severity === "high";
-      const innerR = isCritHigh ? 0.02 : 0.012;
-      const outerR = isCritHigh ? 0.055 : 0.035;
+      const innerR = isCritHigh ? 0.012 : 0.008;
+      const outerR = isCritHigh ? 0.03 : 0.022;
       const rGeo = new THREE.RingGeometry(innerR, outerR, 32);
       const rMat = new THREE.MeshBasicMaterial({
         color: new THREE.Color(severityColors[alert.severity]),
@@ -343,9 +343,9 @@ export function GlobeView({
       // Breathing glow halos
       glowMeshes.forEach((gm) => {
         const phase = (gm.userData as { phase: number }).phase;
-        const breath = 1 + Math.sin(t * 1.5 + phase) * 0.35;
+        const breath = 1 + Math.sin(t * 1.5 + phase) * 0.45;
         gm.scale.set(breath, breath, breath);
-        const base = 0.12 + Math.sin(t * 1.5 + phase) * 0.08;
+        const base = 0.08 + Math.sin(t * 1.5 + phase) * 0.05;
         const region = (gm.userData as { region?: string }).region;
         const dim = activeRegion === "all" || !region || region === activeRegion ? 1 : 0.15;
         (gm.material as THREE.MeshBasicMaterial).opacity = base * dim;
