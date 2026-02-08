@@ -4,6 +4,7 @@ import crypto from "node:crypto";
 
 const MAX_PER_SOURCE = Number.parseInt(process.env.MAX_PER_SOURCE ?? "6", 10);
 const OUTPUT_PATH = process.env.OUTPUT_PATH ?? "public/alerts.json";
+const MAX_AGE_DAYS = Number.parseInt(process.env.MAX_AGE_DAYS ?? "90", 10);
 const WATCH =
   process.argv.includes("--watch") || process.env.WATCH === "1";
 const INTERVAL_MS = Number.parseInt(process.env.INTERVAL_MS ?? "900000", 10);
@@ -306,6 +307,11 @@ function parseDate(value) {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
+function isFresh(date, now) {
+  const cutoff = now.getTime() - MAX_AGE_DAYS * 86400000;
+  return date.getTime() >= cutoff;
+}
+
 function hashId(value) {
   return crypto.createHash("sha1").update(value).digest("hex").slice(0, 12);
 }
@@ -314,8 +320,11 @@ function kevItemToAlert(entry, meta) {
   const cve = entry.cveID ?? entry.cveId ?? entry.cve;
   const title = `${cve ?? "CVE"}: ${entry.vulnerabilityName ?? "Known Exploited Vulnerability"}`;
   const nvdLink = cve ? `https://nvd.nist.gov/vuln/detail/${cve}` : meta.source.base_url;
-  const publishedAt = parseDate(entry.dateAdded) ?? new Date();
   const now = new Date();
+  const publishedAt = parseDate(entry.dateAdded);
+  if (!publishedAt || !isFresh(publishedAt, now)) {
+    return null;
+  }
   const hours = Math.max(1, Math.round((now - publishedAt) / 36e5));
   return {
     alert_id: `${meta.source.source_id}-${hashId(nvdLink)}`,
@@ -356,7 +365,10 @@ async function fetchRss(meta, now) {
     .slice(0, MAX_PER_SOURCE);
 
   return items.map((item) => {
-    const publishedAt = parseDate(item.published) ?? now;
+    const publishedAt = parseDate(item.published);
+    if (!publishedAt || !isFresh(publishedAt, now)) {
+      return null;
+    }
     const hours = Math.max(1, Math.round((now - publishedAt) / 36e5));
     return {
       alert_id: `${meta.source.source_id}-${hashId(item.link)}`,
@@ -375,7 +387,7 @@ async function fetchRss(meta, now) {
       freshness_hours: hours,
       reporting: meta.reporting,
     };
-  });
+  }).filter(Boolean);
 }
 
 async function fetchKev(meta) {
@@ -390,7 +402,10 @@ async function fetchKev(meta) {
   }
   const data = await response.json();
   const vulnerabilities = Array.isArray(data?.vulnerabilities) ? data.vulnerabilities : [];
-  return vulnerabilities.slice(-MAX_PER_SOURCE).map((entry) => kevItemToAlert(entry, meta));
+  return vulnerabilities
+    .slice(-MAX_PER_SOURCE)
+    .map((entry) => kevItemToAlert(entry, meta))
+    .filter(Boolean);
 }
 
 async function buildAlerts() {
