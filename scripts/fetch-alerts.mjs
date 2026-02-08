@@ -2,9 +2,9 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import crypto from "node:crypto";
 
-const MAX_PER_SOURCE = Number.parseInt(process.env.MAX_PER_SOURCE ?? "6", 10);
+const MAX_PER_SOURCE = Number.parseInt(process.env.MAX_PER_SOURCE ?? "20", 10);
 const OUTPUT_PATH = process.env.OUTPUT_PATH ?? "public/alerts.json";
-const MAX_AGE_DAYS = Number.parseInt(process.env.MAX_AGE_DAYS ?? "90", 10);
+const MAX_AGE_DAYS = Number.parseInt(process.env.MAX_AGE_DAYS ?? "180", 10);
 const WATCH =
   process.argv.includes("--watch") || process.env.WATCH === "1";
 const INTERVAL_MS = Number.parseInt(process.env.INTERVAL_MS ?? "900000", 10);
