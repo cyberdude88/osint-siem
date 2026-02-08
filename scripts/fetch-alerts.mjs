@@ -1048,7 +1048,12 @@ const sources = [
       authority_type: "cert",
       base_url: "https://www.cyber.gov.au",
     },
-    feed_url: "https://www.cyber.gov.au/about-us/advisories/rss.xml",
+    feed_url: "https://www.cyber.gov.au/advisories/feed",
+    feed_urls: [
+      "https://www.cyber.gov.au/advisories/feed",
+      "https://www.cyber.gov.au/about-us/advisories/rss.xml",
+      "https://www.cyber.gov.au/alerts/feed",
+    ],
     category: "cyber_advisory",
     region_tag: "AU",
     lat: -35.28,
@@ -1074,6 +1079,11 @@ const sources = [
       base_url: "https://www.afp.gov.au",
     },
     feed_url: "https://www.afp.gov.au/news-centre/media-releases/rss.xml",
+    feed_urls: [
+      "https://www.afp.gov.au/news-centre/media-releases/rss.xml",
+      "https://www.afp.gov.au/news-centre/media-release/rss.xml",
+      "https://www.afp.gov.au/news-centre/media-releases/feed",
+    ],
     category: "public_appeal",
     region_tag: "AU",
     lat: -35.31,
@@ -1082,6 +1092,66 @@ const sources = [
       label: "Report to AFP",
       url: "https://www.afp.gov.au/what-we-do/crime-types/report-crime",
       phone: "131 237",
+    },
+  },
+
+  // ── Queensland Police Service (Oceania) ────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "qps-au",
+      authority_name: "Queensland Police",
+      country: "Australia",
+      country_code: "AU",
+      region: "Oceania",
+      authority_type: "police",
+      base_url: "https://mypolice.qld.gov.au",
+    },
+    feed_url: "https://mypolice.qld.gov.au/feed/",
+    feed_urls: [
+      "https://mypolice.qld.gov.au/feed/",
+      "https://mypolice.qld.gov.au/category/alert/feed/",
+      "https://mypolice.qld.gov.au/category/my-police-news/feed/",
+    ],
+    category: "public_appeal",
+    region_tag: "AU",
+    lat: -27.47,
+    lng: 153.03,
+    reporting: {
+      label: "Report to Queensland Police",
+      url: "https://www.police.qld.gov.au/policelink-reporting",
+      phone: "000 (Emergency) / 131 444 (Policelink)",
+    },
+  },
+
+  // ── New South Wales Police (Oceania) ───────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "nsw-police-au",
+      authority_name: "NSW Police",
+      country: "Australia",
+      country_code: "AU",
+      region: "Oceania",
+      authority_type: "police",
+      base_url: "https://www.police.nsw.gov.au",
+    },
+    feed_url: "https://www.police.nsw.gov.au/news/rss",
+    feed_urls: [
+      "https://www.police.nsw.gov.au/news/rss",
+      "https://www.police.nsw.gov.au/rss/news",
+      "https://www.police.nsw.gov.au/news/feed",
+    ],
+    category: "public_appeal",
+    region_tag: "AU",
+    lat: -33.87,
+    lng: 151.21,
+    reporting: {
+      label: "Report to NSW Police",
+      url: "https://portal.police.nsw.gov.au/s/online-services",
+      phone: "000 (Emergency) / 131 444 (Police Assistance Line)",
     },
   },
 
@@ -1201,6 +1271,11 @@ const sources = [
       base_url: "https://www.csa.gov.sg",
     },
     feed_url: "https://www.csa.gov.sg/singcert/Alerts/rss",
+    feed_urls: [
+      "https://www.csa.gov.sg/singcert/Alerts/rss",
+      "https://www.csa.gov.sg/alerts-and-advisories/alerts/rss",
+      "https://www.csa.gov.sg/alerts-and-advisories/advisories/rss",
+    ],
     category: "cyber_advisory",
     region_tag: "SG",
     lat: 1.29,
@@ -1210,6 +1285,36 @@ const sources = [
       url: "https://www.csa.gov.sg/singcert/reporting",
       email: "singcert@csa.gov.sg",
       phone: "+65 6323 5052",
+    },
+  },
+
+  // ── Singapore Police Force (Asia) ───────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "spf-sg",
+      authority_name: "Singapore Police",
+      country: "Singapore",
+      country_code: "SG",
+      region: "Asia",
+      authority_type: "police",
+      base_url: "https://www.police.gov.sg",
+    },
+    feed_url: "https://www.police.gov.sg/media-room/news/feed",
+    feed_urls: [
+      "https://www.police.gov.sg/media-room/news/feed",
+      "https://www.police.gov.sg/rss",
+      "https://www.police.gov.sg/media-room/news/rss.xml",
+    ],
+    category: "public_appeal",
+    region_tag: "SG",
+    lat: 1.31,
+    lng: 103.84,
+    reporting: {
+      label: "Report to Singapore Police",
+      url: "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
+      phone: "999 (Emergency) / 1800-255-0000 (Police Hotline)",
     },
   },
 
@@ -1679,6 +1784,11 @@ const sources = [
       base_url: "https://www.pnp.gov.ph",
     },
     feed_url: "https://www.pnp.gov.ph/rss",
+    feed_urls: [
+      "https://www.pnp.gov.ph/rss",
+      "https://www.pnp.gov.ph/feed/",
+      "https://www.pnp.gov.ph/category/press-release/feed/",
+    ],
     category: "public_appeal",
     region_tag: "PH",
     lat: 14.60,
@@ -1704,6 +1814,11 @@ const sources = [
       base_url: "https://www.pdrm.gov.my",
     },
     feed_url: "https://www.pdrm.gov.my/rss",
+    feed_urls: [
+      "https://www.pdrm.gov.my/rss",
+      "https://www.rmp.gov.my/rss",
+      "https://www.rmp.gov.my/feed/",
+    ],
     category: "public_appeal",
     region_tag: "MY",
     lat: 3.14,
@@ -1882,6 +1997,10 @@ const sources = [
       base_url: "https://www.thaicert.or.th",
     },
     feed_url: "https://www.thaicert.or.th/RSS/feed-en.xml",
+    feed_urls: [
+      "https://www.thaicert.or.th/RSS/feed-en.xml",
+      "https://www.thaicert.or.th/feed/",
+    ],
     category: "cyber_advisory",
     region_tag: "TH",
     lat: 13.76,
@@ -1907,6 +2026,10 @@ const sources = [
       base_url: "https://www.mycert.org.my",
     },
     feed_url: "https://www.mycert.org.my/portal/rss",
+    feed_urls: [
+      "https://www.mycert.org.my/portal/rss",
+      "https://www.mycert.org.my/feed",
+    ],
     category: "cyber_advisory",
     region_tag: "MY",
     lat: 3.15,
@@ -1915,6 +2038,35 @@ const sources = [
       label: "Report to MyCERT",
       url: "https://www.mycert.org.my/portal/report-incident",
       email: "mycert@cybersecurity.my",
+    },
+  },
+
+  // ── BSSN Indonesia (Asia) ──────────────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "bssn-id",
+      authority_name: "BSSN Indonesia",
+      country: "Indonesia",
+      country_code: "ID",
+      region: "Asia",
+      authority_type: "cert",
+      base_url: "https://bssn.go.id",
+    },
+    feed_url: "https://bssn.go.id/feed/",
+    feed_urls: [
+      "https://bssn.go.id/feed/",
+      "https://bssn.go.id/category/peringatan-keamanan/feed/",
+    ],
+    category: "cyber_advisory",
+    region_tag: "ID",
+    lat: -6.20,
+    lng: 106.82,
+    reporting: {
+      label: "Report to BSSN",
+      url: "https://bssn.go.id/",
+      notes: "Use official BSSN contact channels for incident reporting.",
     },
   },
 ];
@@ -2286,8 +2438,25 @@ async function fetchFeed(url, followRedirects = false) {
   }
 }
 
+async function fetchFeedWithFallback(urls, followRedirects = false) {
+  const candidates = Array.isArray(urls) ? urls.filter(Boolean) : [urls].filter(Boolean);
+  let lastError = null;
+  for (const url of candidates) {
+    try {
+      const xml = await fetchFeed(url, followRedirects);
+      return { xml, feedUrl: url };
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError ?? new Error("no feed URLs available");
+}
+
 async function fetchRss(meta, now) {
-  const xml = await fetchFeed(meta.feed_url, meta.followRedirects);
+  const { xml } = await fetchFeedWithFallback(
+    meta.feed_urls ?? [meta.feed_url],
+    meta.followRedirects
+  );
   let items = parseItems(xml)
     .filter((item) => item.title && item.link)
     .filter((item) => !isBlogContent(item))
