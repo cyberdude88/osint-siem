@@ -10,7 +10,7 @@ const WATCH =
 const INTERVAL_MS = Number.parseInt(process.env.INTERVAL_MS ?? "900000", 10);
 
 // ─── AGENCY FEEDS ───────────────────────────────────────────────
-// Organized by: CISA | FBI | EUROPOL | NCSC | POLICE (region) | PUBLIC SAFETY
+// Organized by: CISA | FBI | INTERPOL | EUROPOL | NCSC | POLICE (region) | PUBLIC SAFETY
 // Only confirmed-working feeds are included.
 
 const sources = [
@@ -60,6 +60,53 @@ const sources = [
       url: "https://tips.fbi.gov/",
       phone: "1-800-CALL-FBI (1-800-225-5324)",
       notes: "Use 911 for emergencies.",
+    },
+  },
+  {
+    type: "rss",
+    source: {
+      source_id: "fbi-wanted",
+      authority_name: "FBI Wanted",
+      country: "United States",
+      country_code: "US",
+      region: "North America",
+      authority_type: "police",
+      base_url: "https://www.fbi.gov",
+    },
+    feed_url: "https://www.fbi.gov/feeds/all-wanted/rss.xml",
+    category: "wanted_suspect",
+    region_tag: "US",
+    lat: 38.9,
+    lng: -77.0,
+    reporting: {
+      label: "Submit a Tip to FBI",
+      url: "https://tips.fbi.gov/",
+      phone: "1-800-CALL-FBI (1-800-225-5324)",
+      notes: "Use 911 for emergencies.",
+    },
+  },
+
+  // ── INTERPOL (International) ──────────────────────────────────
+  {
+    type: "interpol-red-json",
+    source: {
+      source_id: "interpol-red",
+      authority_name: "INTERPOL Red Notices",
+      country: "France",
+      country_code: "FR",
+      region: "International",
+      authority_type: "police",
+      base_url: "https://www.interpol.int",
+    },
+    feed_url: "https://ws-public.interpol.int/notices/v1/red?resultPerPage=20",
+    category: "wanted_suspect",
+    region_tag: "INT",
+    lat: 45.76,
+    lng: 4.84,
+    reporting: {
+      label: "Contact INTERPOL",
+      url: "https://www.interpol.int/Contacts",
+      notes: "Use official national police channels for emergencies.",
     },
   },
 
@@ -321,6 +368,25 @@ function hashId(value) {
   return crypto.createHash("sha1").update(value).digest("hex").slice(0, 12);
 }
 
+function hashToUnit(value) {
+  const hex = crypto.createHash("sha1").update(value).digest("hex").slice(0, 8);
+  return Number.parseInt(hex, 16) / 0xffffffff;
+}
+
+function jitterCoords(lat, lng, seed) {
+  // Spread alerts around source HQ so multiple notices don't collapse into one dot.
+  const angle = hashToUnit(`${seed}:a`) * Math.PI * 2;
+  const radiusKm = 22 + hashToUnit(`${seed}:r`) * 55; // ~22-77 km
+  const dLat = (radiusKm / 111.32) * Math.cos(angle);
+  const cosLat = Math.max(0.2, Math.cos((lat * Math.PI) / 180));
+  const dLng = (radiusKm / (111.32 * cosLat)) * Math.sin(angle);
+  const outLat = Math.max(-89.5, Math.min(89.5, lat + dLat));
+  let outLng = lng + dLng;
+  if (outLng > 180) outLng -= 360;
+  if (outLng < -180) outLng += 360;
+  return { lat: Number(outLat.toFixed(5)), lng: Number(outLng.toFixed(5)) };
+}
+
 function kevItemToAlert(entry, meta) {
   const cve = entry.cveID ?? entry.cveId ?? entry.cve;
   const title = `${cve ?? "CVE"}: ${entry.vulnerabilityName ?? "Known Exploited Vulnerability"}`;
@@ -332,6 +398,7 @@ function kevItemToAlert(entry, meta) {
   }
   const hours = Math.max(1, Math.round((now - publishedAt) / 36e5));
   const kevSeverity = hours <= 72 ? "critical" : hours <= 168 ? "high" : "medium";
+  const jitter = jitterCoords(meta.lat, meta.lng, `${meta.source.source_id}:${nvdLink}:${cve ?? ""}`);
   return {
     alert_id: `${meta.source.source_id}-${hashId(nvdLink)}`,
     source_id: meta.source.source_id,
@@ -344,8 +411,8 @@ function kevItemToAlert(entry, meta) {
     category: meta.category,
     severity: kevSeverity,
     region_tag: meta.region_tag,
-    lat: meta.lat,
-    lng: meta.lng,
+    lat: jitter.lat,
+    lng: jitter.lng,
     freshness_hours: hours,
     reporting: meta.reporting,
   };
@@ -377,6 +444,7 @@ async function fetchRss(meta, now) {
       return null;
     }
     const hours = Math.max(1, Math.round((now - publishedAt) / 36e5));
+    const jitter = jitterCoords(meta.lat, meta.lng, `${meta.source.source_id}:${item.link}`);
     return {
       alert_id: `${meta.source.source_id}-${hashId(item.link)}`,
       source_id: meta.source.source_id,
@@ -389,8 +457,8 @@ async function fetchRss(meta, now) {
       category: meta.category,
       severity: inferSeverity(item.title, defaultSeverity(meta.category)),
       region_tag: meta.region_tag,
-      lat: meta.lat,
-      lng: meta.lng,
+      lat: jitter.lat,
+      lng: jitter.lng,
       freshness_hours: hours,
       reporting: meta.reporting,
     };
@@ -417,6 +485,51 @@ async function fetchKev(meta) {
     .filter(Boolean);
 }
 
+async function fetchInterpolRed(meta, now) {
+  const response = await fetch(meta.feed_url, {
+    headers: {
+      "User-Agent": "osint-siem-bot/1.0",
+      Accept: "application/json",
+    },
+  });
+  if (!response.ok) {
+    throw new Error(`interpol fetch failed ${response.status} ${meta.feed_url}`);
+  }
+  const data = await response.json();
+  const notices = Array.isArray(data?._embedded?.notices) ? data._embedded.notices : [];
+
+  return notices.slice(0, MAX_PER_SOURCE).map((notice) => {
+    const forename = String(notice.forename ?? "").trim();
+    const name = String(notice.name ?? "").trim();
+    const label = [forename, name].filter(Boolean).join(" ");
+    const rawHref = String(notice?._links?.self?.href ?? "").trim();
+    const canonicalUrl = rawHref
+      ? new URL(rawHref, "https://ws-public.interpol.int").toString()
+      : meta.source.base_url;
+    const title = label
+      ? `INTERPOL Red Notice: ${label}`
+      : "INTERPOL Red Notice";
+    const jitter = jitterCoords(meta.lat, meta.lng, `${meta.source.source_id}:${canonicalUrl}`);
+    return {
+      alert_id: `${meta.source.source_id}-${hashId(canonicalUrl + title)}`,
+      source_id: meta.source.source_id,
+      source: meta.source,
+      title,
+      canonical_url: canonicalUrl,
+      first_seen: now.toISOString(),
+      last_seen: now.toISOString(),
+      status: "active",
+      category: meta.category,
+      severity: "critical",
+      region_tag: meta.region_tag,
+      lat: jitter.lat,
+      lng: jitter.lng,
+      freshness_hours: 1,
+      reporting: meta.reporting,
+    };
+  });
+}
+
 async function buildAlerts() {
   const now = new Date();
   const alerts = [];
@@ -426,6 +539,8 @@ async function buildAlerts() {
       const batch =
         entry.type === "kev-json"
           ? await fetchKev(entry)
+          : entry.type === "interpol-red-json"
+          ? await fetchInterpolRed(entry, now)
           : await fetchRss(entry, now);
       alerts.push(...batch);
     } catch (error) {

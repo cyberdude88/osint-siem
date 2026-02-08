@@ -8,8 +8,7 @@ function normalizeAlerts(data: unknown): Alert[] | null {
     return null;
   }
 
-  const alerts = data.filter((item) => item && typeof item === "object") as Alert[];
-  return alerts.length > 0 ? alerts : null;
+  return data.filter((item) => item && typeof item === "object") as Alert[];
 }
 
 function alertsAreEqual(a: Alert[], b: Alert[]): boolean {
