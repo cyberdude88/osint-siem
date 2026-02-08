@@ -16,6 +16,14 @@ export const severityBg: Record<Severity, string> = {
   info: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
 };
 
+export const severityLabel: Record<Severity, string> = {
+  critical: "critical",
+  high: "high",
+  medium: "medium",
+  low: "low",
+  info: "informational",
+};
+
 export const categoryLabels: Record<AlertCategory, string> = {
   missing_person: "Missing Person",
   wanted_suspect: "Wanted Suspect",
@@ -67,5 +75,5 @@ export function freshnessConfidence(hours: number): { label: string; color: stri
   if (hours < 6) return { label: "FRESH", color: "text-green-400" };
   if (hours < 24) return { label: "RECENT", color: "text-yellow-400" };
   if (hours < 72) return { label: "AGING", color: "text-orange-400" };
-  return { label: "STALE", color: "text-red-400" };
+  return { label: "OUTDATED", color: "text-red-400" };
 }

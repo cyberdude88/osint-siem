@@ -1,6 +1,7 @@
 import type { Alert } from "@/types/alert";
 import {
   severityBg,
+  severityLabel,
   categoryLabels,
   freshnessLabel,
   freshnessConfidence,
@@ -56,7 +57,7 @@ export function AlertDetail({ alert, onClose }: Props) {
               severityBg[alert.severity]
             }`}
           >
-            {alert.severity}
+            {severityLabel[alert.severity]}
           </span>
           <span className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded bg-white/5 text-siem-muted border border-siem-border">
             <Radio size={10} />

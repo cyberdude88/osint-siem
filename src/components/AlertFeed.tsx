@@ -1,6 +1,7 @@
 import type { Alert } from "@/types/alert";
 import {
   severityBg,
+  severityLabel,
   categoryLabels,
   categoryOrder,
   categoryBadge,
@@ -67,7 +68,7 @@ export function AlertFeed({ alerts, selectedId, onSelect }: Props) {
                         severityBg[alert.severity]
                       }`}
                     >
-                      {alert.severity}
+                      {severityLabel[alert.severity]}
                     </span>
                     <span className={`text-[10px] font-mono ${fresh.color}`}>
                       {fresh.label}
