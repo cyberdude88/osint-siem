@@ -212,6 +212,27 @@ const COUNTRY_CENTROIDS = {
 };
 
 const CITY_CENTROIDS = {
+  harrisburg: [40.2732, -76.8867],
+  philadelphia: [39.9526, -75.1652],
+  pittsburgh: [40.4406, -79.9959],
+  allentown: [40.6023, -75.4714],
+  scranton: [41.4089, -75.6624],
+  erie: [42.1292, -80.0851],
+  york: [39.9626, -76.7277],
+  lancaster: [40.0379, -76.3055],
+  richmond: [37.5407, -77.436],
+  norfolk: [36.8508, -76.2859],
+  alexandria: [38.8048, -77.0469],
+  arlington: [38.8816, -77.091],
+  baltimore: [39.2904, -76.6122],
+  washington: [38.9072, -77.0369],
+  "washington dc": [38.9072, -77.0369],
+  "new york city": [40.7128, -74.006],
+  "los angeles": [34.0522, -118.2437],
+  chicago: [41.8781, -87.6298],
+  miami: [25.7617, -80.1918],
+  houston: [29.7604, -95.3698],
+  dallas: [32.7767, -96.797],
   auckland: [-36.8485, 174.7633],
   wellington: [-41.2865, 174.7762],
   christchurch: [-43.5321, 172.6362],
@@ -782,6 +803,20 @@ function inferCountryFromIsoCodes(values) {
   return null;
 }
 
+function extractUrlLocationText(urlValue) {
+  try {
+    const url = new URL(String(urlValue));
+    const decodedPath = decodeURIComponent(url.pathname);
+    const query = decodeURIComponent(url.search.replace(/^\?/, ""));
+    return `${url.hostname} ${decodedPath} ${query}`
+      .replace(/[._/+?=&%-]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  } catch {
+    return String(urlValue ?? "");
+  }
+}
+
 function resolveCoords(meta, text, seed) {
   const inferredUS =
     meta.source.country_code === "US" ? inferUSStateCoords(text) : null;
@@ -836,7 +871,7 @@ function kevItemToAlert(entry, meta) {
   const kevSeverity = hours <= 72 ? "critical" : hours <= 168 ? "high" : "medium";
   const jitter = resolveCoords(
     meta,
-    `${title} ${nvdLink}`,
+    `${title} ${nvdLink} ${extractUrlLocationText(nvdLink)}`,
     `${meta.source.source_id}:${nvdLink}:${cve ?? ""}`
   );
   return {
@@ -887,7 +922,7 @@ async function fetchRss(meta, now) {
     const hours = Math.max(1, Math.round((now - publishedAt) / 36e5));
     const jitter = resolveCoords(
       meta,
-      `${item.title} ${item.link}`,
+      `${item.title} ${item.link} ${extractUrlLocationText(item.link)}`,
       `${meta.source.source_id}:${item.link}`
     );
     return {
@@ -957,7 +992,7 @@ async function fetchInterpolNotices(meta, now) {
     const jitter = resolveInterpolNoticeCoords(
       meta,
       notice,
-      title,
+      `${title} ${extractUrlLocationText(canonicalUrl)}`,
       `${meta.source.source_id}:${canonicalUrl}`
     );
     return {
