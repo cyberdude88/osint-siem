@@ -231,6 +231,10 @@ export function GlobeView({
   const [hotspotTypeFilter, setHotspotTypeFilter] = useState<string>("all");
   const [hotspotAgencyFilter, setHotspotAgencyFilter] = useState<string>("all");
   const visibleIdSet = useMemo(() => new Set(visibleAlertIds), [visibleAlertIds]);
+  const alertsById = useMemo(
+    () => new Map(alerts.map((a) => [a.alert_id, a])),
+    [alerts]
+  );
   const hotspotAlerts = useMemo(() => {
     if (!hotspot) return [];
     return alerts
@@ -259,6 +263,10 @@ export function GlobeView({
       return typeOk && agencyOk;
     });
   }, [hotspotAlerts, hotspotAgencyFilter, hotspotTypeFilter]);
+  const findNearbyVisibleAlerts = (lat: number, lng: number) =>
+    alerts
+      .filter((a) => visibleIdSet.has(a.alert_id))
+      .filter((a) => haversineKm(a.lat, a.lng, lat, lng) <= HOTSPOT_RADIUS_KM);
   const regions = useMemo(() => {
     const counts = new Map<string, number>();
     alerts.forEach((a) => {
@@ -676,7 +684,18 @@ export function GlobeView({
       const hits = raycaster.intersectObjects(Array.from(pointMeshes.values()));
       if (hits.length > 0) {
         const id = hits[0].object.userData.alertId;
-        if (id) onSelect(id);
+        if (id) {
+          onSelect(id);
+          const baseAlert = alertsById.get(id);
+          if (baseAlert) {
+            const nearby = findNearbyVisibleAlerts(baseAlert.lat, baseAlert.lng);
+            if (nearby.length >= HOTSPOT_MIN_ALERTS) {
+              setHotspot({ lat: baseAlert.lat, lng: baseAlert.lng });
+            } else {
+              setHotspot(null);
+            }
+          }
+        }
         return;
       }
       const ocean = oceanRef.current;
@@ -687,9 +706,7 @@ export function GlobeView({
       const { lat, lng } = vector3ToLatLng(hitPoint);
       const region = latLngToRegion(lat, lng);
       if (!region) return;
-      const nearby = alerts
-        .filter((a) => visibleIdSet.has(a.alert_id))
-        .filter((a) => haversineKm(a.lat, a.lng, lat, lng) <= HOTSPOT_RADIUS_KM);
+      const nearby = findNearbyVisibleAlerts(lat, lng);
       if (nearby.length >= HOTSPOT_MIN_ALERTS) {
         setHotspot({ lat, lng });
       } else {
@@ -753,9 +770,17 @@ export function GlobeView({
             <span className="text-[10px] uppercase tracking-widest text-siem-accent font-bold">
               Dense Alert Zone
             </span>
-            <span className="text-[10px] text-siem-muted font-mono">
-              {hotspotFiltered.length}/{hotspotAlerts.length}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-siem-muted font-mono">
+                {hotspotFiltered.length}/{hotspotAlerts.length}
+              </span>
+              <button
+                onClick={() => setHotspot(null)}
+                className="text-[10px] px-1.5 py-0.5 rounded border border-siem-border text-siem-muted hover:bg-siem-accent/10 hover:text-siem-accent transition-colors"
+              >
+                Close
+              </button>
+            </div>
           </div>
           <div className="px-3 py-2 space-y-1.5 border-b border-siem-border/70">
             <select
