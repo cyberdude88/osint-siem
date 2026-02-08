@@ -10,9 +10,9 @@ const US_STATES_GEOJSON_URL =
   "https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json";
 const AUTO_ROTATE_SPEED = 0.0003;
 const AUTO_ROTATE_EASE = 2.8;
-const ZOOM_MIN = 1.55;
+const ZOOM_MIN = 1.34;
 const ZOOM_MAX = 4.6;
-const ZOOM_STEP = 0.08;
+const ZOOM_STEP = 0.06;
 const ZOOM_EASE = 7.5;
 const INITIAL_TILT_X = 0.06;
 
