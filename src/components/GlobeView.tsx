@@ -648,25 +648,28 @@ export function GlobeView({
     const resizeObs = new ResizeObserver(onResize);
     resizeObs.observe(container);
 
-    // --- Pointer drag to rotate (mouse + touch + pen) ---
-    const onDown = (e: PointerEvent) => {
+    // --- Pointer/touch drag to rotate ---
+    const beginDrag = (clientX: number, clientY: number) => {
       mouseRef.current = {
         isDown: true,
-        prevX: e.clientX,
-        prevY: e.clientY,
+        prevX: clientX,
+        prevY: clientY,
         prevT: performance.now(),
         dragDistance: 0,
         moved: false,
       };
       rotationRef.current.interacting = true;
       rotationRef.current.ambientBlend = 0;
+    };
+    const onDown = (e: PointerEvent) => {
+      beginDrag(e.clientX, e.clientY);
       try {
         (e.currentTarget as Element).setPointerCapture?.(e.pointerId);
       } catch {
         // Ignore capture errors on unsupported environments.
       }
     };
-    const onMove = (e: PointerEvent) => {
+    const applyDrag = (clientX: number, clientY: number) => {
       if (!mouseRef.current.isDown) return;
       const zoomNorm = Math.max(
         0,
@@ -675,8 +678,8 @@ export function GlobeView({
       const dragSensitivity =
         DRAG_SENSITIVITY_MIN +
         zoomNorm * (DRAG_SENSITIVITY_MAX - DRAG_SENSITIVITY_MIN);
-      const dx = e.clientX - mouseRef.current.prevX;
-      const dy = e.clientY - mouseRef.current.prevY;
+      const dx = clientX - mouseRef.current.prevX;
+      const dy = clientY - mouseRef.current.prevY;
       const now = performance.now();
       const dt = Math.max(0.001, (now - mouseRef.current.prevT) / 1000);
       const rotY = dx * dragSensitivity;
@@ -696,13 +699,31 @@ export function GlobeView({
       const vX = rotX / dt;
       rotationRef.current.velY = rotationRef.current.velY * 0.6 + vY * 0.4;
       rotationRef.current.velX = rotationRef.current.velX * 0.6 + vX * 0.4;
-      mouseRef.current.prevX = e.clientX;
-      mouseRef.current.prevY = e.clientY;
+      mouseRef.current.prevX = clientX;
+      mouseRef.current.prevY = clientY;
       mouseRef.current.prevT = now;
+    };
+    const onMove = (e: PointerEvent) => {
+      applyDrag(e.clientX, e.clientY);
     };
     const onUp = () => {
       mouseRef.current.isDown = false;
       rotationRef.current.interacting = false;
+    };
+    const onTouchStart = (e: TouchEvent) => {
+      const t = e.touches[0];
+      if (!t) return;
+      beginDrag(t.clientX, t.clientY);
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      if (!mouseRef.current.isDown) return;
+      const t = e.touches[0];
+      if (!t) return;
+      e.preventDefault();
+      applyDrag(t.clientX, t.clientY);
+    };
+    const onTouchEnd = () => {
+      onUp();
     };
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
@@ -824,6 +845,10 @@ export function GlobeView({
     el.addEventListener("pointerup", onUp);
     el.addEventListener("pointercancel", onUp);
     el.addEventListener("pointerleave", onUp);
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    el.addEventListener("touchend", onTouchEnd, { passive: true });
+    el.addEventListener("touchcancel", onTouchEnd, { passive: true });
     el.addEventListener("click", onClk);
     el.addEventListener("wheel", onWheel, { passive: false });
     container.addEventListener("wheel", onWheel, { passive: false });
@@ -836,6 +861,10 @@ export function GlobeView({
       el.removeEventListener("pointerup", onUp);
       el.removeEventListener("pointercancel", onUp);
       el.removeEventListener("pointerleave", onUp);
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend", onTouchEnd);
+      el.removeEventListener("touchcancel", onTouchEnd);
       el.removeEventListener("click", onClk);
       el.removeEventListener("wheel", onWheel);
       container.removeEventListener("wheel", onWheel);
