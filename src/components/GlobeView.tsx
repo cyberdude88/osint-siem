@@ -19,6 +19,7 @@ const DRAG_SENSITIVITY_MIN = 0.0016;
 const DRAG_SENSITIVITY_MAX = 0.005;
 const HOTSPOT_RADIUS_KM = 260;
 const HOTSPOT_MIN_ALERTS = 2;
+const HOTSPOT_PIXEL_RADIUS = 22;
 
 interface Props {
   alerts: Alert[];
@@ -694,8 +695,29 @@ export function GlobeView({
           onSelect(id);
           const baseAlert = alertsById.get(id);
           if (baseAlert) {
+            const clickedPos = hits[0].object.getWorldPosition(new THREE.Vector3());
+            const clickedNdc = clickedPos.clone().project(camera);
+            const clickPx = {
+              x: ((clickedNdc.x + 1) / 2) * rect.width,
+              y: ((1 - clickedNdc.y) / 2) * rect.height,
+            };
+            const overlapped = alerts.filter((a) => {
+              if (!visibleIdSet.has(a.alert_id)) return false;
+              const mesh = pointMeshes.get(a.alert_id);
+              if (!mesh || !mesh.visible) return false;
+              const p = mesh.getWorldPosition(new THREE.Vector3()).project(camera);
+              if (p.z < -1 || p.z > 1) return false;
+              const px = ((p.x + 1) / 2) * rect.width;
+              const py = ((1 - p.y) / 2) * rect.height;
+              const dx = px - clickPx.x;
+              const dy = py - clickPx.y;
+              return dx * dx + dy * dy <= HOTSPOT_PIXEL_RADIUS * HOTSPOT_PIXEL_RADIUS;
+            });
             const nearby = findNearbyVisibleAlerts(baseAlert.lat, baseAlert.lng);
-            if (nearby.length >= HOTSPOT_MIN_ALERTS) {
+            if (
+              overlapped.length >= HOTSPOT_MIN_ALERTS ||
+              nearby.length >= HOTSPOT_MIN_ALERTS
+            ) {
               setHotspot({ lat: baseAlert.lat, lng: baseAlert.lng });
             } else {
               setHotspot(null);
