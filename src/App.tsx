@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Header } from "@/components/Header";
 import { StatsBar } from "@/components/StatsBar";
 import { GlobeView } from "@/components/GlobeView";
@@ -9,9 +9,22 @@ import { useAlerts } from "@/hooks/useAlerts";
 export default function App() {
   const { alerts, isLive, isLoading, sourceCount } = useAlerts();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [closing, setClosing] = useState(false);
+  const closingRef = useRef(false);
   const selectedAlert = selectedId
     ? alerts.find((a) => a.alert_id === selectedId) ?? null
     : null;
+
+  const handleClose = useCallback(() => {
+    if (closingRef.current) return;
+    closingRef.current = true;
+    setClosing(true);
+    setTimeout(() => {
+      setSelectedId(null);
+      setClosing(false);
+      closingRef.current = false;
+    }, 250);
+  }, []);
 
   useEffect(() => {
     if (selectedId && !alerts.some((a) => a.alert_id === selectedId)) {
@@ -53,16 +66,16 @@ export default function App() {
 
         {/* Right Panel: Slide-out Alert Detail */}
         {selectedAlert && (
-          <div className="absolute top-0 right-0 h-full z-20 flex">
+          <div className={`absolute top-0 right-0 h-full z-20 flex ${closing ? "animate-slide-out" : "animate-slide-in"}`}>
             {/* Backdrop click to close */}
             <div
               className="w-8 cursor-pointer bg-gradient-to-r from-transparent to-black/30"
-              onClick={() => setSelectedId(null)}
+              onClick={handleClose}
             />
-            <div className="w-[380px] bg-siem-panel border-l border-siem-border flex flex-col shadow-2xl shadow-black/50 animate-slide-in">
+            <div className="w-[380px] bg-siem-panel border-l border-siem-border flex flex-col shadow-2xl shadow-black/50">
               <AlertDetail
                 alert={selectedAlert}
-                onClose={() => setSelectedId(null)}
+                onClose={handleClose}
               />
             </div>
           </div>
