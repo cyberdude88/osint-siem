@@ -9,6 +9,140 @@ const WATCH =
   process.argv.includes("--watch") || process.env.WATCH === "1";
 const INTERVAL_MS = Number.parseInt(process.env.INTERVAL_MS ?? "900000", 10);
 
+const US_STATE_CENTROIDS = {
+  alabama: [32.806671, -86.79113],
+  alaska: [61.370716, -152.404419],
+  arizona: [33.729759, -111.431221],
+  arkansas: [34.969704, -92.373123],
+  california: [36.116203, -119.681564],
+  colorado: [39.059811, -105.311104],
+  connecticut: [41.597782, -72.755371],
+  delaware: [39.318523, -75.507141],
+  florida: [27.766279, -81.686783],
+  georgia: [33.040619, -83.643074],
+  hawaii: [21.094318, -157.498337],
+  idaho: [44.240459, -114.478828],
+  illinois: [40.349457, -88.986137],
+  indiana: [39.849426, -86.258278],
+  iowa: [42.011539, -93.210526],
+  kansas: [38.5266, -96.726486],
+  kentucky: [37.66814, -84.670067],
+  louisiana: [31.169546, -91.867805],
+  maine: [44.693947, -69.381927],
+  maryland: [39.063946, -76.802101],
+  massachusetts: [42.230171, -71.530106],
+  michigan: [43.326618, -84.536095],
+  minnesota: [45.694454, -93.900192],
+  mississippi: [32.741646, -89.678696],
+  missouri: [38.456085, -92.288368],
+  montana: [46.921925, -110.454353],
+  nebraska: [41.12537, -98.268082],
+  nevada: [38.313515, -117.055374],
+  "new hampshire": [43.452492, -71.563896],
+  "new jersey": [40.298904, -74.521011],
+  "new mexico": [34.840515, -106.248482],
+  "new york": [42.165726, -74.948051],
+  "north carolina": [35.630066, -79.806419],
+  "north dakota": [47.528912, -99.784012],
+  ohio: [40.388783, -82.764915],
+  oklahoma: [35.565342, -96.928917],
+  oregon: [44.572021, -122.070938],
+  pennsylvania: [40.590752, -77.209755],
+  "rhode island": [41.680893, -71.51178],
+  "south carolina": [33.856892, -80.945007],
+  "south dakota": [44.299782, -99.438828],
+  tennessee: [35.747845, -86.692345],
+  texas: [31.054487, -97.563461],
+  utah: [40.150032, -111.862434],
+  vermont: [44.045876, -72.710686],
+  virginia: [37.769337, -78.169968],
+  washington: [47.400902, -121.490494],
+  "west virginia": [38.491226, -80.954453],
+  wisconsin: [44.268543, -89.616508],
+  wyoming: [42.755966, -107.30249],
+  "district of columbia": [38.9072, -77.0369],
+  "washington dc": [38.9072, -77.0369],
+};
+
+const US_STATE_ABBR_TO_NAME = {
+  AL: "alabama",
+  AK: "alaska",
+  AZ: "arizona",
+  AR: "arkansas",
+  CA: "california",
+  CO: "colorado",
+  CT: "connecticut",
+  DE: "delaware",
+  FL: "florida",
+  GA: "georgia",
+  HI: "hawaii",
+  ID: "idaho",
+  IL: "illinois",
+  IN: "indiana",
+  IA: "iowa",
+  KS: "kansas",
+  KY: "kentucky",
+  LA: "louisiana",
+  ME: "maine",
+  MD: "maryland",
+  MA: "massachusetts",
+  MI: "michigan",
+  MN: "minnesota",
+  MS: "mississippi",
+  MO: "missouri",
+  MT: "montana",
+  NE: "nebraska",
+  NV: "nevada",
+  NH: "new hampshire",
+  NJ: "new jersey",
+  NM: "new mexico",
+  NY: "new york",
+  NC: "north carolina",
+  ND: "north dakota",
+  OH: "ohio",
+  OK: "oklahoma",
+  OR: "oregon",
+  PA: "pennsylvania",
+  RI: "rhode island",
+  SC: "south carolina",
+  SD: "south dakota",
+  TN: "tennessee",
+  TX: "texas",
+  UT: "utah",
+  VT: "vermont",
+  VA: "virginia",
+  WA: "washington",
+  WV: "west virginia",
+  WI: "wisconsin",
+  WY: "wyoming",
+  DC: "district of columbia",
+};
+
+const US_STATE_ALT_TOKENS = {
+  fla: "florida",
+  calif: "california",
+  penn: "pennsylvania",
+  penna: "pennsylvania",
+  wisc: "wisconsin",
+  minn: "minnesota",
+  colo: "colorado",
+  ariz: "arizona",
+  mich: "michigan",
+  mass: "massachusetts",
+  conn: "connecticut",
+  ill: "illinois",
+  tex: "texas",
+  wash: "washington",
+  ore: "oregon",
+  okla: "oklahoma",
+  "n mex": "new mexico",
+  "n dak": "north dakota",
+  "s dak": "south dakota",
+  "n car": "north carolina",
+  "s car": "south carolina",
+  "w va": "west virginia",
+};
+
 // ─── AGENCY FEEDS ───────────────────────────────────────────────
 // Organized by: CISA | FBI | INTERPOL | EUROPOL | NCSC | POLICE (region) | PUBLIC SAFETY
 // Only confirmed-working feeds are included.
@@ -373,10 +507,10 @@ function hashToUnit(value) {
   return Number.parseInt(hex, 16) / 0xffffffff;
 }
 
-function jitterCoords(lat, lng, seed) {
-  // Spread alerts around source HQ so multiple notices don't collapse into one dot.
+function jitterCoords(lat, lng, seed, minRadiusKm = 22, maxRadiusKm = 77) {
+  // Spread alerts around a base point so multiple notices don't collapse into one dot.
   const angle = hashToUnit(`${seed}:a`) * Math.PI * 2;
-  const radiusKm = 22 + hashToUnit(`${seed}:r`) * 55; // ~22-77 km
+  const radiusKm = minRadiusKm + hashToUnit(`${seed}:r`) * Math.max(1, maxRadiusKm - minRadiusKm);
   const dLat = (radiusKm / 111.32) * Math.cos(angle);
   const cosLat = Math.max(0.2, Math.cos((lat * Math.PI) / 180));
   const dLng = (radiusKm / (111.32 * cosLat)) * Math.sin(angle);
@@ -385,6 +519,51 @@ function jitterCoords(lat, lng, seed) {
   if (outLng > 180) outLng -= 360;
   if (outLng < -180) outLng += 360;
   return { lat: Number(outLat.toFixed(5)), lng: Number(outLng.toFixed(5)) };
+}
+
+function escapeRegex(text) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function inferUSStateCoords(text) {
+  const haystackRaw = ` ${String(text ?? "").toLowerCase()} `;
+  const haystack = haystackRaw.replace(/\./g, " ");
+
+  // Match common two-letter forms like (FL), , FL, " - FL "
+  for (const [abbr, name] of Object.entries(US_STATE_ABBR_TO_NAME)) {
+    const abbrPattern = new RegExp(`(?:^|[^a-z])\\(?${abbr.toLowerCase()}\\)?(?:[^a-z]|$)`, "i");
+    if (abbrPattern.test(haystack)) {
+      const coords = US_STATE_CENTROIDS[name];
+      if (coords) return { lat: coords[0], lng: coords[1] };
+    }
+  }
+
+  // Match short textual forms like "Fla", "Calif", etc.
+  for (const [token, name] of Object.entries(US_STATE_ALT_TOKENS)) {
+    const altPattern = new RegExp(`\\b${escapeRegex(token).replace(/\s+/g, "\\s+")}\\b`, "i");
+    if (altPattern.test(haystack)) {
+      const coords = US_STATE_CENTROIDS[name];
+      if (coords) return { lat: coords[0], lng: coords[1] };
+    }
+  }
+
+  const entries = Object.entries(US_STATE_CENTROIDS).sort((a, b) => b[0].length - a[0].length);
+  for (const [name, [lat, lng]] of entries) {
+    const pattern = new RegExp(`\\b${escapeRegex(name).replace(/\s+/g, "\\s+")}\\b`, "i");
+    if (pattern.test(haystack)) {
+      return { lat, lng };
+    }
+  }
+  return null;
+}
+
+function resolveCoords(meta, text, seed) {
+  const inferredUS =
+    meta.source.country_code === "US" ? inferUSStateCoords(text) : null;
+  if (inferredUS) {
+    return jitterCoords(inferredUS.lat, inferredUS.lng, seed, 10, 35);
+  }
+  return jitterCoords(meta.lat, meta.lng, seed);
 }
 
 function kevItemToAlert(entry, meta) {
@@ -398,7 +577,11 @@ function kevItemToAlert(entry, meta) {
   }
   const hours = Math.max(1, Math.round((now - publishedAt) / 36e5));
   const kevSeverity = hours <= 72 ? "critical" : hours <= 168 ? "high" : "medium";
-  const jitter = jitterCoords(meta.lat, meta.lng, `${meta.source.source_id}:${nvdLink}:${cve ?? ""}`);
+  const jitter = resolveCoords(
+    meta,
+    `${title} ${nvdLink}`,
+    `${meta.source.source_id}:${nvdLink}:${cve ?? ""}`
+  );
   return {
     alert_id: `${meta.source.source_id}-${hashId(nvdLink)}`,
     source_id: meta.source.source_id,
@@ -444,7 +627,11 @@ async function fetchRss(meta, now) {
       return null;
     }
     const hours = Math.max(1, Math.round((now - publishedAt) / 36e5));
-    const jitter = jitterCoords(meta.lat, meta.lng, `${meta.source.source_id}:${item.link}`);
+    const jitter = resolveCoords(
+      meta,
+      `${item.title} ${item.link}`,
+      `${meta.source.source_id}:${item.link}`
+    );
     return {
       alert_id: `${meta.source.source_id}-${hashId(item.link)}`,
       source_id: meta.source.source_id,
@@ -509,7 +696,11 @@ async function fetchInterpolRed(meta, now) {
     const title = label
       ? `INTERPOL Red Notice: ${label}`
       : "INTERPOL Red Notice";
-    const jitter = jitterCoords(meta.lat, meta.lng, `${meta.source.source_id}:${canonicalUrl}`);
+    const jitter = resolveCoords(
+      meta,
+      `${title} ${canonicalUrl}`,
+      `${meta.source.source_id}:${canonicalUrl}`
+    );
     return {
       alert_id: `${meta.source.source_id}-${hashId(canonicalUrl + title)}`,
       source_id: meta.source.source_id,
