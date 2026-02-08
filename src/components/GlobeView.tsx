@@ -6,9 +6,11 @@ import { severityColors } from "@/lib/severity";
 
 const WORLD_TOPO_URL =
   "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+const US_STATES_GEOJSON_URL =
+  "https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json";
 const AUTO_ROTATE_SPEED = 0.0003;
 const AUTO_ROTATE_EASE = 2.8;
-const ZOOM_MIN = 2.15;
+const ZOOM_MIN = 1.25;
 const ZOOM_MAX = 4.6;
 const ZOOM_STEP = 0.24;
 const ZOOM_EASE = 7.5;
@@ -313,6 +315,21 @@ export function GlobeView({
       })
       .catch((err) => console.warn("Failed to load world map:", err));
 
+    // --- U.S. state boundaries (visible mainly when zoomed in) ---
+    const usStateGroup = new THREE.Group();
+    globeGroup.add(usStateGroup);
+    const usStateMat = new THREE.LineBasicMaterial({
+      color: 0x8eb7cf,
+      transparent: true,
+      opacity: 0,
+    });
+    fetch(US_STATES_GEOJSON_URL)
+      .then((r) => r.json())
+      .then((geo: GeoJSON.FeatureCollection) => {
+        drawGeoJson(geo, 1.0032, usStateMat, usStateGroup);
+      })
+      .catch((err) => console.warn("Failed to load US states:", err));
+
     // --- Alert points ---
     const pointMeshes = new Map<string, THREE.Mesh>();
     const glowTexture = createGlowTexture();
@@ -409,6 +426,7 @@ export function GlobeView({
       rotationRef.current.y = globeGroup.rotation.y;
 
       const activeRegion = regionFilterRef.current;
+      const zoomLevel = zoomRef.current.current;
 
       // Keep surface glows static so they read as city lights, not VFX
       glowMeshes.forEach((gm) => {
@@ -429,6 +447,11 @@ export function GlobeView({
         entry.mesh.scale.set(1, 1, 1);
         (entry.mesh.material as THREE.MeshBasicMaterial).opacity = dim;
       });
+
+      // Fade in US state lines as user zooms closer to North America details.
+      const stateFade = Math.max(0, Math.min(1, (2.45 - zoomLevel) / 0.9));
+      usStateGroup.visible = stateFade > 0.01;
+      usStateMat.opacity = 0.82 * stateFade;
 
       renderer.render(scene, camera);
     };
@@ -529,6 +552,7 @@ export function GlobeView({
       container.removeChild(el);
       renderer.dispose();
       glowTexture.dispose();
+      usStateMat.dispose();
     };
   }, [alerts, onSelect]);
 
