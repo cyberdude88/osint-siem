@@ -1,6 +1,10 @@
 import { Shield, Globe } from "lucide-react";
 
-export function Header() {
+interface Props {
+  regionFilter: string;
+}
+
+export function Header({ regionFilter }: Props) {
   return (
     <div className="flex items-center justify-between px-6 py-2.5 bg-siem-panel border-b border-siem-border">
       <div className="flex items-center gap-3">
@@ -19,7 +23,9 @@ export function Header() {
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-1.5 text-xs text-siem-muted">
           <Globe size={12} />
-          <span className="font-mono">ALL REGIONS</span>
+          <span className="font-mono uppercase">
+            {regionFilter === "all" ? "ALL REGIONS" : regionFilter}
+          </span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />

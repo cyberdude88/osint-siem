@@ -209,6 +209,10 @@ const COUNTRY_CENTROIDS = {
   brazil: [-14.235, -51.9253],
   india: [20.5937, 78.9629],
   japan: [36.2048, 138.2529],
+  colombia: [4.5709, -74.2973],
+  "south korea": [35.9078, 127.7669],
+  singapore: [1.3521, 103.8198],
+  "hong kong": [22.3193, 114.1694],
 };
 
 const CITY_CENTROIDS = {
@@ -259,6 +263,16 @@ const CITY_CENTROIDS = {
   sydney: [-33.8688, 151.2093],
   melbourne: [-37.8136, 144.9631],
   tokyo: [35.6762, 139.6503],
+  osaka: [34.6937, 135.5023],
+  bogota: [4.711, -74.0721],
+  medellin: [6.2442, -75.5812],
+  cali: [3.4516, -76.532],
+  "the hague": [52.0705, 4.3007],
+  rotterdam: [51.9225, 4.4792],
+  sacramento: [38.5816, -121.4944],
+  "san francisco": [37.7749, -122.4194],
+  "san diego": [32.7157, -117.1611],
+  "san jose": [37.3382, -121.8863],
 };
 
 const ISO2_COUNTRY_HINTS = {
@@ -575,6 +589,152 @@ const sources = [
       url: "https://report.cybertip.org/",
       phone: "1-800-THE-LOST (1-800-843-5678)",
       notes: "Use 911 for immediate danger.",
+    },
+  },
+
+  // ── CIS MS-ISAC (US / North America) ────────────────────────────
+  {
+    type: "rss",
+    source: {
+      source_id: "cis-msisac",
+      authority_name: "CIS MS-ISAC",
+      country: "United States",
+      country_code: "US",
+      region: "North America",
+      authority_type: "cert",
+      base_url: "https://www.cisecurity.org",
+    },
+    feed_url: "https://www.cisecurity.org/feed/advisories",
+    category: "cyber_advisory",
+    region_tag: "US",
+    lat: 42.65,
+    lng: -73.76,
+    reporting: {
+      label: "Report to MS-ISAC",
+      url: "https://www.cisecurity.org/ms-isac/services/soc",
+      phone: "1-866-787-4722",
+      email: "soc@cisecurity.org",
+      notes: "24/7 Security Operations Center for state, local, tribal, and territorial governments.",
+    },
+  },
+
+  // ── California Attorney General (US / North America) ────────────
+  {
+    type: "rss",
+    source: {
+      source_id: "ca-oag",
+      authority_name: "California AG",
+      country: "United States",
+      country_code: "US",
+      region: "North America",
+      authority_type: "police",
+      base_url: "https://oag.ca.gov",
+    },
+    feed_url: "https://oag.ca.gov/news/feed",
+    category: "public_appeal",
+    region_tag: "US",
+    lat: 38.58,
+    lng: -121.49,
+    reporting: {
+      label: "Report to CA Attorney General",
+      url: "https://oag.ca.gov/contact/consumer-complaint-against-business-or-company",
+      phone: "1-800-952-5225",
+    },
+  },
+
+  // ── CERT-FR (France / Europe) ───────────────────────────────────
+  {
+    type: "rss",
+    source: {
+      source_id: "cert-fr",
+      authority_name: "CERT-FR",
+      country: "France",
+      country_code: "FR",
+      region: "Europe",
+      authority_type: "cert",
+      base_url: "https://www.cert.ssi.gouv.fr",
+    },
+    feed_url: "https://www.cert.ssi.gouv.fr/feed/",
+    category: "cyber_advisory",
+    region_tag: "FR",
+    lat: 48.86,
+    lng: 2.35,
+    reporting: {
+      label: "Report to CERT-FR",
+      url: "https://www.cert.ssi.gouv.fr/contact/",
+      email: "cert-fr@ssi.gouv.fr",
+    },
+  },
+
+  // ── NCSC-NL (Netherlands / Europe) ──────────────────────────────
+  {
+    type: "rss",
+    source: {
+      source_id: "ncsc-nl",
+      authority_name: "NCSC-NL",
+      country: "Netherlands",
+      country_code: "NL",
+      region: "Europe",
+      authority_type: "cert",
+      base_url: "https://advisories.ncsc.nl",
+    },
+    feed_url: "https://advisories.ncsc.nl/rss/advisories",
+    category: "cyber_advisory",
+    region_tag: "NL",
+    lat: 52.07,
+    lng: 4.30,
+    reporting: {
+      label: "Report to NCSC-NL",
+      url: "https://www.ncsc.nl/contact/kwetsbaarheid-melden",
+      email: "cert@ncsc.nl",
+    },
+  },
+
+  // ── JPCERT/CC (Japan / Asia) ────────────────────────────────────
+  {
+    type: "rss",
+    source: {
+      source_id: "jpcert",
+      authority_name: "JPCERT/CC",
+      country: "Japan",
+      country_code: "JP",
+      region: "Asia",
+      authority_type: "cert",
+      base_url: "https://www.jpcert.or.jp",
+    },
+    feed_url: "https://www.jpcert.or.jp/english/rss/jpcert-en.rdf",
+    category: "cyber_advisory",
+    region_tag: "JP",
+    lat: 35.68,
+    lng: 139.69,
+    reporting: {
+      label: "Report to JPCERT/CC",
+      url: "https://www.jpcert.or.jp/english/ir/form.html",
+      email: "info@jpcert.or.jp",
+    },
+  },
+
+  // ── Colombia National Police (South America) ────────────────────
+  {
+    type: "rss",
+    source: {
+      source_id: "policia-colombia",
+      authority_name: "Policía Nacional de Colombia",
+      country: "Colombia",
+      country_code: "CO",
+      region: "South America",
+      authority_type: "police",
+      base_url: "https://www.policia.gov.co",
+    },
+    feed_url: "https://www.policia.gov.co/rss.xml",
+    category: "public_appeal",
+    region_tag: "CO",
+    lat: 4.71,
+    lng: -74.07,
+    reporting: {
+      label: "Report to Policía Nacional",
+      url: "https://www.policia.gov.co/denuncia-virtual",
+      phone: "123 (Emergency) / 112 (Línea única)",
     },
   },
 ];

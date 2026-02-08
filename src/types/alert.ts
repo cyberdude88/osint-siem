@@ -48,5 +48,6 @@ export interface ReportingInfo {
   label: string;
   url?: string;
   phone?: string;
+  email?: string;
   notes?: string;
 }

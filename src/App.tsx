@@ -38,7 +38,7 @@ export default function App() {
   return (
     <div className="flex flex-col h-screen bg-siem-bg">
       {/* Top Bar */}
-      <Header />
+      <Header regionFilter={regionFilter} />
       <StatsBar alerts={alerts} />
 
       {/* Main Content */}

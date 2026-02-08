@@ -14,6 +14,8 @@ import {
   Radio,
   X,
   Phone,
+  Mail,
+  AlertTriangle,
 } from "lucide-react";
 
 interface Props {
@@ -138,32 +140,47 @@ export function AlertDetail({ alert, onClose }: Props) {
         </p>
 
         {alert.reporting && (
-          <div className="bg-white/5 rounded-lg p-3 border border-siem-border space-y-2">
-            <div className="text-[10px] uppercase tracking-wider text-siem-muted">
-              Report / Tip
+          <div className="rounded-lg border-2 border-amber-500/40 bg-amber-500/8 p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <AlertTriangle size={14} className="text-amber-400" />
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-300">
+                {alert.reporting.label}
+              </span>
             </div>
-            <div className="text-sm text-siem-text font-semibold">
-              {alert.reporting.label}
-            </div>
+            <p className="text-[11px] text-amber-200/70 leading-relaxed">
+              Have information? Submit a tip or report to the authority below.
+            </p>
             {alert.reporting.url && (
               <a
                 href={alert.reporting.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full py-2 px-3 bg-siem-accent/10 hover:bg-siem-accent/20 text-siem-text text-xs rounded-lg transition-colors"
+                className="flex items-center justify-center gap-2 w-full py-2.5 px-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-100 text-xs font-bold uppercase tracking-wider rounded-lg border border-amber-500/30 transition-colors"
               >
                 <ExternalLink size={14} />
-                REPORT ONLINE
+                Submit Report Online
               </a>
             )}
             {alert.reporting.phone && (
-              <div className="flex items-center gap-2 text-xs text-siem-muted">
-                <Phone size={12} />
-                {alert.reporting.phone}
-              </div>
+              <a
+                href={`tel:${alert.reporting.phone.replace(/[^+\d]/g, "")}`}
+                className="flex items-center gap-2 w-full py-2 px-3 bg-white/5 hover:bg-amber-500/10 text-siem-text text-xs rounded-lg border border-siem-border transition-colors"
+              >
+                <Phone size={13} className="text-amber-400 shrink-0" />
+                <span className="font-mono">{alert.reporting.phone}</span>
+              </a>
+            )}
+            {alert.reporting.email && (
+              <a
+                href={`mailto:${alert.reporting.email}`}
+                className="flex items-center gap-2 w-full py-2 px-3 bg-white/5 hover:bg-amber-500/10 text-siem-text text-xs rounded-lg border border-siem-border transition-colors"
+              >
+                <Mail size={13} className="text-amber-400 shrink-0" />
+                <span className="font-mono">{alert.reporting.email}</span>
+              </a>
             )}
             {alert.reporting.notes && (
-              <div className="text-[10px] text-siem-muted leading-relaxed">
+              <div className="text-[10px] text-amber-200/50 leading-relaxed border-t border-amber-500/20 pt-2">
                 {alert.reporting.notes}
               </div>
             )}
