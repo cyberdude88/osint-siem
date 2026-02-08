@@ -717,8 +717,11 @@ export function GlobeView({
         0,
         Math.min(1, (zoomRef.current.current - ZOOM_MIN) / (ZOOM_MAX - ZOOM_MIN))
       );
-      // Zoom sensitivity: high when zoomed out, fine-grained when zoomed in.
-      const zoomSensitivity = 0.35 + zoomNorm * 1.35;
+      // Bell-curve sensitivity: very fine near-surface, strongest mid/far distance.
+      const sigma = 0.28;
+      const center = 0.82;
+      const bell = Math.exp(-((zoomNorm - center) ** 2) / (2 * sigma * sigma));
+      const zoomSensitivity = 0.26 + bell * 1.6;
       adjustZoom(dir * ZOOM_STEP * baseIntensity * zoomSensitivity);
     };
 
@@ -731,6 +734,42 @@ export function GlobeView({
         return;
       }
       const rect = container.getBoundingClientRect();
+      const clickPx = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      };
+      const visibleSet = visibleAlertIdsRef.current;
+      const findNearbyVisibleAlertsAt = (lat: number, lng: number) =>
+        alerts
+          .filter((a) => visibleSet.has(a.alert_id))
+          .filter((a) => haversineKm(a.lat, a.lng, lat, lng) <= HOTSPOT_RADIUS_KM);
+      const findPixelClusterAt = (px: { x: number; y: number }, radiusPx: number) => {
+        const r2 = radiusPx * radiusPx;
+        return alerts.filter((a) => {
+          if (!visibleSet.has(a.alert_id)) return false;
+          const mesh = pointMeshes.get(a.alert_id);
+          if (!mesh || !mesh.visible) return false;
+          const p = mesh.getWorldPosition(new THREE.Vector3()).project(camera);
+          if (p.z < -1 || p.z > 1) return false;
+          const sx = ((p.x + 1) / 2) * rect.width;
+          const sy = ((1 - p.y) / 2) * rect.height;
+          const dx = sx - px.x;
+          const dy = sy - px.y;
+          return dx * dx + dy * dy <= r2;
+        });
+      };
+      const openHotspotFromCluster = (cluster: Alert[]) => {
+        if (cluster.length < HOTSPOT_MIN_ALERTS) return false;
+        const center = cluster.reduce(
+          (acc, a) => ({ lat: acc.lat + a.lat, lng: acc.lng + a.lng }),
+          { lat: 0, lng: 0 }
+        );
+        setHotspot({
+          lat: center.lat / cluster.length,
+          lng: center.lng / cluster.length,
+        });
+        return true;
+      };
       mv.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       mv.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
       raycaster.setFromCamera(mv, camera);
@@ -741,31 +780,9 @@ export function GlobeView({
           onSelect(id);
           const baseAlert = alertsById.get(id);
           if (baseAlert) {
-            const clickedPos = hits[0].object.getWorldPosition(new THREE.Vector3());
-            const clickedNdc = clickedPos.clone().project(camera);
-            const clickPx = {
-              x: ((clickedNdc.x + 1) / 2) * rect.width,
-              y: ((1 - clickedNdc.y) / 2) * rect.height,
-            };
-            const overlapped = alerts.filter((a) => {
-              if (!visibleIdSet.has(a.alert_id)) return false;
-              const mesh = pointMeshes.get(a.alert_id);
-              if (!mesh || !mesh.visible) return false;
-              const p = mesh.getWorldPosition(new THREE.Vector3()).project(camera);
-              if (p.z < -1 || p.z > 1) return false;
-              const px = ((p.x + 1) / 2) * rect.width;
-              const py = ((1 - p.y) / 2) * rect.height;
-              const dx = px - clickPx.x;
-              const dy = py - clickPx.y;
-              return dx * dx + dy * dy <= HOTSPOT_PIXEL_RADIUS * HOTSPOT_PIXEL_RADIUS;
-            });
-            const nearby = findNearbyVisibleAlerts(baseAlert.lat, baseAlert.lng);
-            if (
-              overlapped.length >= HOTSPOT_MIN_ALERTS ||
-              nearby.length >= HOTSPOT_MIN_ALERTS
-            ) {
-              setHotspot({ lat: baseAlert.lat, lng: baseAlert.lng });
-            } else {
+            const overlapped = findPixelClusterAt(clickPx, HOTSPOT_PIXEL_RADIUS * 1.3);
+            const nearby = findNearbyVisibleAlertsAt(baseAlert.lat, baseAlert.lng);
+            if (!openHotspotFromCluster(overlapped) && !openHotspotFromCluster(nearby)) {
               setHotspot(null);
             }
           }
@@ -780,10 +797,9 @@ export function GlobeView({
       const { lat, lng } = vector3ToLatLng(hitPoint);
       const region = latLngToRegion(lat, lng);
       if (!region) return;
-      const nearby = findNearbyVisibleAlerts(lat, lng);
-      if (nearby.length >= HOTSPOT_MIN_ALERTS) {
-        setHotspot({ lat, lng });
-      } else {
+      const overlapped = findPixelClusterAt(clickPx, HOTSPOT_PIXEL_RADIUS * 1.35);
+      const nearby = findNearbyVisibleAlertsAt(lat, lng);
+      if (!openHotspotFromCluster(overlapped) && !openHotspotFromCluster(nearby)) {
         setHotspot(null);
       }
       if (!regionSetRef.current.has(region)) return;
