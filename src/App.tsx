@@ -9,21 +9,18 @@ import { useAlerts } from "@/hooks/useAlerts";
 export default function App() {
   const { alerts, isLive, isLoading, sourceCount } = useAlerts();
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [closing, setClosing] = useState(false);
-  const closingRef = useRef(false);
+  const panelRef = useRef<HTMLDivElement>(null);
   const selectedAlert = selectedId
     ? alerts.find((a) => a.alert_id === selectedId) ?? null
     : null;
 
   const handleClose = useCallback(() => {
-    if (closingRef.current) return;
-    closingRef.current = true;
-    setClosing(true);
-    setTimeout(() => {
+    const el = panelRef.current;
+    if (!el) { setSelectedId(null); return; }
+    el.style.animation = "slide-out-right 0.3s ease-in forwards";
+    el.addEventListener("animationend", () => {
       setSelectedId(null);
-      setClosing(false);
-      closingRef.current = false;
-    }, 250);
+    }, { once: true });
   }, []);
 
   useEffect(() => {
@@ -66,7 +63,10 @@ export default function App() {
 
         {/* Right Panel: Slide-out Alert Detail */}
         {selectedAlert && (
-          <div className={`absolute top-0 right-0 h-full z-20 flex ${closing ? "animate-slide-out" : "animate-slide-in"}`}>
+          <div
+            ref={panelRef}
+            className="absolute top-0 right-0 h-full z-20 flex animate-slide-in"
+          >
             {/* Backdrop click to close */}
             <div
               className="w-8 cursor-pointer bg-gradient-to-r from-transparent to-black/30"
