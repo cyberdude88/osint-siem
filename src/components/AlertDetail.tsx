@@ -13,6 +13,7 @@ import {
   Shield,
   Radio,
   X,
+  Phone,
 } from "lucide-react";
 
 interface Props {
@@ -149,6 +150,39 @@ export function AlertDetail({ alert, onClose }: Props) {
           <br />
           No content is stored on this platform.
         </p>
+
+        {alert.reporting && (
+          <div className="bg-white/5 rounded-lg p-3 border border-siem-border space-y-2">
+            <div className="text-[10px] uppercase tracking-wider text-siem-muted">
+              Report / Tip
+            </div>
+            <div className="text-sm text-siem-text font-semibold">
+              {alert.reporting.label}
+            </div>
+            {alert.reporting.url && (
+              <a
+                href={alert.reporting.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 w-full py-2 px-3 bg-white/10 hover:bg-white/20 text-siem-text text-xs rounded-lg transition-colors"
+              >
+                <ExternalLink size={14} />
+                REPORT ONLINE
+              </a>
+            )}
+            {alert.reporting.phone && (
+              <div className="flex items-center gap-2 text-xs text-siem-muted">
+                <Phone size={12} />
+                {alert.reporting.phone}
+              </div>
+            )}
+            {alert.reporting.notes && (
+              <div className="text-[10px] text-siem-muted leading-relaxed">
+                {alert.reporting.notes}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,0 +1,45 @@
+name: Update alerts feed
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Fetch alerts
+        run: node scripts/fetch-alerts.mjs
+        env:
+          MAX_PER_SOURCE: "6"
+          OUTPUT_PATH: "public/alerts.json"
+
+      - name: Commit updates
+        run: |
+          if git diff --quiet -- public/alerts.json; then
+            echo "No changes"
+            exit 0
+          fi
+          git config user.name "osint-siem-bot"
+          git config user.email "osint-siem-bot@users.noreply.github.com"
+          git add public/alerts.json
+          git commit -m "chore: update alerts feed"
+          git push

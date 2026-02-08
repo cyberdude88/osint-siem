@@ -41,4 +41,12 @@ export interface Alert {
   lat: number;
   lng: number;
   freshness_hours: number;
+  reporting?: ReportingInfo;
+}
+
+export interface ReportingInfo {
+  label: string;
+  url?: string;
+  phone?: string;
+  notes?: string;
 }
