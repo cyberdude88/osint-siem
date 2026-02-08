@@ -213,6 +213,16 @@ const COUNTRY_CENTROIDS = {
   "south korea": [35.9078, 127.7669],
   singapore: [1.3521, 103.8198],
   "hong kong": [22.3193, 114.1694],
+  "south africa": [-30.5595, 22.9375],
+  nigeria: [9.082, 8.6753],
+  kenya: [-0.0236, 37.9062],
+  mexico: [23.6345, -102.5528],
+  chile: [-35.6751, -71.543],
+  argentina: [-38.4161, -63.6167],
+  norway: [60.472, 8.4689],
+  sweden: [60.1282, 18.6435],
+  denmark: [56.2639, 9.5018],
+  finland: [61.9241, 25.7482],
 };
 
 const CITY_CENTROIDS = {
@@ -737,6 +747,690 @@ const sources = [
       phone: "123 (Emergency) / 112 (Línea única)",
     },
   },
+
+  // ── CISA Alerts RSS (US / North America) ─────────────────────────
+  // May return 403 locally but works from GitHub Actions
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "cisa-alerts",
+      authority_name: "CISA Alerts",
+      country: "United States",
+      country_code: "US",
+      region: "North America",
+      authority_type: "cert",
+      base_url: "https://www.cisa.gov",
+    },
+    feed_url: "https://www.cisa.gov/cybersecurity-advisories/all.xml",
+    category: "cyber_advisory",
+    region_tag: "US",
+    lat: 38.89,
+    lng: -77.03,
+    reporting: {
+      label: "Report to CISA",
+      url: "https://www.cisa.gov/report",
+      phone: "1-888-282-0870",
+      email: "central@cisa.dhs.gov",
+      notes: "Use 911 for emergencies.",
+    },
+  },
+
+  // ── DHS (US / North America) ────────────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "dhs",
+      authority_name: "DHS",
+      country: "United States",
+      country_code: "US",
+      region: "North America",
+      authority_type: "national_security",
+      base_url: "https://www.dhs.gov",
+    },
+    feed_url: "https://www.dhs.gov/news/rss.xml",
+    category: "public_safety",
+    region_tag: "US",
+    lat: 38.886,
+    lng: -77.015,
+    reporting: {
+      label: "Report to DHS",
+      url: "https://www.dhs.gov/see-something-say-something/how-to-report-suspicious-activity",
+      phone: "1-866-347-2423",
+    },
+  },
+
+  // ── US Secret Service (US / North America) ──────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "usss",
+      authority_name: "US Secret Service",
+      country: "United States",
+      country_code: "US",
+      region: "North America",
+      authority_type: "police",
+      base_url: "https://www.secretservice.gov",
+    },
+    feed_url: "https://www.secretservice.gov/rss.xml",
+    category: "public_appeal",
+    region_tag: "US",
+    lat: 38.899,
+    lng: -77.034,
+    reporting: {
+      label: "Report to Secret Service",
+      url: "https://www.secretservice.gov/contact",
+      phone: "1-202-406-5708",
+    },
+  },
+
+  // ── DEA (US / North America) ────────────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "dea",
+      authority_name: "DEA",
+      country: "United States",
+      country_code: "US",
+      region: "North America",
+      authority_type: "police",
+      base_url: "https://www.dea.gov",
+    },
+    feed_url: "https://www.dea.gov/press-releases/rss.xml",
+    category: "public_appeal",
+    region_tag: "US",
+    lat: 38.871,
+    lng: -77.053,
+    reporting: {
+      label: "Report to DEA",
+      url: "https://www.dea.gov/submit-tip",
+      phone: "1-877-792-2873",
+    },
+  },
+
+  // ── ATF (US / North America) ────────────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "atf",
+      authority_name: "ATF",
+      country: "United States",
+      country_code: "US",
+      region: "North America",
+      authority_type: "police",
+      base_url: "https://www.atf.gov",
+    },
+    feed_url: "https://www.atf.gov/news/rss.xml",
+    category: "public_appeal",
+    region_tag: "US",
+    lat: 38.893,
+    lng: -77.025,
+    reporting: {
+      label: "Report to ATF",
+      url: "https://www.atf.gov/contact/atf-tips",
+      phone: "1-888-283-8477",
+      email: "atftips@atf.gov",
+    },
+  },
+
+  // ── US Marshals (US / North America) ────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "usms",
+      authority_name: "US Marshals",
+      country: "United States",
+      country_code: "US",
+      region: "North America",
+      authority_type: "police",
+      base_url: "https://www.usmarshals.gov",
+    },
+    feed_url: "https://www.usmarshals.gov/news/news-releases.rss",
+    category: "wanted_suspect",
+    region_tag: "US",
+    lat: 38.895,
+    lng: -77.021,
+    reporting: {
+      label: "Report to US Marshals",
+      url: "https://www.usmarshals.gov/tips",
+      phone: "1-877-926-8332",
+    },
+  },
+
+  // ── NCA UK (UK / Europe) ────────────────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "nca-uk",
+      authority_name: "NCA UK",
+      country: "United Kingdom",
+      country_code: "GB",
+      region: "Europe",
+      authority_type: "police",
+      base_url: "https://www.nationalcrimeagency.gov.uk",
+    },
+    feed_url: "https://nationalcrimeagency.gov.uk/news?format=feed&type=rss",
+    category: "public_appeal",
+    region_tag: "GB",
+    lat: 51.49,
+    lng: -0.11,
+    reporting: {
+      label: "Report to NCA",
+      url: "https://www.nationalcrimeagency.gov.uk/what-we-do/crime-threats/cyber-crime/reporting-cyber-crime",
+      phone: "0370 496 7622",
+    },
+  },
+
+  // ── GMP Manchester UK (UK / Europe) ─────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "gmp-uk",
+      authority_name: "Greater Manchester Police",
+      country: "United Kingdom",
+      country_code: "GB",
+      region: "Europe",
+      authority_type: "police",
+      base_url: "https://www.gmp.police.uk",
+    },
+    feed_url: "https://www.gmp.police.uk/news/greater-manchester/rss/",
+    category: "public_appeal",
+    region_tag: "GB",
+    lat: 53.48,
+    lng: -2.24,
+    reporting: {
+      label: "Report to GMP",
+      url: "https://www.gmp.police.uk/ro/report/",
+      phone: "999 (Emergency) / 101 (Non-emergency)",
+    },
+  },
+
+  // ── Met Police UK (UK / Europe) ─────────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "met-police-uk",
+      authority_name: "Met Police UK",
+      country: "United Kingdom",
+      country_code: "GB",
+      region: "Europe",
+      authority_type: "police",
+      base_url: "https://news.met.police.uk",
+    },
+    feed_url: "https://news.met.police.uk/feeds/rss",
+    category: "public_appeal",
+    region_tag: "GB",
+    lat: 51.51,
+    lng: -0.14,
+    reporting: {
+      label: "Report to Met Police",
+      url: "https://www.met.police.uk/ro/report/",
+      phone: "999 (Emergency) / 101 (Non-emergency)",
+    },
+  },
+
+  // ── BSI Germany (Germany / Europe) ──────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "bsi-de",
+      authority_name: "BSI Germany",
+      country: "Germany",
+      country_code: "DE",
+      region: "Europe",
+      authority_type: "cert",
+      base_url: "https://www.bsi.bund.de",
+    },
+    feed_url: "https://www.bsi.bund.de/SiteGlobals/Functions/RSSFeed/RSSNewsfeed/RSSNewsfeed.xml",
+    category: "cyber_advisory",
+    region_tag: "DE",
+    lat: 50.73,
+    lng: 7.10,
+    reporting: {
+      label: "Report to BSI",
+      url: "https://www.bsi.bund.de/EN/Service-Navi/Contact/contact_node.html",
+      email: "certbund@bsi.bund.de",
+    },
+  },
+
+  // ── BKA Germany (Germany / Europe) ──────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "bka-de",
+      authority_name: "BKA Germany",
+      country: "Germany",
+      country_code: "DE",
+      region: "Europe",
+      authority_type: "police",
+      base_url: "https://www.bka.de",
+    },
+    feed_url: "https://www.bka.de/SharedDocs/Kurzmeldungen/DE/Warnhinweise/RSS/BKA_Pressemitteilungen_RSS.xml",
+    category: "wanted_suspect",
+    region_tag: "DE",
+    lat: 50.12,
+    lng: 8.68,
+    reporting: {
+      label: "Report to BKA",
+      url: "https://www.bka.de/DE/KontaktAufnehmen/Hinweisportal/hinweisportal_node.html",
+      phone: "+49 611 55-0",
+    },
+  },
+
+  // ── ACSC Australia (Oceania) ────────────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "acsc-au",
+      authority_name: "ACSC Australia",
+      country: "Australia",
+      country_code: "AU",
+      region: "Oceania",
+      authority_type: "cert",
+      base_url: "https://www.cyber.gov.au",
+    },
+    feed_url: "https://www.cyber.gov.au/about-us/advisories/rss.xml",
+    category: "cyber_advisory",
+    region_tag: "AU",
+    lat: -35.28,
+    lng: 149.13,
+    reporting: {
+      label: "Report to ACSC",
+      url: "https://www.cyber.gov.au/report-and-recover/report",
+      phone: "1300 292 371",
+    },
+  },
+
+  // ── AFP Australia (Oceania) ─────────────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "afp-au",
+      authority_name: "AFP Australia",
+      country: "Australia",
+      country_code: "AU",
+      region: "Oceania",
+      authority_type: "police",
+      base_url: "https://www.afp.gov.au",
+    },
+    feed_url: "https://www.afp.gov.au/news-centre/media-releases/rss.xml",
+    category: "public_appeal",
+    region_tag: "AU",
+    lat: -35.31,
+    lng: 149.14,
+    reporting: {
+      label: "Report to AFP",
+      url: "https://www.afp.gov.au/what-we-do/crime-types/report-crime",
+      phone: "131 237",
+    },
+  },
+
+  // ── Canada Cyber Centre (North America) ─────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "cccs-ca",
+      authority_name: "Canada Cyber Centre",
+      country: "Canada",
+      country_code: "CA",
+      region: "North America",
+      authority_type: "cert",
+      base_url: "https://www.cyber.gc.ca",
+    },
+    feed_url: "https://www.cyber.gc.ca/en/alerts-advisories/feed",
+    category: "cyber_advisory",
+    region_tag: "CA",
+    lat: 45.42,
+    lng: -75.69,
+    reporting: {
+      label: "Report to Cyber Centre",
+      url: "https://www.cyber.gc.ca/en/incident-management",
+      email: "contact@cyber.gc.ca",
+      phone: "1-833-292-3722",
+    },
+  },
+
+  // ── RCMP Canada (North America) ─────────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "rcmp-ca",
+      authority_name: "RCMP Canada",
+      country: "Canada",
+      country_code: "CA",
+      region: "North America",
+      authority_type: "police",
+      base_url: "https://www.rcmp-grc.gc.ca",
+    },
+    feed_url: "https://www.rcmp-grc.gc.ca/en/news/rss",
+    category: "public_appeal",
+    region_tag: "CA",
+    lat: 45.40,
+    lng: -75.70,
+    reporting: {
+      label: "Report to RCMP",
+      url: "https://www.rcmp-grc.gc.ca/en/report-information-online",
+      phone: "1-800-771-5401",
+    },
+  },
+
+  // ── Policia Nacional Spain (Europe) ─────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "cnp-es",
+      authority_name: "Policía Nacional Spain",
+      country: "Spain",
+      country_code: "ES",
+      region: "Europe",
+      authority_type: "police",
+      base_url: "https://www.policia.es",
+    },
+    feed_url: "https://www.policia.es/rss/rss_prensa.xml",
+    category: "public_appeal",
+    region_tag: "ES",
+    lat: 40.42,
+    lng: -3.70,
+    reporting: {
+      label: "Report to Policía Nacional",
+      url: "https://www.policia.es/colabora.php",
+      phone: "091",
+    },
+  },
+
+  // ── CERT-In India (Asia) ────────────────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "cert-in",
+      authority_name: "CERT-In",
+      country: "India",
+      country_code: "IN",
+      region: "Asia",
+      authority_type: "cert",
+      base_url: "https://www.cert-in.org.in",
+    },
+    feed_url: "https://www.cert-in.org.in/s2cMainServlet?pageid=RSSFEED",
+    category: "cyber_advisory",
+    region_tag: "IN",
+    lat: 28.61,
+    lng: 77.21,
+    reporting: {
+      label: "Report to CERT-In",
+      url: "https://www.cert-in.org.in/",
+      email: "incident@cert-in.org.in",
+      phone: "+91-11-24368572",
+    },
+  },
+
+  // ── SingCERT Singapore (Asia) ───────────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "singcert",
+      authority_name: "SingCERT",
+      country: "Singapore",
+      country_code: "SG",
+      region: "Asia",
+      authority_type: "cert",
+      base_url: "https://www.csa.gov.sg",
+    },
+    feed_url: "https://www.csa.gov.sg/singcert/Alerts/rss",
+    category: "cyber_advisory",
+    region_tag: "SG",
+    lat: 1.29,
+    lng: 103.85,
+    reporting: {
+      label: "Report to SingCERT",
+      url: "https://www.csa.gov.sg/singcert/reporting",
+      email: "singcert@csa.gov.sg",
+      phone: "+65 6323 5052",
+    },
+  },
+
+  // ── HKCERT Hong Kong (Asia) ─────────────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "hkcert",
+      authority_name: "HKCERT",
+      country: "Hong Kong",
+      country_code: "HK",
+      region: "Asia",
+      authority_type: "cert",
+      base_url: "https://www.hkcert.org",
+    },
+    feed_url: "https://www.hkcert.org/rss",
+    category: "cyber_advisory",
+    region_tag: "HK",
+    lat: 22.32,
+    lng: 114.17,
+    reporting: {
+      label: "Report to HKCERT",
+      url: "https://www.hkcert.org/report-incident",
+      email: "hkcert@hkcert.org",
+      phone: "+852 8105 6060",
+    },
+  },
+
+  // ── SAPS South Africa (Africa) ──────────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "saps-za",
+      authority_name: "SAPS South Africa",
+      country: "South Africa",
+      country_code: "ZA",
+      region: "Africa",
+      authority_type: "police",
+      base_url: "https://www.saps.gov.za",
+    },
+    feed_url: "https://www.saps.gov.za/newsroom/rss.php",
+    category: "public_appeal",
+    region_tag: "ZA",
+    lat: -25.75,
+    lng: 28.19,
+    reporting: {
+      label: "Report to SAPS",
+      url: "https://www.saps.gov.za/resource_centre/contacts/contacts.php",
+      phone: "10111 (Emergency) / 08600 10111 (Crime Stop)",
+    },
+  },
+
+  // ── Crimestoppers UK (Europe) ───────────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "crimestoppers-uk",
+      authority_name: "Crimestoppers UK",
+      country: "United Kingdom",
+      country_code: "GB",
+      region: "Europe",
+      authority_type: "public_safety_program",
+      base_url: "https://www.crimestoppers-uk.org",
+    },
+    feed_url: "https://www.crimestoppers-uk.org/give-information/latest-news-feeds/rss",
+    category: "public_appeal",
+    region_tag: "GB",
+    lat: 51.52,
+    lng: -0.08,
+    reporting: {
+      label: "Report to Crimestoppers",
+      url: "https://crimestoppers-uk.org/give-information",
+      phone: "0800 555 111",
+      notes: "100% anonymous. You can also report online.",
+    },
+  },
+
+  // ── Japan NPA (Asia) ────────────────────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "npa-jp",
+      authority_name: "Japan NPA",
+      country: "Japan",
+      country_code: "JP",
+      region: "Asia",
+      authority_type: "police",
+      base_url: "https://www.npa.go.jp",
+    },
+    feed_url: "https://www.npa.go.jp/rss/index.xml",
+    category: "public_safety",
+    region_tag: "JP",
+    lat: 35.69,
+    lng: 139.75,
+    reporting: {
+      label: "Report to NPA Japan",
+      url: "https://www.npa.go.jp/english/index.html",
+      phone: "110 (Emergency)",
+    },
+  },
+
+  // ── Gendarmerie France (Europe) ─────────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "gendarmerie-fr",
+      authority_name: "Gendarmerie France",
+      country: "France",
+      country_code: "FR",
+      region: "Europe",
+      authority_type: "police",
+      base_url: "https://www.gendarmerie.interieur.gouv.fr",
+    },
+    feed_url: "https://www.gendarmerie.interieur.gouv.fr/rss",
+    category: "public_appeal",
+    region_tag: "FR",
+    lat: 48.85,
+    lng: 2.30,
+    reporting: {
+      label: "Report to Gendarmerie",
+      url: "https://www.pre-plainte-en-ligne.gouv.fr/",
+      phone: "17 (Emergency)",
+    },
+  },
+
+  // ── Polisen Sweden (Europe) ─────────────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "polisen-se",
+      authority_name: "Polisen Sweden",
+      country: "Sweden",
+      country_code: "SE",
+      region: "Europe",
+      authority_type: "police",
+      base_url: "https://polisen.se",
+    },
+    feed_url: "https://polisen.se/aktuellt/rss/hela-landet/",
+    category: "public_appeal",
+    region_tag: "SE",
+    lat: 59.33,
+    lng: 18.07,
+    reporting: {
+      label: "Report to Polisen",
+      url: "https://polisen.se/en/victims-of-crime/report-a-crime-online/",
+      phone: "112 (Emergency) / 114 14 (Non-emergency)",
+    },
+  },
+
+  // ── Politiet Norway (Europe) ────────────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "politiet-no",
+      authority_name: "Politiet Norway",
+      country: "Norway",
+      country_code: "NO",
+      region: "Europe",
+      authority_type: "police",
+      base_url: "https://www.politiet.no",
+    },
+    feed_url: "https://www.politiet.no/rss/",
+    category: "public_appeal",
+    region_tag: "NO",
+    lat: 59.91,
+    lng: 10.75,
+    reporting: {
+      label: "Report to Politiet",
+      url: "https://www.politiet.no/en/services/report-an-offence/",
+      phone: "112 (Emergency) / 02800 (Non-emergency)",
+    },
+  },
+
+  // ── Policia Federal Brazil (South America) ──────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "pf-br",
+      authority_name: "Polícia Federal Brazil",
+      country: "Brazil",
+      country_code: "BR",
+      region: "South America",
+      authority_type: "police",
+      base_url: "https://www.gov.br/pf",
+    },
+    feed_url: "https://www.gov.br/pf/pt-br/rss",
+    category: "public_appeal",
+    region_tag: "BR",
+    lat: -15.79,
+    lng: -47.88,
+    reporting: {
+      label: "Report to Polícia Federal",
+      url: "https://www.gov.br/pf/pt-br/canais_atendimento/denuncia",
+      phone: "190 (Emergency)",
+    },
+  },
+
+  // ── Carabineros Chile (South America) ───────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "carabineros-cl",
+      authority_name: "Carabineros Chile",
+      country: "Chile",
+      country_code: "CL",
+      region: "South America",
+      authority_type: "police",
+      base_url: "https://www.carabineros.cl",
+    },
+    feed_url: "https://www.carabineros.cl/rss",
+    category: "public_appeal",
+    region_tag: "CL",
+    lat: -33.45,
+    lng: -70.67,
+    reporting: {
+      label: "Report to Carabineros",
+      url: "https://www.carabineros.cl/",
+      phone: "133 (Emergency)",
+    },
+  },
 ];
 
 function decodeXml(value) {
@@ -1054,17 +1748,24 @@ function kevItemToAlert(entry, meta) {
 }
 
 async function fetchFeed(url, followRedirects = false) {
-  const response = await fetch(url, {
-    redirect: followRedirects ? "follow" : "manual",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (compatible; osint-siem-bot/1.0)",
-      Accept: "application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.8",
-    },
-  });
-  if (!response.ok) {
-    throw new Error(`feed fetch failed ${response.status} ${url}`);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
+  try {
+    const response = await fetch(url, {
+      redirect: followRedirects ? "follow" : "manual",
+      signal: controller.signal,
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; osint-siem-bot/1.0)",
+        Accept: "application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.8",
+      },
+    });
+    if (!response.ok) {
+      throw new Error(`feed fetch failed ${response.status} ${url}`);
+    }
+    return response.text();
+  } finally {
+    clearTimeout(timer);
   }
-  return response.text();
 }
 
 async function fetchRss(meta, now) {
@@ -1106,12 +1807,20 @@ async function fetchRss(meta, now) {
 }
 
 async function fetchKev(meta) {
-  const response = await fetch(meta.feed_url, {
-    headers: {
-      "User-Agent": "osint-siem-bot/1.0",
-      Accept: "application/json",
-    },
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
+  let response;
+  try {
+    response = await fetch(meta.feed_url, {
+      signal: controller.signal,
+      headers: {
+        "User-Agent": "osint-siem-bot/1.0",
+        Accept: "application/json",
+      },
+    });
+  } finally {
+    clearTimeout(timer);
+  }
   if (!response.ok) {
     throw new Error(`kev fetch failed ${response.status} ${meta.feed_url}`);
   }
@@ -1126,12 +1835,20 @@ async function fetchKev(meta) {
 }
 
 async function fetchInterpolNotices(meta, now) {
-  const response = await fetch(meta.feed_url, {
-    headers: {
-      "User-Agent": "osint-siem-bot/1.0",
-      Accept: "application/json",
-    },
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
+  let response;
+  try {
+    response = await fetch(meta.feed_url, {
+      signal: controller.signal,
+      headers: {
+        "User-Agent": "osint-siem-bot/1.0",
+        Accept: "application/json",
+      },
+    });
+  } finally {
+    clearTimeout(timer);
+  }
   if (!response.ok) {
     throw new Error(`interpol fetch failed ${response.status} ${meta.feed_url}`);
   }
