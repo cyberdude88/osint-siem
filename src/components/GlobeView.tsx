@@ -10,9 +10,9 @@ const US_STATES_GEOJSON_URL =
   "https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json";
 const AUTO_ROTATE_SPEED = 0.0003;
 const AUTO_ROTATE_EASE = 2.8;
-const ZOOM_MIN = 1.06;
+const ZOOM_MIN = 1.55;
 const ZOOM_MAX = 4.6;
-const ZOOM_STEP = 0.24;
+const ZOOM_STEP = 0.08;
 const ZOOM_EASE = 7.5;
 const INITIAL_TILT_X = 0.06;
 
@@ -232,6 +232,7 @@ export function GlobeView({
     currentSpeed: AUTO_ROTATE_SPEED,
   });
   const regionFilterRef = useRef(regionFilter);
+  const selectedIdRef = useRef<string | null>(selectedId);
   const visibleAlertIdsRef = useRef<Set<string>>(new Set(visibleAlertIds));
   const regionSetRef = useRef<Set<string>>(new Set());
   const adjustZoom = (delta: number) => {
@@ -242,6 +243,10 @@ export function GlobeView({
   useEffect(() => {
     regionFilterRef.current = regionFilter;
   }, [regionFilter]);
+
+  useEffect(() => {
+    selectedIdRef.current = selectedId;
+  }, [selectedId]);
 
   useEffect(() => {
     visibleAlertIdsRef.current = new Set(visibleAlertIds);
@@ -416,7 +421,12 @@ export function GlobeView({
     const pointMeshes = new Map<string, THREE.Mesh>();
     const glowTexture = createGlowTexture();
     const glowMeshes: THREE.Mesh[] = [];
-    const allDotMeshes: { mesh: THREE.Mesh; severity: string; alertId: string }[] = [];
+    const allDotMeshes: {
+      mesh: THREE.Mesh;
+      severity: string;
+      alertId: string;
+      baseGlow: number;
+    }[] = [];
     alerts.forEach((alert, idx) => {
       const pos = latLngToVector3(alert.lat, alert.lng, 1.02);
       const size =
@@ -444,7 +454,6 @@ export function GlobeView({
       dotMesh.userData = { alertId: alert.alert_id, region: alert.source.region };
       globeGroup.add(dotMesh);
       pointMeshes.set(alert.alert_id, dotMesh);
-      allDotMeshes.push({ mesh: dotMesh, severity: alert.severity, alertId: alert.alert_id });
 
       // Bright inner center for a crisp, modern marker look
       const coreGeo = new THREE.SphereGeometry(size * 0.42, 10, 10);
@@ -480,6 +489,12 @@ export function GlobeView({
       };
       globeGroup.add(gm);
       glowMeshes.push(gm);
+      allDotMeshes.push({
+        mesh: dotMesh,
+        severity: alert.severity,
+        alertId: alert.alert_id,
+        baseGlow,
+      });
     });
     pointMeshesRef.current = pointMeshes;
 
@@ -509,8 +524,15 @@ export function GlobeView({
       rotationRef.current.y = globeGroup.rotation.y;
 
       const activeRegion = regionFilterRef.current;
+      const selected = selectedIdRef.current;
       const visibleSet = visibleAlertIdsRef.current;
       const zoomLevel = zoomRef.current.current;
+      const zoomNorm = Math.max(
+        0,
+        Math.min(1, (zoomLevel - ZOOM_MIN) / (ZOOM_MAX - ZOOM_MIN))
+      );
+      const dotScaleBase = 0.42 + zoomNorm * 0.68; // smaller when zoomed in
+      const glowScaleBase = 0.38 + zoomNorm * 0.62; // tighter glow when zoomed in
 
       // Keep surface glows static so they read as city lights, not VFX
       glowMeshes.forEach((gm) => {
@@ -521,7 +543,7 @@ export function GlobeView({
         const { baseGlow } = gm.userData as {
           baseGlow: number;
         };
-        gm.scale.set(baseGlow, baseGlow, 1);
+        gm.scale.set(baseGlow * glowScaleBase, baseGlow * glowScaleBase, 1);
         const base = 0.13;
         const region = (gm.userData as { region?: string }).region;
         const dim = activeRegion === "all" || !region || region === activeRegion ? 1 : 0.15;
@@ -535,7 +557,9 @@ export function GlobeView({
         if (!isVisibleInStack) return;
         const region = (entry.mesh.userData as { region?: string }).region;
         const dim = activeRegion === "all" || !region || region === activeRegion ? 1 : 0.15;
-        entry.mesh.scale.set(1, 1, 1);
+        const selectedBoost = entry.alertId === selected ? 1.9 : 1;
+        const dotScale = dotScaleBase * selectedBoost;
+        entry.mesh.scale.set(dotScale, dotScale, dotScale);
         (entry.mesh.material as THREE.MeshBasicMaterial).opacity = dim;
       });
 
@@ -591,7 +615,7 @@ export function GlobeView({
       const normalized = e.deltaY * deltaScale;
       if (normalized === 0) return;
       const dir = normalized > 0 ? 1 : -1;
-      const intensity = Math.max(0.4, Math.min(1.8, Math.abs(normalized) / 120));
+      const intensity = Math.max(0.25, Math.min(1.2, Math.abs(normalized) / 140));
       adjustZoom(dir * ZOOM_STEP * intensity);
     };
 
