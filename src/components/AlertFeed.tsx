@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { Alert } from "@/types/alert";
+import type { Alert, AlertCategory, Severity } from "@/types/alert";
 import {
   severityBg,
   severityLabel,
@@ -26,6 +26,8 @@ export function AlertFeed({
   onRegionChange,
 }: Props) {
   const [actionableOnly, setActionableOnly] = useState(true);
+  const [categoryFilter, setCategoryFilter] = useState<AlertCategory | "all">("all");
+  const [severityFilter, setSeverityFilter] = useState<Severity | "all">("all");
   const [isRefreshingList, setIsRefreshingList] = useState(false);
   const [newAlertIds, setNewAlertIds] = useState<Set<string>>(new Set());
   const knownAlertIdsRef = useRef<Set<string>>(new Set());
@@ -41,17 +43,23 @@ export function AlertFeed({
     return [...set.entries()].sort((a, b) => b[1] - a[1]);
   }, [alerts]);
 
-  const filtered =
+  const regionFiltered =
     regionFilter === "all"
       ? alerts
       : alerts.filter((a) => a.source.region === regionFilter);
 
   const actionable = actionableOnly
-    ? filtered.filter((a) => a.reporting?.url || a.reporting?.phone)
-    : filtered;
+    ? regionFiltered.filter((a) => a.reporting?.url || a.reporting?.phone)
+    : regionFiltered;
 
-  const infoAlerts = actionable.filter((a) => a.severity === "info");
-  const primaryAlerts = actionable.filter((a) => a.severity !== "info");
+  const facetFiltered = actionable.filter((a) => {
+    const categoryMatch = categoryFilter === "all" || a.category === categoryFilter;
+    const severityMatch = severityFilter === "all" || a.severity === severityFilter;
+    return categoryMatch && severityMatch;
+  });
+
+  const infoAlerts = facetFiltered.filter((a) => a.severity === "info");
+  const primaryAlerts = facetFiltered.filter((a) => a.severity !== "info");
 
   const sorted = [...primaryAlerts].sort((a, b) => {
     const sev = ["critical", "high", "medium", "low", "info"];
@@ -187,10 +195,10 @@ export function AlertFeed({
       <div className="px-3 py-3 border-b border-siem-border bg-siem-panel/95 space-y-2.5">
         <div className="flex items-center justify-between">
           <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-siem-muted">
-            SOC Triage Stack
+            SOC Alert Stack
           </h2>
           <span className="px-2 py-0.5 rounded border border-siem-accent/30 bg-siem-accent/12 text-[10px] text-siem-accent font-mono">
-            {actionable.length} IN QUEUE
+            {facetFiltered.length} IN QUEUE
           </span>
         </div>
         <div className="grid grid-cols-2 gap-2 text-[10px] font-mono uppercase tracking-wide">
@@ -205,8 +213,8 @@ export function AlertFeed({
             </span>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1">
+        <div className="grid grid-cols-1 gap-2">
+          <div className="relative">
             <Globe size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-siem-muted pointer-events-none" />
             <select
               value={regionFilter}
@@ -222,17 +230,49 @@ export function AlertFeed({
             </select>
             <ChevronDown size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-siem-muted pointer-events-none" />
           </div>
-          <button
-            type="button"
-            onClick={() => setActionableOnly((prev) => !prev)}
-            className={`shrink-0 rounded-md border px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors ${
-              actionableOnly
-                ? "bg-siem-accent/18 text-siem-accent border-siem-accent/35"
-                : "bg-white/5 text-siem-muted border-siem-border hover:bg-siem-accent/10 hover:text-siem-accent"
-            }`}
-          >
-            Actionable
-          </button>
+          <div className="relative">
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value as AlertCategory | "all")}
+              className="w-full appearance-none bg-white/5 border border-siem-border rounded-md px-2.5 pr-8 py-1.5 text-xs text-siem-text cursor-pointer hover:bg-siem-accent/10 transition-colors focus:outline-none focus:ring-1 focus:ring-siem-accent"
+            >
+              <option value="all">All Categories</option>
+              {categoryOrder.map((category) => (
+                <option key={category} value={category}>
+                  {categoryLabels[category]}
+                </option>
+              ))}
+            </select>
+            <ChevronDown size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-siem-muted pointer-events-none" />
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <select
+                value={severityFilter}
+                onChange={(e) => setSeverityFilter(e.target.value as Severity | "all")}
+                className="w-full appearance-none bg-white/5 border border-siem-border rounded-md px-2.5 pr-8 py-1.5 text-xs text-siem-text cursor-pointer hover:bg-siem-accent/10 transition-colors focus:outline-none focus:ring-1 focus:ring-siem-accent"
+              >
+                <option value="all">All Severity</option>
+                <option value="critical">Critical</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+                <option value="info">Informational</option>
+              </select>
+              <ChevronDown size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-siem-muted pointer-events-none" />
+            </div>
+            <button
+              type="button"
+              onClick={() => setActionableOnly((prev) => !prev)}
+              className={`shrink-0 rounded-md border px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors ${
+                actionableOnly
+                  ? "bg-siem-accent/18 text-siem-accent border-siem-accent/35"
+                  : "bg-white/5 text-siem-muted border-siem-border hover:bg-siem-accent/10 hover:text-siem-accent"
+              }`}
+            >
+              Actionable
+            </button>
+          </div>
         </div>
       </div>
       <div
@@ -256,7 +296,7 @@ export function AlertFeed({
               </span>
             </div>
             <div className="p-2 space-y-2">
-              {group.alerts.map((alert, idx) => renderAlertCard(alert, "Queue", idx))}
+              {group.alerts.map((alert, idx) => renderAlertCard(alert, "Stack", idx))}
             </div>
           </section>
         ))}
@@ -271,11 +311,11 @@ export function AlertFeed({
               </span>
             </div>
             <div className="p-2 space-y-2">
-              {infoAlerts.map((alert, idx) => renderAlertCard(alert, "Info", idx))}
+              {infoAlerts.map((alert, idx) => renderAlertCard(alert, "Stack", idx))}
             </div>
           </section>
         )}
-        {actionable.length === 0 && (
+        {facetFiltered.length === 0 && (
           <div className="rounded-lg border border-siem-border bg-siem-panel/35 p-4 text-center">
             <p className="text-xs text-siem-muted uppercase tracking-wider">
               No alerts match current queue filters

@@ -6,8 +6,12 @@ import { severityColors } from "@/lib/severity";
 
 const WORLD_TOPO_URL =
   "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
-const AUTO_ROTATE_SPEED = 0.0015;
+const AUTO_ROTATE_SPEED = 0.0003;
 const AUTO_ROTATE_EASE = 2.8;
+const ZOOM_MIN = 2.15;
+const ZOOM_MAX = 4.6;
+const ZOOM_STEP = 0.24;
+const ZOOM_EASE = 7.5;
 
 interface Props {
   alerts: Alert[];
@@ -157,6 +161,7 @@ export function GlobeView({
   const pointMeshesRef = useRef<Map<string, THREE.Mesh>>(new Map());
   const frameRef = useRef<number>(0);
   const mouseRef = useRef({ isDown: false, prevX: 0, prevY: 0 });
+  const zoomRef = useRef({ current: 3.2, target: 3.2 });
   const rotationRef = useRef({
     autoRotate: true,
     x: 0.35,
@@ -165,6 +170,10 @@ export function GlobeView({
   });
   const regionFilterRef = useRef(regionFilter);
   const regionSetRef = useRef<Set<string>>(new Set());
+  const adjustZoom = (delta: number) => {
+    const next = zoomRef.current.target + delta;
+    zoomRef.current.target = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, next));
+  };
 
   useEffect(() => {
     regionFilterRef.current = regionFilter;
@@ -188,7 +197,7 @@ export function GlobeView({
       0.1,
       1000
     );
-    camera.position.z = 3.2;
+    camera.position.z = zoomRef.current.current;
 
     // --- Renderer ---
     const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -392,6 +401,10 @@ export function GlobeView({
       rotationRef.current.currentSpeed +=
         (targetSpeed - rotationRef.current.currentSpeed) * ease;
       globeGroup.rotation.y += rotationRef.current.currentSpeed * delta;
+      const zoomEase = Math.min(1, delta * ZOOM_EASE);
+      zoomRef.current.current +=
+        (zoomRef.current.target - zoomRef.current.current) * zoomEase;
+      camera.position.z = zoomRef.current.current;
       rotationRef.current.x = globeGroup.rotation.x;
       rotationRef.current.y = globeGroup.rotation.y;
 
@@ -452,6 +465,21 @@ export function GlobeView({
       mouseRef.current.isDown = false;
       rotationRef.current.autoRotate = true;
     };
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const deltaScale =
+        e.deltaMode === WheelEvent.DOM_DELTA_LINE
+          ? 16
+          : e.deltaMode === WheelEvent.DOM_DELTA_PAGE
+          ? window.innerHeight
+          : 1;
+      const normalized = e.deltaY * deltaScale;
+      if (normalized === 0) return;
+      const dir = normalized > 0 ? 1 : -1;
+      const intensity = Math.max(0.4, Math.min(1.8, Math.abs(normalized) / 120));
+      adjustZoom(dir * ZOOM_STEP * intensity);
+    };
 
     // --- Click raycasting ---
     const raycaster = new THREE.Raycaster();
@@ -485,6 +513,8 @@ export function GlobeView({
     el.addEventListener("mouseup", onUp);
     el.addEventListener("mouseleave", onUp);
     el.addEventListener("click", onClk);
+    el.addEventListener("wheel", onWheel, { passive: false });
+    container.addEventListener("wheel", onWheel, { passive: false });
 
     return () => {
       cancelAnimationFrame(frameRef.current);
@@ -494,6 +524,8 @@ export function GlobeView({
       el.removeEventListener("mouseup", onUp);
       el.removeEventListener("mouseleave", onUp);
       el.removeEventListener("click", onClk);
+      el.removeEventListener("wheel", onWheel);
+      container.removeEventListener("wheel", onWheel);
       container.removeChild(el);
       renderer.dispose();
       glowTexture.dispose();
@@ -542,7 +574,25 @@ export function GlobeView({
         ))}
       </div>
       <div className="absolute top-4 left-1/2 -translate-x-1/2 text-[10px] text-siem-muted/50 uppercase tracking-widest pointer-events-none">
-        Drag to rotate &middot; Click alert points
+        Drag to rotate &middot; Scroll to zoom &middot; Click alert points
+      </div>
+      <div className="absolute bottom-4 right-4 flex items-center gap-1.5 bg-siem-panel/80 backdrop-blur-sm px-2 py-2 rounded-lg border border-siem-border">
+        <button
+          onClick={() => adjustZoom(-ZOOM_STEP * 1.2)}
+          className="w-7 h-7 rounded border border-siem-border bg-white/5 text-siem-text hover:bg-siem-accent/10 hover:text-siem-accent transition-colors text-sm font-bold"
+          aria-label="Zoom in"
+          title="Zoom in"
+        >
+          +
+        </button>
+        <button
+          onClick={() => adjustZoom(ZOOM_STEP * 1.2)}
+          className="w-7 h-7 rounded border border-siem-border bg-white/5 text-siem-text hover:bg-siem-accent/10 hover:text-siem-accent transition-colors text-sm font-bold"
+          aria-label="Zoom out"
+          title="Zoom out"
+        >
+          -
+        </button>
       </div>
       <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-siem-panel/80 backdrop-blur-sm px-2.5 py-2 rounded-lg border border-siem-border">
         <button
