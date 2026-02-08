@@ -35,7 +35,7 @@ export function AlertDetail({ alert, onClose }: Props) {
         </h2>
         <button
           onClick={onClose}
-          className="p-1 rounded hover:bg-white/10 text-siem-muted"
+          className="p-1 rounded hover:bg-siem-accent/12 hover:text-siem-accent text-siem-muted transition-colors"
         >
           <X size={14} />
         </button>
@@ -71,7 +71,7 @@ export function AlertDetail({ alert, onClose }: Props) {
               Authority
             </div>
             <div className="flex items-center gap-1.5 text-sm">
-              <Building2 size={12} className="text-siem-accent" />
+              <Building2 size={12} className="text-siem-neutral" />
               {alert.source.authority_name}
             </div>
           </div>
@@ -80,7 +80,7 @@ export function AlertDetail({ alert, onClose }: Props) {
               Country
             </div>
             <div className="flex items-center gap-1.5 text-sm">
-              <MapPin size={12} className="text-siem-accent" />
+              <MapPin size={12} className="text-siem-neutral" />
               {alert.source.country}
             </div>
           </div>
@@ -95,7 +95,7 @@ export function AlertDetail({ alert, onClose }: Props) {
               First Seen
             </div>
             <div className="flex items-center gap-1.5 text-sm">
-              <Clock size={12} className="text-siem-accent" />
+              <Clock size={12} className="text-siem-neutral" />
               {freshnessLabel(alert.freshness_hours)}
             </div>
           </div>
@@ -156,7 +156,7 @@ export function AlertDetail({ alert, onClose }: Props) {
                 href={alert.reporting.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full py-2 px-3 bg-white/10 hover:bg-white/20 text-siem-text text-xs rounded-lg transition-colors"
+                className="flex items-center justify-center gap-2 w-full py-2 px-3 bg-siem-accent/10 hover:bg-siem-accent/20 text-siem-text text-xs rounded-lg transition-colors"
               >
                 <ExternalLink size={14} />
                 REPORT ONLINE

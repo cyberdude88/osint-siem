@@ -6,6 +6,8 @@ import { severityColors } from "@/lib/severity";
 
 const WORLD_TOPO_URL =
   "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+const AUTO_ROTATE_SPEED = 0.0015;
+const AUTO_ROTATE_EASE = 2.8;
 
 interface Props {
   alerts: Alert[];
@@ -48,6 +50,50 @@ function latLngToRegion(lat: number, lng: number): string | null {
   if (lat >= -50 && lat <= 10 && lng >= 110 && lng <= 180) return "Oceania";
   if (lat < -60) return "Antarctica";
   return null;
+}
+
+function createGlowTexture(): THREE.CanvasTexture {
+  const size = 256;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    const fallback = new THREE.CanvasTexture(canvas);
+    fallback.needsUpdate = true;
+    return fallback;
+  }
+  const image = ctx.createImageData(size, size);
+  const data = image.data;
+  const center = size / 2;
+  const maxR = size / 2;
+  for (let y = 0; y < size; y += 1) {
+    for (let x = 0; x < size; x += 1) {
+      const dx = x - center;
+      const dy = y - center;
+      const r = Math.sqrt(dx * dx + dy * dy) / maxR;
+      const idx = (y * size + x) * 4;
+
+      // Gaussian-like continuous fade (no hard stop bands).
+      const alpha =
+        r >= 1
+          ? 0
+          : Math.exp(-3.8 * r * r) * Math.pow(1 - r, 0.75);
+      const a = Math.max(0, Math.min(255, Math.round(alpha * 255)));
+      data[idx] = 255;
+      data[idx + 1] = 255;
+      data[idx + 2] = 255;
+      data[idx + 3] = a;
+    }
+  }
+  ctx.putImageData(image, 0, 0);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.generateMipmaps = false;
+  texture.needsUpdate = true;
+  return texture;
 }
 
 /** Convert a GeoJSON MultiLineString / Polygon ring coords into THREE.Line segments */
@@ -111,7 +157,12 @@ export function GlobeView({
   const pointMeshesRef = useRef<Map<string, THREE.Mesh>>(new Map());
   const frameRef = useRef<number>(0);
   const mouseRef = useRef({ isDown: false, prevX: 0, prevY: 0 });
-  const rotationRef = useRef({ autoRotate: true, x: 0.35, y: 0 });
+  const rotationRef = useRef({
+    autoRotate: true,
+    x: 0.35,
+    y: 0,
+    currentSpeed: AUTO_ROTATE_SPEED,
+  });
   const regionFilterRef = useRef(regionFilter);
   const regionSetRef = useRef<Set<string>>(new Set());
 
@@ -164,7 +215,7 @@ export function GlobeView({
     oceanRef.current = oceanMesh;
 
     // --- Atmosphere glow ---
-    const glowGeo = new THREE.SphereGeometry(1.12, 64, 64);
+    const glowGeo = new THREE.SphereGeometry(1.04, 64, 64);
     const glowMat = new THREE.ShaderMaterial({
       vertexShader: `
         varying vec3 vNormal;
@@ -176,8 +227,8 @@ export function GlobeView({
       fragmentShader: `
         varying vec3 vNormal;
         void main() {
-          float intensity = pow(0.55 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 4.0);
-          gl_FragColor = vec4(0.23, 0.51, 0.96, 1.0) * intensity;
+          float intensity = pow(max(0.0, 0.45 - dot(vNormal, vec3(0.0, 0.0, 1.0))), 2.0);
+          gl_FragColor = vec4(0.12, 0.32, 0.62, intensity * 0.14);
         }
       `,
       blending: THREE.AdditiveBlending,
@@ -255,8 +306,9 @@ export function GlobeView({
 
     // --- Alert points ---
     const pointMeshes = new Map<string, THREE.Mesh>();
+    const glowTexture = createGlowTexture();
     const glowMeshes: THREE.Mesh[] = [];
-    const allDotMeshes: { mesh: THREE.Mesh; baseSize: number; severity: string }[] = [];
+    const allDotMeshes: { mesh: THREE.Mesh; severity: string }[] = [];
     alerts.forEach((alert, idx) => {
       const pos = latLngToVector3(alert.lat, alert.lng, 1.02);
       const size =
@@ -266,58 +318,61 @@ export function GlobeView({
           ? 0.014
           : 0.011;
       const color = new THREE.Color(severityColors[alert.severity]);
+      const glowColor = color.clone().lerp(new THREE.Color(0xfff3cc), 0.78);
 
       // Core dot
       const dotGeo = new THREE.SphereGeometry(size, 16, 16);
-      const dotMat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 1 });
+      const dotMat = new THREE.MeshPhongMaterial({
+        color,
+        emissive: color.clone().multiplyScalar(0.5),
+        shininess: 85,
+        specular: new THREE.Color(0xffffff),
+        transparent: true,
+        opacity: 0.95,
+        depthWrite: false,
+      });
       const dotMesh = new THREE.Mesh(dotGeo, dotMat);
       dotMesh.position.copy(pos);
       dotMesh.userData = { alertId: alert.alert_id, region: alert.source.region };
       globeGroup.add(dotMesh);
       pointMeshes.set(alert.alert_id, dotMesh);
-      allDotMeshes.push({ mesh: dotMesh, baseSize: 1, severity: alert.severity });
+      allDotMeshes.push({ mesh: dotMesh, severity: alert.severity });
 
-      // Outer glow halo (breathes)
-      const glowG = new THREE.SphereGeometry(size * 7, 20, 20);
-      const glowM = new THREE.MeshBasicMaterial({
-        color,
+      // Bright inner center for a crisp, modern marker look
+      const coreGeo = new THREE.SphereGeometry(size * 0.42, 10, 10);
+      const coreMat = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
         transparent: true,
-        opacity: 0.12,
+        opacity: 0.85,
       });
-      const gm = new THREE.Mesh(glowG, glowM);
+      const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+      dotMesh.add(coreMesh);
+
+      // Surface-hugging glow (tangent to globe) to avoid "dome" billboard look
+      const glowM = new THREE.MeshBasicMaterial({
+        map: glowTexture,
+        color: glowColor,
+        transparent: true,
+        opacity: 0.2,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+      });
+      const gm = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), glowM);
       gm.position.copy(pos);
-      gm.userData = { phase: idx * 0.8, region: alert.source.region };
+      const baseGlow = size * 6;
+      gm.scale.set(baseGlow, baseGlow, 1);
+      const normal = pos.clone().normalize();
+      gm.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
+      gm.userData = {
+        phase: idx * 0.8,
+        region: alert.source.region,
+        baseGlow,
+      };
       globeGroup.add(gm);
       glowMeshes.push(gm);
     });
     pointMeshesRef.current = pointMeshes;
-
-    // --- Pulse rings for ALL alerts (bigger + faster for critical/high) ---
-    const ringMeshes: { mesh: THREE.Mesh; speed: number; maxScale: number; region: string }[] = [];
-    alerts.forEach((alert, idx) => {
-      const pos = latLngToVector3(alert.lat, alert.lng, 1.025);
-      const isCritHigh = alert.severity === "critical" || alert.severity === "high";
-      const innerR = isCritHigh ? 0.012 : 0.008;
-      const outerR = isCritHigh ? 0.03 : 0.022;
-      const rGeo = new THREE.RingGeometry(innerR, outerR, 32);
-      const rMat = new THREE.MeshBasicMaterial({
-        color: new THREE.Color(severityColors[alert.severity]),
-        transparent: true,
-        opacity: 0.7,
-        side: THREE.DoubleSide,
-      });
-      const rMesh = new THREE.Mesh(rGeo, rMat);
-      rMesh.position.copy(pos);
-      rMesh.lookAt(new THREE.Vector3(0, 0, 0));
-      rMesh.userData = { phase: idx * 1.3 };
-      globeGroup.add(rMesh);
-      ringMeshes.push({
-        mesh: rMesh,
-        speed: isCritHigh ? 3.0 : 1.8,
-        maxScale: isCritHigh ? 2.5 : 1.8,
-        region: alert.source.region,
-      });
-    });
 
     // --- Initial tilt (persisted) ---
     globeGroup.rotation.x = rotationRef.current.x;
@@ -332,48 +387,34 @@ export function GlobeView({
       const delta = (now - last) / 1000;
       last = now;
       t += delta;
-      if (rotationRef.current.autoRotate) {
-        globeGroup.rotation.y += 0.072 * delta;
-      }
+      const targetSpeed = rotationRef.current.autoRotate ? AUTO_ROTATE_SPEED : 0;
+      const ease = Math.min(1, delta * AUTO_ROTATE_EASE);
+      rotationRef.current.currentSpeed +=
+        (targetSpeed - rotationRef.current.currentSpeed) * ease;
+      globeGroup.rotation.y += rotationRef.current.currentSpeed * delta;
       rotationRef.current.x = globeGroup.rotation.x;
       rotationRef.current.y = globeGroup.rotation.y;
 
       const activeRegion = regionFilterRef.current;
 
-      // Breathing glow halos
+      // Keep surface glows static so they read as city lights, not VFX
       glowMeshes.forEach((gm) => {
-        const phase = (gm.userData as { phase: number }).phase;
-        const breath = 1 + Math.sin(t * 1.5 + phase) * 0.45;
-        gm.scale.set(breath, breath, breath);
-        const base = 0.08 + Math.sin(t * 1.5 + phase) * 0.05;
+        const { baseGlow } = gm.userData as {
+          baseGlow: number;
+        };
+        gm.scale.set(baseGlow, baseGlow, 1);
+        const base = 0.13;
         const region = (gm.userData as { region?: string }).region;
         const dim = activeRegion === "all" || !region || region === activeRegion ? 1 : 0.15;
         (gm.material as THREE.MeshBasicMaterial).opacity = base * dim;
       });
 
-      // Dot breathing (subtle scale pulse)
-      allDotMeshes.forEach((entry, i) => {
-        const pulse =
-          entry.severity === "critical"
-            ? 1 + Math.sin(t * 3.0 + i * 0.9) * 0.3
-            : entry.severity === "high"
-            ? 1 + Math.sin(t * 2.2 + i * 1.1) * 0.2
-            : 1 + Math.sin(t * 1.4 + i * 1.3) * 0.12;
+      // Keep dots stable (no visible pulsing)
+      allDotMeshes.forEach((entry) => {
         const region = (entry.mesh.userData as { region?: string }).region;
         const dim = activeRegion === "all" || !region || region === activeRegion ? 1 : 0.15;
-        entry.mesh.scale.set(pulse, pulse, pulse);
+        entry.mesh.scale.set(1, 1, 1);
         (entry.mesh.material as THREE.MeshBasicMaterial).opacity = dim;
-      });
-
-      // Expanding ring waves
-      ringMeshes.forEach(({ mesh, speed, maxScale, region }) => {
-        const phase = (mesh.userData as { phase: number }).phase;
-        const cycle = ((t * speed + phase) % (Math.PI * 2)) / (Math.PI * 2);
-        const s = 1 + cycle * (maxScale - 1);
-        mesh.scale.set(s, s, 1);
-        const dim = activeRegion === "all" || region === activeRegion ? 1 : 0.1;
-        (mesh.material as THREE.MeshBasicMaterial).opacity =
-          0.7 * Math.max(0, 1 - cycle) * dim;
       });
 
       renderer.render(scene, camera);
@@ -455,6 +496,7 @@ export function GlobeView({
       el.removeEventListener("click", onClk);
       container.removeChild(el);
       renderer.dispose();
+      glowTexture.dispose();
     };
   }, [alerts, onSelect]);
 
@@ -463,7 +505,7 @@ export function GlobeView({
     pointMeshesRef.current.forEach((mesh, id) => {
       const alert = alerts.find((a) => a.alert_id === id);
       if (!alert) return;
-      const mat = mesh.material as THREE.MeshBasicMaterial;
+      const mat = mesh.material as THREE.MeshPhongMaterial;
       if (id === selectedId) {
         mat.color.set(0xffffff);
         mesh.scale.set(2.5, 2.5, 2.5);
@@ -505,10 +547,10 @@ export function GlobeView({
       <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-siem-panel/80 backdrop-blur-sm px-2.5 py-2 rounded-lg border border-siem-border">
         <button
           onClick={() => onRegionChange("all")}
-          className={`px-2 py-1 text-[10px] uppercase tracking-wider rounded border ${
+          className={`px-2 py-1 text-[10px] uppercase tracking-wider rounded border transition-colors ${
             regionFilter === "all"
               ? "bg-siem-accent/20 text-siem-accent border-siem-accent/40"
-              : "bg-white/5 text-siem-muted border-siem-border"
+              : "bg-white/5 text-siem-muted border-siem-border hover:bg-siem-accent/10 hover:text-siem-accent"
           }`}
         >
           All
@@ -517,10 +559,10 @@ export function GlobeView({
           <button
             key={region}
             onClick={() => onRegionChange(region)}
-            className={`px-2 py-1 text-[10px] uppercase tracking-wider rounded border ${
+            className={`px-2 py-1 text-[10px] uppercase tracking-wider rounded border transition-colors ${
               regionFilter === region
                 ? "bg-siem-accent/20 text-siem-accent border-siem-accent/40"
-                : "bg-white/5 text-siem-muted border-siem-border"
+                : "bg-white/5 text-siem-muted border-siem-border hover:bg-siem-accent/10 hover:text-siem-accent"
             }`}
           >
             {region}

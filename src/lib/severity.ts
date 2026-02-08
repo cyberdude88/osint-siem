@@ -1,19 +1,19 @@
 import type { Severity, AlertCategory } from "@/types/alert";
 
 export const severityColors: Record<Severity, string> = {
-  critical: "#ef4444",
-  high: "#f97316",
-  medium: "#eab308",
-  low: "#22c55e",
-  info: "#06b6d4",
+  critical: "#d96464",
+  high: "#d98958",
+  medium: "#d1b35a",
+  low: "#4eaf82",
+  info: "#4fa0b1",
 };
 
 export const severityBg: Record<Severity, string> = {
-  critical: "bg-red-500/20 text-red-400 border-red-500/30",
-  high: "bg-orange-500/20 text-orange-400 border-orange-500/30",
-  medium: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
-  low: "bg-green-500/20 text-green-400 border-green-500/30",
-  info: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
+  critical: "bg-red-300/15 text-red-200 border-red-300/25",
+  high: "bg-orange-300/15 text-orange-200 border-orange-300/25",
+  medium: "bg-amber-300/15 text-amber-200 border-amber-300/25",
+  low: "bg-emerald-300/15 text-emerald-200 border-emerald-300/25",
+  info: "bg-cyan-300/15 text-cyan-200 border-cyan-300/25",
 };
 
 export const severityLabel: Record<Severity, string> = {

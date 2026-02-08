@@ -12,6 +12,23 @@ function normalizeAlerts(data: unknown): Alert[] | null {
   return alerts.length > 0 ? alerts : null;
 }
 
+function alertsAreEqual(a: Alert[], b: Alert[]): boolean {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i += 1) {
+    const left = a[i];
+    const right = b[i];
+    if (left.alert_id !== right.alert_id) return false;
+    if (left.title !== right.title) return false;
+    if (left.severity !== right.severity) return false;
+    if (left.first_seen !== right.first_seen) return false;
+    if (left.last_seen !== right.last_seen) return false;
+    if (left.lat !== right.lat || left.lng !== right.lng) return false;
+    if (left.source.region !== right.source.region) return false;
+    if (left.canonical_url !== right.canonical_url) return false;
+  }
+  return true;
+}
+
 export function useAlerts() {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [isLive, setIsLive] = useState(false);
@@ -34,7 +51,7 @@ export function useAlerts() {
         const data = (await response.json()) as unknown;
         const normalized = normalizeAlerts(data);
         if (!cancelled && normalized) {
-          setAlerts(normalized);
+          setAlerts((prev) => (alertsAreEqual(prev, normalized) ? prev : normalized));
           setIsLive(true);
           setIsLoading(false);
         }
