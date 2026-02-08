@@ -10,10 +10,11 @@ const US_STATES_GEOJSON_URL =
   "https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json";
 const AUTO_ROTATE_SPEED = 0.0003;
 const AUTO_ROTATE_EASE = 2.8;
-const ZOOM_MIN = 1.25;
+const ZOOM_MIN = 1.06;
 const ZOOM_MAX = 4.6;
 const ZOOM_STEP = 0.24;
 const ZOOM_EASE = 7.5;
+const INITIAL_TILT_X = 0.06;
 
 interface Props {
   alerts: Alert[];
@@ -21,6 +22,7 @@ interface Props {
   onSelect: (id: string) => void;
   regionFilter: string;
   onRegionChange: (region: string) => void;
+  visibleAlertIds: string[];
 }
 
 function latLngToVector3(
@@ -205,6 +207,7 @@ export function GlobeView({
   onSelect,
   regionFilter,
   onRegionChange,
+  visibleAlertIds,
 }: Props) {
   const regions = useMemo(() => {
     const counts = new Map<string, number>();
@@ -224,11 +227,12 @@ export function GlobeView({
   const zoomRef = useRef({ current: 3.2, target: 3.2 });
   const rotationRef = useRef({
     autoRotate: true,
-    x: 0.35,
+    x: INITIAL_TILT_X,
     y: 0,
     currentSpeed: AUTO_ROTATE_SPEED,
   });
   const regionFilterRef = useRef(regionFilter);
+  const visibleAlertIdsRef = useRef<Set<string>>(new Set(visibleAlertIds));
   const regionSetRef = useRef<Set<string>>(new Set());
   const adjustZoom = (delta: number) => {
     const next = zoomRef.current.target + delta;
@@ -238,6 +242,10 @@ export function GlobeView({
   useEffect(() => {
     regionFilterRef.current = regionFilter;
   }, [regionFilter]);
+
+  useEffect(() => {
+    visibleAlertIdsRef.current = new Set(visibleAlertIds);
+  }, [visibleAlertIds]);
 
   useEffect(() => {
     regionSetRef.current = new Set(regions.map(([r]) => r));
@@ -321,6 +329,18 @@ export function GlobeView({
       const g = new THREE.BufferGeometry().setFromPoints(pts);
       globeGroup.add(new THREE.Line(g, gratMat));
     }
+    // Equator line (slightly more visible reference)
+    const equatorPts: THREE.Vector3[] = [];
+    for (let lng = -180; lng <= 180; lng += 2) {
+      equatorPts.push(latLngToVector3(0, lng, 1.001));
+    }
+    const equatorGeo = new THREE.BufferGeometry().setFromPoints(equatorPts);
+    const equatorMat = new THREE.LineBasicMaterial({
+      color: 0x2f5f86,
+      transparent: true,
+      opacity: 0.28,
+    });
+    globeGroup.add(new THREE.Line(equatorGeo, equatorMat));
     // Longitude lines every 30 degrees
     for (let lng = -180; lng < 180; lng += 30) {
       const pts: THREE.Vector3[] = [];
@@ -396,7 +416,7 @@ export function GlobeView({
     const pointMeshes = new Map<string, THREE.Mesh>();
     const glowTexture = createGlowTexture();
     const glowMeshes: THREE.Mesh[] = [];
-    const allDotMeshes: { mesh: THREE.Mesh; severity: string }[] = [];
+    const allDotMeshes: { mesh: THREE.Mesh; severity: string; alertId: string }[] = [];
     alerts.forEach((alert, idx) => {
       const pos = latLngToVector3(alert.lat, alert.lng, 1.02);
       const size =
@@ -424,7 +444,7 @@ export function GlobeView({
       dotMesh.userData = { alertId: alert.alert_id, region: alert.source.region };
       globeGroup.add(dotMesh);
       pointMeshes.set(alert.alert_id, dotMesh);
-      allDotMeshes.push({ mesh: dotMesh, severity: alert.severity });
+      allDotMeshes.push({ mesh: dotMesh, severity: alert.severity, alertId: alert.alert_id });
 
       // Bright inner center for a crisp, modern marker look
       const coreGeo = new THREE.SphereGeometry(size * 0.42, 10, 10);
@@ -456,6 +476,7 @@ export function GlobeView({
         phase: idx * 0.8,
         region: alert.source.region,
         baseGlow,
+        alertId: alert.alert_id,
       };
       globeGroup.add(gm);
       glowMeshes.push(gm);
@@ -488,10 +509,15 @@ export function GlobeView({
       rotationRef.current.y = globeGroup.rotation.y;
 
       const activeRegion = regionFilterRef.current;
+      const visibleSet = visibleAlertIdsRef.current;
       const zoomLevel = zoomRef.current.current;
 
       // Keep surface glows static so they read as city lights, not VFX
       glowMeshes.forEach((gm) => {
+        const alertId = (gm.userData as { alertId?: string }).alertId;
+        const isVisibleInStack = !alertId || visibleSet.has(alertId);
+        gm.visible = isVisibleInStack;
+        if (!isVisibleInStack) return;
         const { baseGlow } = gm.userData as {
           baseGlow: number;
         };
@@ -504,6 +530,9 @@ export function GlobeView({
 
       // Keep dots stable (no visible pulsing)
       allDotMeshes.forEach((entry) => {
+        const isVisibleInStack = visibleSet.has(entry.alertId);
+        entry.mesh.visible = isVisibleInStack;
+        if (!isVisibleInStack) return;
         const region = (entry.mesh.userData as { region?: string }).region;
         const dim = activeRegion === "all" || !region || region === activeRegion ? 1 : 0.15;
         entry.mesh.scale.set(1, 1, 1);

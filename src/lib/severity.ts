@@ -9,11 +9,11 @@ export const severityColors: Record<Severity, string> = {
 };
 
 export const severityBg: Record<Severity, string> = {
-  critical: "bg-red-300/15 text-red-200 border-red-300/25",
-  high: "bg-orange-300/15 text-orange-200 border-orange-300/25",
-  medium: "bg-amber-300/15 text-amber-200 border-amber-300/25",
-  low: "bg-emerald-300/15 text-emerald-200 border-emerald-300/25",
-  info: "bg-cyan-300/15 text-cyan-200 border-cyan-300/25",
+  critical: "bg-[#d96464]/15 text-[#d96464] border-[#d96464]/35",
+  high: "bg-[#d98958]/15 text-[#d98958] border-[#d98958]/35",
+  medium: "bg-[#d1b35a]/15 text-[#d1b35a] border-[#d1b35a]/35",
+  low: "bg-[#4eaf82]/15 text-[#4eaf82] border-[#4eaf82]/35",
+  info: "bg-[#4fa0b1]/15 text-[#4fa0b1] border-[#4fa0b1]/35",
 };
 
 export const severityLabel: Record<Severity, string> = {
@@ -69,11 +69,4 @@ export function freshnessLabel(hours: number): string {
   if (hours < 24) return `${Math.round(hours)}h ago`;
   if (hours < 168) return `${Math.round(hours / 24)}d ago`;
   return `${Math.round(hours / 168)}w ago`;
-}
-
-export function freshnessConfidence(hours: number): { label: string; color: string } {
-  if (hours < 6) return { label: "FRESH", color: "text-green-400" };
-  if (hours < 24) return { label: "RECENT", color: "text-yellow-400" };
-  if (hours < 72) return { label: "AGING", color: "text-orange-400" };
-  return { label: "OUTDATED", color: "text-red-400" };
 }

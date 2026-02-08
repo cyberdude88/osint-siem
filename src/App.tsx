@@ -10,6 +10,7 @@ export default function App() {
   const { alerts, isLive, isLoading, sourceCount } = useAlerts();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [regionFilter, setRegionFilter] = useState<string>("all");
+  const [visibleAlertIds, setVisibleAlertIds] = useState<string[]>([]);
   const panelRef = useRef<HTMLDivElement>(null);
   const selectedAlert = selectedId
     ? alerts.find((a) => a.alert_id === selectedId) ?? null
@@ -29,6 +30,10 @@ export default function App() {
       setSelectedId(null);
     }
   }, [alerts, selectedId]);
+
+  useEffect(() => {
+    setVisibleAlertIds(alerts.map((a) => a.alert_id));
+  }, [alerts]);
 
   return (
     <div className="flex flex-col h-screen bg-siem-bg">
@@ -51,6 +56,7 @@ export default function App() {
               onSelect={setSelectedId}
               regionFilter={regionFilter}
               onRegionChange={setRegionFilter}
+              onVisibleAlertIdsChange={setVisibleAlertIds}
             />
           )}
         </div>
@@ -63,6 +69,7 @@ export default function App() {
             onSelect={setSelectedId}
             regionFilter={regionFilter}
             onRegionChange={setRegionFilter}
+            visibleAlertIds={visibleAlertIds}
           />
         </div>
 

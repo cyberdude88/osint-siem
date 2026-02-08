@@ -4,7 +4,6 @@ import {
   severityLabel,
   categoryLabels,
   freshnessLabel,
-  freshnessConfidence,
 } from "@/lib/severity";
 import {
   ExternalLink,
@@ -24,8 +23,6 @@ interface Props {
 
 export function AlertDetail({ alert, onClose }: Props) {
   if (!alert) return null;
-
-  const fresh = freshnessConfidence(alert.freshness_hours);
 
   return (
     <div className="flex flex-col h-full">
@@ -53,9 +50,6 @@ export function AlertDetail({ alert, onClose }: Props) {
           <span className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded bg-white/5 text-siem-muted border border-siem-border">
             <Radio size={10} />
             {alert.status.toUpperCase()}
-          </span>
-          <span className={`text-xs font-mono ${fresh.color}`}>
-            {fresh.label}
           </span>
         </div>
 
@@ -111,13 +105,13 @@ export function AlertDetail({ alert, onClose }: Props) {
           </div>
         </div>
 
-        {/* Freshness Confidence */}
+        {/* Notice Age */}
         <div className="bg-white/5 rounded-lg p-3 border border-siem-border">
           <div className="text-[10px] uppercase tracking-wider text-siem-muted mb-1">
-            Freshness Confidence
+            Notice Age
           </div>
-          <div className={`text-sm font-mono font-bold ${fresh.color}`}>
-            {fresh.label}
+          <div className="text-sm font-mono font-bold text-siem-text">
+            {freshnessLabel(alert.freshness_hours)}
           </div>
           <div className="text-[11px] text-siem-muted mt-1">
             Last confirmed: {freshnessLabel(

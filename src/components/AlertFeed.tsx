@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Alert, AlertCategory, Severity } from "@/types/alert";
 import {
+  severityColors,
   severityBg,
   severityLabel,
   categoryLabels,
@@ -16,6 +17,7 @@ interface Props {
   onSelect: (id: string) => void;
   regionFilter: string;
   onRegionChange: (region: string) => void;
+  onVisibleAlertIdsChange: (ids: string[]) => void;
 }
 
 export function AlertFeed({
@@ -24,6 +26,7 @@ export function AlertFeed({
   onSelect,
   regionFilter,
   onRegionChange,
+  onVisibleAlertIdsChange,
 }: Props) {
   const [actionableOnly, setActionableOnly] = useState(true);
   const [categoryFilter, setCategoryFilter] = useState<AlertCategory | "all">("all");
@@ -32,6 +35,7 @@ export function AlertFeed({
   const [isRefreshingList, setIsRefreshingList] = useState(false);
   const [newAlertIds, setNewAlertIds] = useState<Set<string>>(new Set());
   const knownAlertIdsRef = useRef<Set<string>>(new Set());
+  const lastVisibleSigRef = useRef("");
   const refreshTimeoutRef = useRef<number | null>(null);
   const glowTimeoutsRef = useRef<number[]>([]);
 
@@ -75,6 +79,11 @@ export function AlertFeed({
       alerts: sorted.filter((alert) => alert.category === category),
     }))
     .filter((group) => group.alerts.length > 0);
+
+  const visibleAlertIds = useMemo(
+    () => facetFiltered.map((a) => a.alert_id),
+    [facetFiltered]
+  );
 
   useEffect(() => {
     return () => {
@@ -125,12 +134,19 @@ export function AlertFeed({
   }, [alerts]);
 
   const severityRail: Record<Alert["severity"], string> = {
-    critical: "bg-red-300/80",
-    high: "bg-orange-300/80",
-    medium: "bg-amber-300/80",
-    low: "bg-emerald-300/80",
-    info: "bg-cyan-300/80",
+    critical: severityColors.critical,
+    high: severityColors.high,
+    medium: severityColors.medium,
+    low: severityColors.low,
+    info: severityColors.info,
   };
+
+  useEffect(() => {
+    const sig = visibleAlertIds.join("|");
+    if (sig === lastVisibleSigRef.current) return;
+    lastVisibleSigRef.current = sig;
+    onVisibleAlertIdsChange(visibleAlertIds);
+  }, [visibleAlertIds, onVisibleAlertIdsChange]);
 
   const renderAlertCard = (alert: Alert, queueLabel: string, position: number) => {
     const isSelected = selectedId === alert.alert_id;
@@ -145,7 +161,8 @@ export function AlertFeed({
         } ${isNew ? "animate-alert-new-glow" : ""}`}
       >
         <span
-          className={`absolute left-0 top-0 h-full w-1 rounded-l-lg ${severityRail[alert.severity]}`}
+          className="absolute left-0 top-0 h-full w-1 rounded-l-lg opacity-90"
+          style={{ backgroundColor: severityRail[alert.severity] }}
           aria-hidden
         />
         <div className="flex items-center justify-between gap-2 mb-1.5">

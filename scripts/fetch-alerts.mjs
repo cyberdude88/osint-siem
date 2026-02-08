@@ -430,6 +430,26 @@ function parseItems(xml) {
   }));
 }
 
+function isBlogContent(item) {
+  const title = String(item?.title ?? "").toLowerCase();
+  const link = String(item?.link ?? "").toLowerCase();
+  if (/\bblog\b/.test(title)) return true;
+  if (/\/blog(s)?(\/|$)/.test(link)) return true;
+  if (link.includes("medium.com")) return true;
+  if (link.includes("wordpress.com")) return true;
+  return false;
+}
+
+function isBlogAlert(alert) {
+  const title = String(alert?.title ?? "").toLowerCase();
+  const link = String(alert?.canonical_url ?? "").toLowerCase();
+  if (/\bblog\b/.test(title)) return true;
+  if (/\/blog(s)?(\/|$)/.test(link)) return true;
+  if (link.includes("medium.com")) return true;
+  if (link.includes("wordpress.com")) return true;
+  return false;
+}
+
 function isInformational(title) {
   const t = title.toLowerCase();
   const keywords = [
@@ -619,6 +639,7 @@ async function fetchRss(meta, now) {
   const xml = await fetchFeed(meta.feed_url, meta.followRedirects);
   const items = parseItems(xml)
     .filter((item) => item.title && item.link)
+    .filter((item) => !isBlogContent(item))
     .slice(0, MAX_PER_SOURCE);
 
   return items.map((item) => {
@@ -739,8 +760,9 @@ async function buildAlerts() {
     }
   }
 
-  alerts.sort((a, b) => new Date(b.first_seen).getTime() - new Date(a.first_seen).getTime());
-  return alerts;
+  const sanitized = alerts.filter((a) => !isBlogAlert(a));
+  sanitized.sort((a, b) => new Date(b.first_seen).getTime() - new Date(a.first_seen).getTime());
+  return sanitized;
 }
 
 async function writeAlerts(alerts) {
