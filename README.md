@@ -7,8 +7,8 @@ This is a live, authority-driven OSINT dashboard. It indexes public alerts, link
 ## Use It
 
 1. Visit the live site: `https://cyberdude88.github.io/osint-siem/`
-2. Pick an alert category and drill into the official source.
-3. Report responsibly using the provided official channels.
+2. Assist authorities by researching and providing valuable information through researching Open Source Intelligence (OSINT), through ongoing investigations. Your report can save lives.
+3. Report responsibly using the provided official channels, and following correct reporting procedures outlined in the alert link.
 
 ## Run Locally
 
