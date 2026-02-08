@@ -861,7 +861,7 @@ export function GlobeView({
       className="w-full h-full relative cursor-grab active:cursor-grabbing"
     >
       {hotspot && hotspotAlerts.length >= HOTSPOT_MIN_ALERTS && (
-        <div className="absolute top-4 left-4 w-[290px] max-h-[52%] rounded-xl border border-siem-accent/25 bg-siem-panel/58 backdrop-blur-md shadow-lg shadow-black/35 overflow-hidden">
+        <div className="absolute top-2 left-2 md:top-4 md:left-4 w-[calc(100%-1rem)] md:w-[290px] max-h-[58%] md:max-h-[52%] rounded-xl border border-siem-accent/25 bg-siem-panel/58 backdrop-blur-md shadow-lg shadow-black/35 overflow-hidden">
           <div className="px-3 py-2 border-b border-siem-border/80 flex items-center justify-between">
             <span className="text-[10px] uppercase tracking-widest text-siem-accent font-bold">
               Dense Alert Zone
@@ -926,7 +926,7 @@ export function GlobeView({
         </div>
       )}
       {/* Legend */}
-      <div className="absolute bottom-4 left-4 flex items-center gap-4 bg-siem-panel/80 backdrop-blur-sm px-3 py-2 rounded-lg border border-siem-border">
+      <div className="hidden sm:flex absolute bottom-4 left-4 items-center gap-4 bg-siem-panel/80 backdrop-blur-sm px-3 py-2 rounded-lg border border-siem-border">
         {(
           [
             ["critical", "bg-red-500"],
@@ -945,13 +945,13 @@ export function GlobeView({
           </div>
         ))}
       </div>
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 text-[10px] text-siem-muted/50 uppercase tracking-widest pointer-events-none">
+      <div className="hidden md:block absolute top-4 left-1/2 -translate-x-1/2 text-[10px] text-siem-muted/50 uppercase tracking-widest pointer-events-none">
         Drag to rotate &middot; Scroll to zoom &middot; Click alert points
       </div>
-      <div className="absolute bottom-4 right-4 flex items-center gap-1.5 bg-siem-panel/80 backdrop-blur-sm px-2 py-2 rounded-lg border border-siem-border">
+      <div className="absolute bottom-3 right-3 md:bottom-4 md:right-4 flex items-center gap-1.5 bg-siem-panel/80 backdrop-blur-sm px-2 py-2 rounded-lg border border-siem-border">
         <button
           onClick={() => adjustZoom(-ZOOM_STEP * 1.2)}
-          className="w-7 h-7 rounded border border-siem-border bg-white/5 text-siem-text hover:bg-siem-accent/10 hover:text-siem-accent transition-colors text-sm font-bold"
+          className="w-8 h-8 md:w-7 md:h-7 rounded border border-siem-border bg-white/5 text-siem-text hover:bg-siem-accent/10 hover:text-siem-accent transition-colors text-sm font-bold"
           aria-label="Zoom in"
           title="Zoom in"
         >
@@ -959,14 +959,14 @@ export function GlobeView({
         </button>
         <button
           onClick={() => adjustZoom(ZOOM_STEP * 1.2)}
-          className="w-7 h-7 rounded border border-siem-border bg-white/5 text-siem-text hover:bg-siem-accent/10 hover:text-siem-accent transition-colors text-sm font-bold"
+          className="w-8 h-8 md:w-7 md:h-7 rounded border border-siem-border bg-white/5 text-siem-text hover:bg-siem-accent/10 hover:text-siem-accent transition-colors text-sm font-bold"
           aria-label="Zoom out"
           title="Zoom out"
         >
           -
         </button>
       </div>
-      <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-siem-panel/80 backdrop-blur-sm px-2.5 py-2 rounded-lg border border-siem-border">
+      <div className="hidden md:flex absolute top-4 right-4 items-center gap-1.5 bg-siem-panel/80 backdrop-blur-sm px-2.5 py-2 rounded-lg border border-siem-border">
         <button
           onClick={() => onRegionChange("all")}
           className={`px-2 py-1 text-[10px] uppercase tracking-wider rounded border transition-colors ${
@@ -990,6 +990,20 @@ export function GlobeView({
             {region}
           </button>
         ))}
+      </div>
+      <div className="md:hidden absolute top-3 right-3 w-[150px] bg-siem-panel/85 backdrop-blur-sm px-2 py-1.5 rounded-lg border border-siem-border">
+        <select
+          value={regionFilter}
+          onChange={(e) => onRegionChange(e.target.value)}
+          className="w-full appearance-none bg-white/5 border border-siem-border rounded-md px-2 py-1 text-[10px] text-siem-text"
+        >
+          <option value="all">All Regions</option>
+          {regions.map(([region]) => (
+            <option key={region} value={region}>
+              {region}
+            </option>
+          ))}
+        </select>
       </div>
     </div>
   );

@@ -23,17 +23,17 @@ export function StatsBar({ alerts }: Props) {
   ];
 
   return (
-    <div className="flex items-center gap-6 px-6 py-3 bg-siem-panel border-b border-siem-border">
-      <div className="flex items-center gap-2 mr-4">
+    <div className="flex items-center gap-3 md:gap-6 px-3 md:px-6 py-2 md:py-3 bg-siem-panel border-b border-siem-border overflow-x-auto">
+      <div className="flex items-center gap-2 mr-1 md:mr-4 shrink-0">
         <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-        <span className="text-xs font-mono uppercase tracking-wider text-siem-muted">
+        <span className="text-[10px] md:text-xs font-mono uppercase tracking-wider text-siem-muted">
           Live
         </span>
       </div>
       {stats.map((s) => (
-        <div key={s.label} className="flex items-center gap-2">
-          <s.icon size={14} className={s.color} />
-          <div className="text-xs">
+        <div key={s.label} className="flex items-center gap-1.5 md:gap-2 shrink-0">
+          <s.icon size={13} className={s.color} />
+          <div className="text-[10px] md:text-xs">
             <span className={`font-bold font-mono ${s.color}`}>{s.value}</span>
             <span className="text-siem-muted ml-1">{s.label}</span>
           </div>
