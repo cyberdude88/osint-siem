@@ -223,6 +223,14 @@ const COUNTRY_CENTROIDS = {
   sweden: [60.1282, 18.6435],
   denmark: [56.2639, 9.5018],
   finland: [61.9241, 25.7482],
+  jamaica: [18.1096, -77.2975],
+  "trinidad and tobago": [10.6918, -61.2225],
+  philippines: [12.8797, 121.774],
+  malaysia: [4.2105, 101.9758],
+  thailand: [15.87, 100.9925],
+  vietnam: [14.0583, 108.2772],
+  indonesia: [-0.7893, 113.9213],
+  taiwan: [23.6978, 120.9605],
 };
 
 const CITY_CENTROIDS = {
@@ -1431,6 +1439,484 @@ const sources = [
       phone: "133 (Emergency)",
     },
   },
+
+  // ── FBI Seeking Information (US / North America) ────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "fbi-seeking",
+      authority_name: "FBI Seeking Info",
+      country: "United States",
+      country_code: "US",
+      region: "North America",
+      authority_type: "police",
+      base_url: "https://www.fbi.gov",
+    },
+    feed_url: "https://www.fbi.gov/feeds/seeking-information/rss.xml",
+    category: "public_appeal",
+    region_tag: "US",
+    lat: 38.91,
+    lng: -77.01,
+    reporting: {
+      label: "Submit a Tip to FBI",
+      url: "https://tips.fbi.gov/",
+      phone: "1-800-CALL-FBI (1-800-225-5324)",
+      notes: "The FBI is seeking the public's assistance. If you have information, submit a tip.",
+    },
+  },
+
+  // ── FBI Most Wanted (US / North America) ────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "fbi-mostwanted",
+      authority_name: "FBI Most Wanted",
+      country: "United States",
+      country_code: "US",
+      region: "North America",
+      authority_type: "police",
+      base_url: "https://www.fbi.gov",
+    },
+    feed_url: "https://www.fbi.gov/feeds/fbi-most-wanted/rss.xml",
+    category: "wanted_suspect",
+    region_tag: "US",
+    lat: 38.89,
+    lng: -77.02,
+    reporting: {
+      label: "Report Sighting to FBI",
+      url: "https://tips.fbi.gov/",
+      phone: "1-800-CALL-FBI (1-800-225-5324)",
+      notes: "Do NOT attempt to apprehend. Call 911 immediately if in danger.",
+    },
+  },
+
+  // ── Action Fraud UK (Europe) ────────────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "actionfraud-uk",
+      authority_name: "Action Fraud UK",
+      country: "United Kingdom",
+      country_code: "GB",
+      region: "Europe",
+      authority_type: "police",
+      base_url: "https://www.actionfraud.police.uk",
+    },
+    feed_url: "https://www.actionfraud.police.uk/rss",
+    category: "fraud_alert",
+    region_tag: "GB",
+    lat: 51.50,
+    lng: -0.12,
+    reporting: {
+      label: "Report Fraud to Action Fraud",
+      url: "https://www.actionfraud.police.uk/reporting-fraud-and-cyber-crime",
+      phone: "0300 123 2040",
+    },
+  },
+
+  // ── CNA Singapore Crime (Asia) ──────────────────────────────────
+  {
+    type: "rss",
+    source: {
+      source_id: "cna-sg-crime",
+      authority_name: "CNA Singapore Crime",
+      country: "Singapore",
+      country_code: "SG",
+      region: "Asia",
+      authority_type: "public_safety_program",
+      base_url: "https://www.channelnewsasia.com",
+    },
+    feed_url: "https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml&category=6511",
+    category: "public_safety",
+    region_tag: "SG",
+    lat: 1.35,
+    lng: 103.82,
+    reporting: {
+      label: "Report Crime in Singapore",
+      url: "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
+      phone: "999 (Emergency) / 1800-255-0000 (Police Hotline)",
+    },
+  },
+
+  // ── Yonhap News Korea (Asia) ────────────────────────────────────
+  {
+    type: "rss",
+    source: {
+      source_id: "yonhap-kr",
+      authority_name: "Yonhap News Korea",
+      country: "South Korea",
+      country_code: "KR",
+      region: "Asia",
+      authority_type: "public_safety_program",
+      base_url: "https://en.yna.co.kr",
+    },
+    feed_url: "https://en.yna.co.kr/RSS/news.xml",
+    category: "public_safety",
+    region_tag: "KR",
+    lat: 37.57,
+    lng: 126.98,
+    reporting: {
+      label: "Report Crime in South Korea",
+      url: "https://www.police.go.kr/eng/index.do",
+      phone: "112 (Emergency)",
+    },
+  },
+
+  // ── NHK Japan News (Asia) ──────────────────────────────────────
+  // In Japanese - auto-translated to English
+  {
+    type: "rss",
+    source: {
+      source_id: "nhk-jp",
+      authority_name: "NHK Japan",
+      country: "Japan",
+      country_code: "JP",
+      region: "Asia",
+      authority_type: "public_safety_program",
+      base_url: "https://www3.nhk.or.jp",
+    },
+    feed_url: "https://www3.nhk.or.jp/rss/news/cat1.xml",
+    category: "public_safety",
+    region_tag: "JP",
+    lat: 35.67,
+    lng: 139.71,
+    reporting: {
+      label: "Report to Japan Police",
+      url: "https://www.npa.go.jp/english/index.html",
+      phone: "110 (Emergency)",
+    },
+  },
+
+  // ── SCMP Hong Kong (Asia) ──────────────────────────────────────
+  {
+    type: "rss",
+    source: {
+      source_id: "scmp-hk",
+      authority_name: "SCMP Hong Kong",
+      country: "Hong Kong",
+      country_code: "HK",
+      region: "Asia",
+      authority_type: "public_safety_program",
+      base_url: "https://www.scmp.com",
+    },
+    feed_url: "https://www.scmp.com/rss/5/feed",
+    followRedirects: true,
+    category: "public_safety",
+    region_tag: "HK",
+    lat: 22.28,
+    lng: 114.16,
+    reporting: {
+      label: "Report Crime in Hong Kong",
+      url: "https://www.police.gov.hk/ppp_en/contact_us.html",
+      phone: "999 (Emergency)",
+    },
+  },
+
+  // ── Jamaica Observer (Caribbean) ────────────────────────────────
+  {
+    type: "rss",
+    source: {
+      source_id: "jamaica-observer",
+      authority_name: "Jamaica Observer",
+      country: "Jamaica",
+      country_code: "JM",
+      region: "Caribbean",
+      authority_type: "public_safety_program",
+      base_url: "https://www.jamaicaobserver.com",
+    },
+    feed_url: "https://jamaicaobserver.com/feed/",
+    followRedirects: true,
+    category: "public_safety",
+    region_tag: "JM",
+    lat: 18.11,
+    lng: -77.30,
+    reporting: {
+      label: "Report Crime in Jamaica",
+      url: "https://www.jcf.gov.jm/",
+      phone: "119 (Emergency) / 311 (Crime Stop)",
+      notes: "Jamaica Constabulary Force - Crime Stop: 311",
+    },
+  },
+
+  // ── Straits Times Singapore (Asia) ──────────────────────────────
+  {
+    type: "rss",
+    source: {
+      source_id: "straitstimes-sg",
+      authority_name: "Straits Times Singapore",
+      country: "Singapore",
+      country_code: "SG",
+      region: "Asia",
+      authority_type: "public_safety_program",
+      base_url: "https://www.straitstimes.com",
+    },
+    feed_url: "https://www.straitstimes.com/news/singapore/rss.xml",
+    category: "public_safety",
+    region_tag: "SG",
+    lat: 1.30,
+    lng: 103.84,
+    reporting: {
+      label: "Report Crime in Singapore",
+      url: "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
+      phone: "999 (Emergency)",
+    },
+  },
+
+  // ── Philippine National Police (Asia) ───────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "pnp-ph",
+      authority_name: "PNP Philippines",
+      country: "Philippines",
+      country_code: "PH",
+      region: "Asia",
+      authority_type: "police",
+      base_url: "https://www.pnp.gov.ph",
+    },
+    feed_url: "https://www.pnp.gov.ph/rss",
+    category: "public_appeal",
+    region_tag: "PH",
+    lat: 14.60,
+    lng: 120.98,
+    reporting: {
+      label: "Report to PNP",
+      url: "https://www.pnp.gov.ph/",
+      phone: "117 (Emergency) / 8722-0650",
+    },
+  },
+
+  // ── Royal Malaysia Police (Asia) ────────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "pdrm-my",
+      authority_name: "PDRM Malaysia",
+      country: "Malaysia",
+      country_code: "MY",
+      region: "Asia",
+      authority_type: "police",
+      base_url: "https://www.pdrm.gov.my",
+    },
+    feed_url: "https://www.pdrm.gov.my/rss",
+    category: "public_appeal",
+    region_tag: "MY",
+    lat: 3.14,
+    lng: 101.69,
+    reporting: {
+      label: "Report to PDRM",
+      url: "https://semakonline.rmp.gov.my/",
+      phone: "999 (Emergency)",
+    },
+  },
+
+  // ── Trinidad & Tobago Police (Caribbean) ────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "ttps",
+      authority_name: "Trinidad & Tobago Police",
+      country: "Trinidad and Tobago",
+      country_code: "TT",
+      region: "Caribbean",
+      authority_type: "police",
+      base_url: "https://www.ttps.gov.tt",
+    },
+    feed_url: "https://www.ttps.gov.tt/rss",
+    category: "public_appeal",
+    region_tag: "TT",
+    lat: 10.65,
+    lng: -61.50,
+    reporting: {
+      label: "Report to TTPS",
+      url: "https://www.ttps.gov.tt/",
+      phone: "999 (Emergency) / 555 (Crime Stoppers)",
+    },
+  },
+
+  // ── Jamaica Constabulary Force (Caribbean) ──────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "jcf-jm",
+      authority_name: "JCF Jamaica",
+      country: "Jamaica",
+      country_code: "JM",
+      region: "Caribbean",
+      authority_type: "police",
+      base_url: "https://www.jcf.gov.jm",
+    },
+    feed_url: "https://www.jcf.gov.jm/rss",
+    category: "public_appeal",
+    region_tag: "JM",
+    lat: 18.00,
+    lng: -76.79,
+    reporting: {
+      label: "Report to JCF",
+      url: "https://www.jcf.gov.jm/",
+      phone: "119 (Emergency) / 311 (Crime Stop)",
+    },
+  },
+
+  // ── Mexico FGR / Fiscalía (North America) ──────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "fgr-mx",
+      authority_name: "FGR Mexico",
+      country: "Mexico",
+      country_code: "MX",
+      region: "North America",
+      authority_type: "police",
+      base_url: "https://www.gob.mx/fgr",
+    },
+    feed_url: "https://www.gob.mx/fgr/rss",
+    category: "public_appeal",
+    region_tag: "MX",
+    lat: 19.43,
+    lng: -99.13,
+    reporting: {
+      label: "Report to FGR Mexico",
+      url: "https://www.gob.mx/fgr",
+      phone: "800-008-5400",
+      notes: "Denuncia anónima / Anonymous tip line.",
+    },
+  },
+
+  // ── Mexico AMBER Alert (North America) ──────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "amber-mx",
+      authority_name: "AMBER Alert Mexico",
+      country: "Mexico",
+      country_code: "MX",
+      region: "North America",
+      authority_type: "public_safety_program",
+      base_url: "https://www.gob.mx/amber",
+    },
+    feed_url: "https://www.gob.mx/amber/rss",
+    category: "missing_person",
+    region_tag: "MX",
+    lat: 19.44,
+    lng: -99.14,
+    reporting: {
+      label: "Report Missing Child Mexico",
+      url: "https://www.gob.mx/amber",
+      phone: "800-008-5400",
+      notes: "Alerta AMBER México",
+    },
+  },
+
+  // ── Canada Missing Children (North America) ────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "missing-ca",
+      authority_name: "Canada Missing Children",
+      country: "Canada",
+      country_code: "CA",
+      region: "North America",
+      authority_type: "public_safety_program",
+      base_url: "https://www.canadasmissing.ca",
+    },
+    feed_url: "https://www.canadasmissing.ca/rss/index-eng.xml",
+    category: "missing_person",
+    region_tag: "CA",
+    lat: 45.43,
+    lng: -75.68,
+    reporting: {
+      label: "Report Missing Person Canada",
+      url: "https://www.canadasmissing.ca/index-eng.htm",
+      phone: "1-866-KID-TIPS (1-866-543-8477)",
+      notes: "Canadian Centre for Child Protection",
+    },
+  },
+
+  // ── Korea Police (Asia) ─────────────────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "knpa-kr",
+      authority_name: "Korea National Police",
+      country: "South Korea",
+      country_code: "KR",
+      region: "Asia",
+      authority_type: "police",
+      base_url: "https://www.police.go.kr",
+    },
+    feed_url: "https://www.police.go.kr/eng/portal/rss/rss.do",
+    category: "public_safety",
+    region_tag: "KR",
+    lat: 37.58,
+    lng: 126.97,
+    reporting: {
+      label: "Report to Korean Police",
+      url: "https://www.police.go.kr/eng/index.do",
+      phone: "112 (Emergency)",
+    },
+  },
+
+  // ── Thai CERT (Asia) ────────────────────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "thaicert",
+      authority_name: "ThaiCERT",
+      country: "Thailand",
+      country_code: "TH",
+      region: "Asia",
+      authority_type: "cert",
+      base_url: "https://www.thaicert.or.th",
+    },
+    feed_url: "https://www.thaicert.or.th/RSS/feed-en.xml",
+    category: "cyber_advisory",
+    region_tag: "TH",
+    lat: 13.76,
+    lng: 100.50,
+    reporting: {
+      label: "Report to ThaiCERT",
+      url: "https://www.thaicert.or.th/",
+      email: "op@thaicert.or.th",
+    },
+  },
+
+  // ── MyCERT Malaysia (Asia) ──────────────────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "mycert-my",
+      authority_name: "MyCERT Malaysia",
+      country: "Malaysia",
+      country_code: "MY",
+      region: "Asia",
+      authority_type: "cert",
+      base_url: "https://www.mycert.org.my",
+    },
+    feed_url: "https://www.mycert.org.my/portal/rss",
+    category: "cyber_advisory",
+    region_tag: "MY",
+    lat: 3.15,
+    lng: 101.70,
+    reporting: {
+      label: "Report to MyCERT",
+      url: "https://www.mycert.org.my/portal/report-incident",
+      email: "mycert@cybersecurity.my",
+    },
+  },
 ];
 
 function decodeXml(value) {
@@ -1747,6 +2233,38 @@ function kevItemToAlert(entry, meta) {
   };
 }
 
+// ─── AUTO-TRANSLATION ─────────────────────────────────────────
+// Detect non-Latin text and translate to English via free Google Translate API.
+const NON_LATIN_RE = /[\u3000-\u9FFF\uAC00-\uD7AF\u0400-\u04FF\u0600-\u06FF\u0E00-\u0E7F\u1100-\u11FF\uA960-\uA97F\uD7B0-\uD7FF]/;
+
+async function translateToEnglish(text) {
+  if (!text || !NON_LATIN_RE.test(text)) return text;
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 5000);
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURIComponent(text)}`;
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timer);
+    if (!res.ok) return text;
+    const data = await res.json();
+    const translated = data?.[0]?.map((s) => s?.[0] ?? "").join("") ?? text;
+    return translated || text;
+  } catch {
+    return text;
+  }
+}
+
+async function translateBatch(items) {
+  const results = [];
+  for (const item of items) {
+    if (NON_LATIN_RE.test(item.title)) {
+      item.title = await translateToEnglish(item.title);
+    }
+    results.push(item);
+  }
+  return results;
+}
+
 async function fetchFeed(url, followRedirects = false) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 15000);
@@ -1770,10 +2288,13 @@ async function fetchFeed(url, followRedirects = false) {
 
 async function fetchRss(meta, now) {
   const xml = await fetchFeed(meta.feed_url, meta.followRedirects);
-  const items = parseItems(xml)
+  let items = parseItems(xml)
     .filter((item) => item.title && item.link)
     .filter((item) => !isBlogContent(item))
     .slice(0, MAX_PER_SOURCE);
+
+  // Auto-translate non-English titles
+  items = await translateBatch(items);
 
   return items.map((item) => {
     const publishedAt = parseDate(item.published) ?? now;
