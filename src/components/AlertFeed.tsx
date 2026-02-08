@@ -18,6 +18,7 @@ interface Props {
   regionFilter: string;
   onRegionChange: (region: string) => void;
   onVisibleAlertIdsChange: (ids: string[]) => void;
+  onHideDesktop?: () => void;
 }
 
 export function AlertFeed({
@@ -27,6 +28,7 @@ export function AlertFeed({
   regionFilter,
   onRegionChange,
   onVisibleAlertIdsChange,
+  onHideDesktop,
 }: Props) {
   const [actionableOnly, setActionableOnly] = useState(true);
   const [categoryFilter, setCategoryFilter] = useState<AlertCategory | "all">("all");
@@ -227,9 +229,13 @@ export function AlertFeed({
           <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-siem-muted">
             SOC Alert Stack
           </h2>
-          <span className="px-2 py-0.5 rounded border border-siem-accent/30 bg-siem-accent/12 text-[10px] text-siem-accent font-mono">
-            {facetFiltered.length} IN QUEUE
-          </span>
+          <button
+            type="button"
+            onClick={() => onHideDesktop?.()}
+            className="hidden md:inline-flex px-2 py-0.5 rounded border border-siem-accent/30 bg-siem-accent/12 text-[10px] text-siem-accent font-mono uppercase tracking-wider hover:bg-siem-accent/20 transition-colors"
+          >
+            Hide
+          </button>
         </div>
         <div className="grid grid-cols-2 gap-2 text-[10px] font-mono uppercase tracking-wide">
           <div className="rounded border border-siem-border bg-white/5 px-2 py-1">

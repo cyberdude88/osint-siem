@@ -90,15 +90,6 @@ export default function App() {
               : "md:w-0 md:min-w-0 md:border-r-0"
           } bg-siem-panel flex-col min-h-0 overflow-hidden transition-[width] duration-300 relative`}
         >
-          {isDesktopFeedOpen && (
-            <button
-              type="button"
-              onClick={() => setIsDesktopFeedOpen(false)}
-              className="hidden md:flex absolute right-2 top-2 z-10 rounded border border-siem-border bg-white/5 px-1.5 py-1 text-[10px] font-mono uppercase tracking-wider text-siem-muted hover:bg-siem-accent/12 hover:text-siem-accent transition-colors"
-            >
-              Hide &#8249;
-            </button>
-          )}
           {isLoading ? (
             <div className="flex-1 flex items-center justify-center text-siem-muted text-sm">
               Loading live feed...
@@ -111,6 +102,7 @@ export default function App() {
               regionFilter={regionFilter}
               onRegionChange={setRegionFilter}
               onVisibleAlertIdsChange={setVisibleAlertIds}
+              onHideDesktop={() => setIsDesktopFeedOpen(false)}
             />
           )}
         </div>
