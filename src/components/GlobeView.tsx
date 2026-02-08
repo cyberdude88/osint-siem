@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import * as topojson from "topojson-client";
 import type { Alert } from "@/types/alert";
-import { severityColors } from "@/lib/severity";
+import { categoryLabels, severityColors } from "@/lib/severity";
 
 const WORLD_TOPO_URL =
   "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
@@ -17,6 +17,8 @@ const ZOOM_EASE = 7.5;
 const INITIAL_TILT_X = 0.06;
 const DRAG_SENSITIVITY_MIN = 0.0016;
 const DRAG_SENSITIVITY_MAX = 0.005;
+const HOTSPOT_RADIUS_KM = 260;
+const HOTSPOT_MIN_ALERTS = 2;
 
 interface Props {
   alerts: Alert[];
@@ -25,6 +27,20 @@ interface Props {
   regionFilter: string;
   onRegionChange: (region: string) => void;
   visibleAlertIds: string[];
+}
+
+function haversineKm(aLat: number, aLng: number, bLat: number, bLng: number): number {
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(bLat - aLat);
+  const dLng = toRad(bLng - aLng);
+  const lat1 = toRad(aLat);
+  const lat2 = toRad(bLat);
+  const sinDLat = Math.sin(dLat / 2);
+  const sinDLng = Math.sin(dLng / 2);
+  const x =
+    sinDLat * sinDLat +
+    Math.cos(lat1) * Math.cos(lat2) * sinDLng * sinDLng;
+  return 6371 * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
 }
 
 function latLngToVector3(
@@ -211,6 +227,38 @@ export function GlobeView({
   onRegionChange,
   visibleAlertIds,
 }: Props) {
+  const [hotspot, setHotspot] = useState<{ lat: number; lng: number } | null>(null);
+  const [hotspotTypeFilter, setHotspotTypeFilter] = useState<string>("all");
+  const [hotspotAgencyFilter, setHotspotAgencyFilter] = useState<string>("all");
+  const visibleIdSet = useMemo(() => new Set(visibleAlertIds), [visibleAlertIds]);
+  const hotspotAlerts = useMemo(() => {
+    if (!hotspot) return [];
+    return alerts
+      .filter((a) => visibleIdSet.has(a.alert_id))
+      .filter(
+        (a) =>
+          haversineKm(a.lat, a.lng, hotspot.lat, hotspot.lng) <= HOTSPOT_RADIUS_KM
+      )
+      .sort(
+        (a, b) => new Date(b.first_seen).getTime() - new Date(a.first_seen).getTime()
+      );
+  }, [alerts, hotspot, visibleIdSet]);
+  const hotspotTypeOptions = useMemo(
+    () => [...new Set(hotspotAlerts.map((a) => a.category))],
+    [hotspotAlerts]
+  );
+  const hotspotAgencyOptions = useMemo(
+    () => [...new Set(hotspotAlerts.map((a) => a.source.authority_name))].sort(),
+    [hotspotAlerts]
+  );
+  const hotspotFiltered = useMemo(() => {
+    return hotspotAlerts.filter((a) => {
+      const typeOk = hotspotTypeFilter === "all" || a.category === hotspotTypeFilter;
+      const agencyOk =
+        hotspotAgencyFilter === "all" || a.source.authority_name === hotspotAgencyFilter;
+      return typeOk && agencyOk;
+    });
+  }, [hotspotAlerts, hotspotAgencyFilter, hotspotTypeFilter]);
   const regions = useMemo(() => {
     const counts = new Map<string, number>();
     alerts.forEach((a) => {
@@ -336,18 +384,6 @@ export function GlobeView({
       const g = new THREE.BufferGeometry().setFromPoints(pts);
       globeGroup.add(new THREE.Line(g, gratMat));
     }
-    // Equator line (slightly more visible reference)
-    const equatorPts: THREE.Vector3[] = [];
-    for (let lng = -180; lng <= 180; lng += 2) {
-      equatorPts.push(latLngToVector3(0, lng, 1.001));
-    }
-    const equatorGeo = new THREE.BufferGeometry().setFromPoints(equatorPts);
-    const equatorMat = new THREE.LineBasicMaterial({
-      color: 0x2f5f86,
-      transparent: true,
-      opacity: 0.28,
-    });
-    globeGroup.add(new THREE.Line(equatorGeo, equatorMat));
     // Longitude lines every 30 degrees
     for (let lng = -180; lng < 180; lng += 30) {
       const pts: THREE.Vector3[] = [];
@@ -651,6 +687,14 @@ export function GlobeView({
       const { lat, lng } = vector3ToLatLng(hitPoint);
       const region = latLngToRegion(lat, lng);
       if (!region) return;
+      const nearby = alerts
+        .filter((a) => visibleIdSet.has(a.alert_id))
+        .filter((a) => haversineKm(a.lat, a.lng, lat, lng) <= HOTSPOT_RADIUS_KM);
+      if (nearby.length >= HOTSPOT_MIN_ALERTS) {
+        setHotspot({ lat, lng });
+      } else {
+        setHotspot(null);
+      }
       if (!regionSetRef.current.has(region)) return;
       onRegionChange(region);
     };
@@ -703,6 +747,63 @@ export function GlobeView({
       ref={containerRef}
       className="w-full h-full relative cursor-grab active:cursor-grabbing"
     >
+      {hotspot && hotspotAlerts.length >= HOTSPOT_MIN_ALERTS && (
+        <div className="absolute top-4 left-4 w-[290px] max-h-[52%] rounded-xl border border-siem-accent/25 bg-siem-panel/58 backdrop-blur-md shadow-lg shadow-black/35 overflow-hidden">
+          <div className="px-3 py-2 border-b border-siem-border/80 flex items-center justify-between">
+            <span className="text-[10px] uppercase tracking-widest text-siem-accent font-bold">
+              Dense Alert Zone
+            </span>
+            <span className="text-[10px] text-siem-muted font-mono">
+              {hotspotFiltered.length}/{hotspotAlerts.length}
+            </span>
+          </div>
+          <div className="px-3 py-2 space-y-1.5 border-b border-siem-border/70">
+            <select
+              value={hotspotTypeFilter}
+              onChange={(e) => setHotspotTypeFilter(e.target.value)}
+              className="w-full appearance-none bg-white/5 border border-siem-border rounded-md px-2 py-1 text-[11px] text-siem-text"
+            >
+              <option value="all">All Types</option>
+              {hotspotTypeOptions.map((type) => (
+                <option key={type} value={type}>
+                  {categoryLabels[type]}
+                </option>
+              ))}
+            </select>
+            <select
+              value={hotspotAgencyFilter}
+              onChange={(e) => setHotspotAgencyFilter(e.target.value)}
+              className="w-full appearance-none bg-white/5 border border-siem-border rounded-md px-2 py-1 text-[11px] text-siem-text"
+            >
+              <option value="all">All Agencies</option>
+              {hotspotAgencyOptions.map((agency) => (
+                <option key={agency} value={agency}>
+                  {agency}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="max-h-[250px] overflow-y-auto p-2 space-y-1.5">
+            {hotspotFiltered.map((alert) => (
+              <button
+                key={alert.alert_id}
+                onClick={() => onSelect(alert.alert_id)}
+                className="w-full text-left rounded-md border border-siem-border bg-white/5 hover:bg-siem-accent/10 px-2 py-1.5 transition-colors"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[10px] text-siem-accent truncate">
+                    {alert.source.authority_name}
+                  </span>
+                  <span className="text-[10px] text-siem-muted">{alert.severity}</span>
+                </div>
+                <p className="text-[11px] text-siem-text line-clamp-2 leading-snug mt-0.5">
+                  {alert.title}
+                </p>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
       {/* Legend */}
       <div className="absolute bottom-4 left-4 flex items-center gap-4 bg-siem-panel/80 backdrop-blur-sm px-3 py-2 rounded-lg border border-siem-border">
         {(

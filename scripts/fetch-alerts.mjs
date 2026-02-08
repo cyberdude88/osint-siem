@@ -144,6 +144,42 @@ const US_STATE_ALT_TOKENS = {
 };
 
 const COUNTRY_CENTROIDS = {
+  "south africa": [-30.5595, 22.9375],
+  egypt: [26.8206, 30.8025],
+  nigeria: [9.082, 8.6753],
+  kenya: [-0.0236, 37.9062],
+  morocco: [31.7917, -7.0926],
+  algeria: [28.0339, 1.6596],
+  ghana: [7.9465, -1.0232],
+  ethiopia: [9.145, 40.4897],
+  argentina: [-38.4161, -63.6167],
+  chile: [-35.6751, -71.543],
+  colombia: [4.5709, -74.2973],
+  peru: [-9.19, -75.0152],
+  uruguay: [-32.5228, -55.7658],
+  paraguay: [-23.4425, -58.4438],
+  bolivia: [-16.2902, -63.5887],
+  venezuela: [6.4238, -66.5897],
+  mexico: [23.6345, -102.5528],
+  "south korea": [35.9078, 127.7669],
+  malaysia: [4.2105, 101.9758],
+  thailand: [15.87, 100.9925],
+  vietnam: [14.0583, 108.2772],
+  indonesia: [-0.7893, 113.9213],
+  philippines: [12.8797, 121.774],
+  bangladesh: [23.685, 90.3563],
+  "sri lanka": [7.8731, 80.7718],
+  "united arab emirates": [23.4241, 53.8478],
+  "saudi arabia": [23.8859, 45.0792],
+  qatar: [25.3548, 51.1839],
+  kuwait: [29.3117, 47.4818],
+  bahrain: [26.0667, 50.5577],
+  oman: [21.4735, 55.9754],
+  jordan: [30.5852, 36.2384],
+  lebanon: [33.8547, 35.8623],
+  israel: [31.0461, 34.8516],
+  iran: [32.4279, 53.688],
+  iraq: [33.2232, 43.6793],
   france: [46.2276, 2.2137],
   germany: [51.1657, 10.4515],
   netherlands: [52.1326, 5.2913],
@@ -202,6 +238,60 @@ const CITY_CENTROIDS = {
   sydney: [-33.8688, 151.2093],
   melbourne: [-37.8136, 144.9631],
   tokyo: [35.6762, 139.6503],
+};
+
+const ISO2_COUNTRY_HINTS = {
+  ZA: "south africa",
+  EG: "egypt",
+  NG: "nigeria",
+  KE: "kenya",
+  MA: "morocco",
+  DZ: "algeria",
+  GH: "ghana",
+  ET: "ethiopia",
+  BR: "brazil",
+  AR: "argentina",
+  CL: "chile",
+  CO: "colombia",
+  PE: "peru",
+  UY: "uruguay",
+  PY: "paraguay",
+  BO: "bolivia",
+  VE: "venezuela",
+  MX: "mexico",
+  JP: "japan",
+  IN: "india",
+  SG: "singapore",
+  KR: "south korea",
+  MY: "malaysia",
+  TH: "thailand",
+  VN: "vietnam",
+  ID: "indonesia",
+  PH: "philippines",
+  BD: "bangladesh",
+  LK: "sri lanka",
+  AE: "united arab emirates",
+  SA: "saudi arabia",
+  QA: "qatar",
+  KW: "kuwait",
+  BH: "bahrain",
+  OM: "oman",
+  JO: "jordan",
+  LB: "lebanon",
+  IL: "israel",
+  TR: "turkey",
+  IR: "iran",
+  IQ: "iraq",
+  FR: "france",
+  DE: "germany",
+  NL: "netherlands",
+  ES: "spain",
+  IT: "italy",
+  GB: "united kingdom",
+  US: "united states",
+  CA: "canada",
+  AU: "australia",
+  NZ: "new zealand",
 };
 
 // ─── AGENCY FEEDS ───────────────────────────────────────────────
@@ -295,6 +385,28 @@ const sources = [
     },
     feed_url: "https://ws-public.interpol.int/notices/v1/red?resultPerPage=20",
     category: "wanted_suspect",
+    region_tag: "INT",
+    lat: 45.76,
+    lng: 4.84,
+    reporting: {
+      label: "Contact INTERPOL",
+      url: "https://www.interpol.int/Contacts",
+      notes: "Use official national police channels for emergencies.",
+    },
+  },
+  {
+    type: "interpol-yellow-json",
+    source: {
+      source_id: "interpol-yellow",
+      authority_name: "INTERPOL Yellow Notices",
+      country: "France",
+      country_code: "FR",
+      region: "International",
+      authority_type: "police",
+      base_url: "https://www.interpol.int",
+    },
+    feed_url: "https://ws-public.interpol.int/notices/v1/yellow?resultPerPage=20",
+    category: "missing_person",
     region_tag: "INT",
     lat: 45.76,
     lng: 4.84,
@@ -658,6 +770,18 @@ function inferCountryCoords(text) {
   return null;
 }
 
+function inferCountryFromIsoCodes(values) {
+  const list = Array.isArray(values) ? values : [values];
+  for (const value of list) {
+    const code = String(value ?? "").trim().toUpperCase();
+    const name = ISO2_COUNTRY_HINTS[code];
+    if (!name) continue;
+    const coords = COUNTRY_CENTROIDS[name];
+    if (coords) return { lat: coords[0], lng: coords[1] };
+  }
+  return null;
+}
+
 function resolveCoords(meta, text, seed) {
   const inferredUS =
     meta.source.country_code === "US" ? inferUSStateCoords(text) : null;
@@ -673,6 +797,30 @@ function resolveCoords(meta, text, seed) {
     return jitterCoords(inferredCountry.lat, inferredCountry.lng, seed, 12, 52);
   }
   return jitterCoords(meta.lat, meta.lng, seed);
+}
+
+function resolveInterpolNoticeCoords(meta, notice, title, seed) {
+  const textHints = [
+    title,
+    notice?.place_of_birth,
+    notice?.issuing_entity,
+    notice?.forename,
+    notice?.name,
+    ...(Array.isArray(notice?.nationalities) ? notice.nationalities : []),
+    ...(Array.isArray(notice?.countries_likely_to_be_visited)
+      ? notice.countries_likely_to_be_visited
+      : []),
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const isoCoords =
+    inferCountryFromIsoCodes(notice?.countries_likely_to_be_visited) ||
+    inferCountryFromIsoCodes(notice?.nationalities);
+  if (isoCoords) {
+    return jitterCoords(isoCoords.lat, isoCoords.lng, seed, 10, 45);
+  }
+  return resolveCoords(meta, textHints, seed);
 }
 
 function kevItemToAlert(entry, meta) {
@@ -782,7 +930,7 @@ async function fetchKev(meta) {
     .filter(Boolean);
 }
 
-async function fetchInterpolRed(meta, now) {
+async function fetchInterpolNotices(meta, now) {
   const response = await fetch(meta.feed_url, {
     headers: {
       "User-Agent": "osint-siem-bot/1.0",
@@ -806,9 +954,10 @@ async function fetchInterpolRed(meta, now) {
     const title = label
       ? `INTERPOL Red Notice: ${label}`
       : "INTERPOL Red Notice";
-    const jitter = resolveCoords(
+    const jitter = resolveInterpolNoticeCoords(
       meta,
-      `${title} ${canonicalUrl}`,
+      notice,
+      title,
       `${meta.source.source_id}:${canonicalUrl}`
     );
     return {
@@ -840,8 +989,8 @@ async function buildAlerts() {
       const batch =
         entry.type === "kev-json"
           ? await fetchKev(entry)
-          : entry.type === "interpol-red-json"
-          ? await fetchInterpolRed(entry, now)
+          : entry.type === "interpol-red-json" || entry.type === "interpol-yellow-json"
+          ? await fetchInterpolNotices(entry, now)
           : await fetchRss(entry, now);
       alerts.push(...batch);
     } catch (error) {
