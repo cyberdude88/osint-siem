@@ -11,12 +11,14 @@ export function StatsBar({ alerts }: Props) {
   const high = alerts.filter((a) => a.severity === "high").length;
   const active = alerts.filter((a) => a.status === "active").length;
   const regions = new Set(alerts.map((a) => a.source.country_code)).size;
+  const agencyTypes = new Set(alerts.map((a) => a.source.authority_type)).size;
 
   const stats = [
     { icon: Radio, label: "ACTIVE ALERTS", value: active, color: "text-green-400" },
     { icon: AlertTriangle, label: "CRITICAL", value: critical, color: "text-red-400" },
     { icon: Shield, label: "HIGH", value: high, color: "text-orange-400" },
     { icon: Globe, label: "REGIONS", value: regions, color: "text-blue-400" },
+    { icon: Shield, label: "AGENCY TYPES", value: agencyTypes, color: "text-siem-muted" },
     { icon: Clock, label: "TOTAL", value: total, color: "text-siem-muted" },
   ];
 

@@ -205,14 +205,16 @@ export function GlobeView({ alerts, selectedId, onSelect }: Props) {
 
     // --- Alert points ---
     const pointMeshes = new Map<string, THREE.Mesh>();
-    alerts.forEach((alert) => {
+    const glowMeshes: THREE.Mesh[] = [];
+    const allDotMeshes: { mesh: THREE.Mesh; baseSize: number; severity: string }[] = [];
+    alerts.forEach((alert, idx) => {
       const pos = latLngToVector3(alert.lat, alert.lng, 1.02);
       const size =
         alert.severity === "critical"
-          ? 0.028
+          ? 0.032
           : alert.severity === "high"
-          ? 0.022
-          : 0.016;
+          ? 0.026
+          : 0.018;
       const color = new THREE.Color(severityColors[alert.severity]);
 
       // Core dot
@@ -223,39 +225,48 @@ export function GlobeView({ alerts, selectedId, onSelect }: Props) {
       dotMesh.userData = { alertId: alert.alert_id };
       globeGroup.add(dotMesh);
       pointMeshes.set(alert.alert_id, dotMesh);
+      allDotMeshes.push({ mesh: dotMesh, baseSize: 1, severity: alert.severity });
 
-      // Outer glow
-      const glowG = new THREE.SphereGeometry(size * 3.5, 16, 16);
+      // Outer glow halo (breathes)
+      const glowG = new THREE.SphereGeometry(size * 4, 16, 16);
       const glowM = new THREE.MeshBasicMaterial({
         color,
         transparent: true,
-        opacity: 0.15,
+        opacity: 0.18,
       });
       const gm = new THREE.Mesh(glowG, glowM);
       gm.position.copy(pos);
+      gm.userData = { phase: idx * 0.8 };
       globeGroup.add(gm);
+      glowMeshes.push(gm);
     });
     pointMeshesRef.current = pointMeshes;
 
-    // --- Pulse rings for critical / very fresh ---
-    const ringMeshes: THREE.Mesh[] = [];
-    alerts
-      .filter((a) => a.severity === "critical" || a.freshness_hours < 6)
-      .forEach((alert) => {
-        const pos = latLngToVector3(alert.lat, alert.lng, 1.025);
-        const rGeo = new THREE.RingGeometry(0.02, 0.045, 32);
-        const rMat = new THREE.MeshBasicMaterial({
-          color: new THREE.Color(severityColors[alert.severity]),
-          transparent: true,
-          opacity: 0.6,
-          side: THREE.DoubleSide,
-        });
-        const rMesh = new THREE.Mesh(rGeo, rMat);
-        rMesh.position.copy(pos);
-        rMesh.lookAt(new THREE.Vector3(0, 0, 0));
-        globeGroup.add(rMesh);
-        ringMeshes.push(rMesh);
+    // --- Pulse rings for ALL alerts (bigger + faster for critical/high) ---
+    const ringMeshes: { mesh: THREE.Mesh; speed: number; maxScale: number }[] = [];
+    alerts.forEach((alert, idx) => {
+      const pos = latLngToVector3(alert.lat, alert.lng, 1.025);
+      const isCritHigh = alert.severity === "critical" || alert.severity === "high";
+      const innerR = isCritHigh ? 0.02 : 0.012;
+      const outerR = isCritHigh ? 0.055 : 0.035;
+      const rGeo = new THREE.RingGeometry(innerR, outerR, 32);
+      const rMat = new THREE.MeshBasicMaterial({
+        color: new THREE.Color(severityColors[alert.severity]),
+        transparent: true,
+        opacity: 0.7,
+        side: THREE.DoubleSide,
       });
+      const rMesh = new THREE.Mesh(rGeo, rMat);
+      rMesh.position.copy(pos);
+      rMesh.lookAt(new THREE.Vector3(0, 0, 0));
+      rMesh.userData = { phase: idx * 1.3 };
+      globeGroup.add(rMesh);
+      ringMeshes.push({
+        mesh: rMesh,
+        speed: isCritHigh ? 3.0 : 1.8,
+        maxScale: isCritHigh ? 2.5 : 1.8,
+      });
+    });
 
     // --- Initial tilt ---
     globeGroup.rotation.x = 0.35;
@@ -268,12 +279,37 @@ export function GlobeView({ alerts, selectedId, onSelect }: Props) {
       if (rotationRef.current.autoRotate) {
         globeGroup.rotation.y += 0.0012;
       }
-      ringMeshes.forEach((ring, i) => {
-        const s = 1 + Math.sin(t * 2.5 + i * 1.7) * 1.0;
-        ring.scale.set(s, s, 1);
-        (ring.material as THREE.MeshBasicMaterial).opacity =
-          0.6 * Math.max(0, 1 - (s - 1) / 2);
+
+      // Breathing glow halos
+      glowMeshes.forEach((gm) => {
+        const phase = (gm.userData as { phase: number }).phase;
+        const breath = 1 + Math.sin(t * 1.5 + phase) * 0.35;
+        gm.scale.set(breath, breath, breath);
+        (gm.material as THREE.MeshBasicMaterial).opacity =
+          0.12 + Math.sin(t * 1.5 + phase) * 0.08;
       });
+
+      // Dot breathing (subtle scale pulse)
+      allDotMeshes.forEach((entry, i) => {
+        const pulse =
+          entry.severity === "critical"
+            ? 1 + Math.sin(t * 3.0 + i * 0.9) * 0.3
+            : entry.severity === "high"
+            ? 1 + Math.sin(t * 2.2 + i * 1.1) * 0.2
+            : 1 + Math.sin(t * 1.4 + i * 1.3) * 0.12;
+        entry.mesh.scale.set(pulse, pulse, pulse);
+      });
+
+      // Expanding ring waves
+      ringMeshes.forEach(({ mesh, speed, maxScale }) => {
+        const phase = (mesh.userData as { phase: number }).phase;
+        const cycle = ((t * speed + phase) % (Math.PI * 2)) / (Math.PI * 2);
+        const s = 1 + cycle * (maxScale - 1);
+        mesh.scale.set(s, s, 1);
+        (mesh.material as THREE.MeshBasicMaterial).opacity =
+          0.7 * Math.max(0, 1 - cycle);
+      });
+
       renderer.render(scene, camera);
     };
     animate();
@@ -376,6 +412,7 @@ export function GlobeView({ alerts, selectedId, onSelect }: Props) {
             ["high", "bg-orange-500"],
             ["medium", "bg-yellow-500"],
             ["low", "bg-green-500"],
+            ["info", "bg-cyan-500"],
           ] as const
         ).map(([sev, bg]) => (
           <div

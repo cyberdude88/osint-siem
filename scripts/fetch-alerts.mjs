@@ -372,8 +372,8 @@ async function fetchRss(meta, now) {
     .slice(0, MAX_PER_SOURCE);
 
   return items.map((item) => {
-    const publishedAt = parseDate(item.published);
-    if (!publishedAt || !isFresh(publishedAt, now)) {
+    const publishedAt = parseDate(item.published) ?? now;
+    if (!isFresh(publishedAt, now)) {
       return null;
     }
     const hours = Math.max(1, Math.round((now - publishedAt) / 36e5));
@@ -409,8 +409,10 @@ async function fetchKev(meta) {
   }
   const data = await response.json();
   const vulnerabilities = Array.isArray(data?.vulnerabilities) ? data.vulnerabilities : [];
+  // Sort by dateAdded descending (newest first) then take top N
+  vulnerabilities.sort((a, b) => new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime());
   return vulnerabilities
-    .slice(-MAX_PER_SOURCE)
+    .slice(0, MAX_PER_SOURCE)
     .map((entry) => kevItemToAlert(entry, meta))
     .filter(Boolean);
 }
