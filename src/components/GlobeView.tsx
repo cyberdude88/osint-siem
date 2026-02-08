@@ -662,6 +662,7 @@ export function GlobeView({
       rotationRef.current.ambientBlend = 0;
     };
     const onDown = (e: PointerEvent) => {
+      e.preventDefault();
       beginDrag(e.clientX, e.clientY);
       try {
         (e.currentTarget as Element).setPointerCapture?.(e.pointerId);
@@ -704,6 +705,7 @@ export function GlobeView({
       mouseRef.current.prevT = now;
     };
     const onMove = (e: PointerEvent) => {
+      e.preventDefault();
       applyDrag(e.clientX, e.clientY);
     };
     const onUp = () => {
@@ -713,6 +715,7 @@ export function GlobeView({
     const onTouchStart = (e: TouchEvent) => {
       const t = e.touches[0];
       if (!t) return;
+      e.preventDefault();
       beginDrag(t.clientX, t.clientY);
     };
     const onTouchMove = (e: TouchEvent) => {
@@ -840,15 +843,25 @@ export function GlobeView({
 
     const el = renderer.domElement;
     el.style.touchAction = "none";
+    container.style.touchAction = "none";
     el.addEventListener("pointerdown", onDown);
     el.addEventListener("pointermove", onMove);
     el.addEventListener("pointerup", onUp);
     el.addEventListener("pointercancel", onUp);
     el.addEventListener("pointerleave", onUp);
-    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchstart", onTouchStart, { passive: false });
     el.addEventListener("touchmove", onTouchMove, { passive: false });
     el.addEventListener("touchend", onTouchEnd, { passive: true });
     el.addEventListener("touchcancel", onTouchEnd, { passive: true });
+    container.addEventListener("pointerdown", onDown);
+    container.addEventListener("pointermove", onMove);
+    container.addEventListener("pointerup", onUp);
+    container.addEventListener("pointercancel", onUp);
+    container.addEventListener("pointerleave", onUp);
+    container.addEventListener("touchstart", onTouchStart, { passive: false });
+    container.addEventListener("touchmove", onTouchMove, { passive: false });
+    container.addEventListener("touchend", onTouchEnd, { passive: true });
+    container.addEventListener("touchcancel", onTouchEnd, { passive: true });
     el.addEventListener("click", onClk);
     el.addEventListener("wheel", onWheel, { passive: false });
     container.addEventListener("wheel", onWheel, { passive: false });
@@ -865,6 +878,15 @@ export function GlobeView({
       el.removeEventListener("touchmove", onTouchMove);
       el.removeEventListener("touchend", onTouchEnd);
       el.removeEventListener("touchcancel", onTouchEnd);
+      container.removeEventListener("pointerdown", onDown);
+      container.removeEventListener("pointermove", onMove);
+      container.removeEventListener("pointerup", onUp);
+      container.removeEventListener("pointercancel", onUp);
+      container.removeEventListener("pointerleave", onUp);
+      container.removeEventListener("touchstart", onTouchStart);
+      container.removeEventListener("touchmove", onTouchMove);
+      container.removeEventListener("touchend", onTouchEnd);
+      container.removeEventListener("touchcancel", onTouchEnd);
       el.removeEventListener("click", onClk);
       el.removeEventListener("wheel", onWheel);
       container.removeEventListener("wheel", onWheel);

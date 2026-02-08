@@ -2136,45 +2136,6 @@ function isBlogAlert(alert) {
   return false;
 }
 
-const CASE_HELP_KEYWORDS = [
-  "seeking information",
-  "wanted",
-  "most wanted",
-  "fugitive",
-  "missing",
-  "disappearance",
-  "locate",
-  "whereabouts",
-  "tip",
-  "tip line",
-  "public appeal",
-  "help identify",
-  "identify this person",
-  "person of interest",
-  "witness",
-  "crime stoppers",
-  "amber alert",
-];
-
-function isActionableCaseAlert(alert) {
-  const hasReportingPath = Boolean(
-    alert?.reporting?.url || alert?.reporting?.phone || alert?.reporting?.email
-  );
-  if (!hasReportingPath) return false;
-
-  const authorityType = String(alert?.source?.authority_type ?? "");
-  if (!["police", "public_safety_program"].includes(authorityType)) {
-    return false;
-  }
-
-  const category = String(alert?.category ?? "");
-  if (category === "wanted_suspect" || category === "missing_person") return true;
-  if (category !== "public_appeal") return false;
-
-  const title = String(alert?.title ?? "").toLowerCase();
-  return CASE_HELP_KEYWORDS.some((word) => title.includes(word));
-}
-
 function isInformational(title) {
   const t = title.toLowerCase();
   const keywords = [
@@ -2639,9 +2600,7 @@ async function buildAlerts() {
     }
   }
 
-  const sanitized = alerts
-    .filter((a) => !isBlogAlert(a))
-    .filter((a) => isActionableCaseAlert(a));
+  const sanitized = alerts.filter((a) => !isBlogAlert(a));
   sanitized.sort((a, b) => new Date(b.first_seen).getTime() - new Date(a.first_seen).getTime());
   return sanitized;
 }
