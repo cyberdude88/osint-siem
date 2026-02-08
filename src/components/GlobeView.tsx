@@ -231,6 +231,7 @@ export function GlobeView({
   visibleAlertIds,
 }: Props) {
   const [hotspot, setHotspot] = useState<{ lat: number; lng: number } | null>(null);
+  const [hotspotAlertIds, setHotspotAlertIds] = useState<string[]>([]);
   const [hotspotTypeFilter, setHotspotTypeFilter] = useState<string>("all");
   const [hotspotAgencyFilter, setHotspotAgencyFilter] = useState<string>("all");
   const visibleIdSet = useMemo(() => new Set(visibleAlertIds), [visibleAlertIds]);
@@ -238,18 +239,20 @@ export function GlobeView({
     () => new Map(alerts.map((a) => [a.alert_id, a])),
     [alerts]
   );
+  const closeHotspot = () => {
+    setHotspot(null);
+    setHotspotAlertIds([]);
+  };
   const hotspotAlerts = useMemo(() => {
-    if (!hotspot) return [];
-    return alerts
+    if (!hotspot || hotspotAlertIds.length === 0) return [];
+    return hotspotAlertIds
+      .map((id) => alertsById.get(id))
+      .filter((a): a is Alert => Boolean(a))
       .filter((a) => visibleIdSet.has(a.alert_id))
-      .filter(
-        (a) =>
-          haversineKm(a.lat, a.lng, hotspot.lat, hotspot.lng) <= HOTSPOT_RADIUS_KM
-      )
       .sort(
         (a, b) => new Date(b.first_seen).getTime() - new Date(a.first_seen).getTime()
       );
-  }, [alerts, hotspot, visibleIdSet]);
+  }, [alertsById, hotspot, hotspotAlertIds, visibleIdSet]);
   const hotspotTypeOptions = useMemo(
     () => [...new Set(hotspotAlerts.map((a) => a.category))],
     [hotspotAlerts]
@@ -266,10 +269,6 @@ export function GlobeView({
       return typeOk && agencyOk;
     });
   }, [hotspotAlerts, hotspotAgencyFilter, hotspotTypeFilter]);
-  const findNearbyVisibleAlerts = (lat: number, lng: number) =>
-    alerts
-      .filter((a) => visibleIdSet.has(a.alert_id))
-      .filter((a) => haversineKm(a.lat, a.lng, lat, lng) <= HOTSPOT_RADIUS_KM);
   const regions = useMemo(() => {
     const counts = new Map<string, number>();
     alerts.forEach((a) => {
@@ -760,6 +759,8 @@ export function GlobeView({
       };
       const openHotspotFromCluster = (cluster: Alert[]) => {
         if (cluster.length < HOTSPOT_MIN_ALERTS) return false;
+        const uniqueIds = [...new Set(cluster.map((a) => a.alert_id))];
+        if (uniqueIds.length < HOTSPOT_MIN_ALERTS) return false;
         const center = cluster.reduce(
           (acc, a) => ({ lat: acc.lat + a.lat, lng: acc.lng + a.lng }),
           { lat: 0, lng: 0 }
@@ -768,6 +769,9 @@ export function GlobeView({
           lat: center.lat / cluster.length,
           lng: center.lng / cluster.length,
         });
+        setHotspotAlertIds(uniqueIds);
+        setHotspotTypeFilter("all");
+        setHotspotAgencyFilter("all");
         return true;
       };
       mv.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -783,7 +787,7 @@ export function GlobeView({
             const overlapped = findPixelClusterAt(clickPx, HOTSPOT_PIXEL_RADIUS * 1.3);
             const nearby = findNearbyVisibleAlertsAt(baseAlert.lat, baseAlert.lng);
             if (!openHotspotFromCluster(overlapped) && !openHotspotFromCluster(nearby)) {
-              setHotspot(null);
+              closeHotspot();
             }
           }
         }
@@ -800,7 +804,7 @@ export function GlobeView({
       const overlapped = findPixelClusterAt(clickPx, HOTSPOT_PIXEL_RADIUS * 1.35);
       const nearby = findNearbyVisibleAlertsAt(lat, lng);
       if (!openHotspotFromCluster(overlapped) && !openHotspotFromCluster(nearby)) {
-        setHotspot(null);
+        closeHotspot();
       }
       if (!regionSetRef.current.has(region)) return;
       onRegionChange(region);
@@ -865,7 +869,7 @@ export function GlobeView({
                 {hotspotFiltered.length}/{hotspotAlerts.length}
               </span>
               <button
-                onClick={() => setHotspot(null)}
+                onClick={closeHotspot}
                 className="text-[10px] px-1.5 py-0.5 rounded border border-siem-border text-siem-muted hover:bg-siem-accent/10 hover:text-siem-accent transition-colors"
               >
                 Close
