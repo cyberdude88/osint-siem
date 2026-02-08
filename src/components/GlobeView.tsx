@@ -648,7 +648,8 @@ export function GlobeView({
     const resizeObs = new ResizeObserver(onResize);
     resizeObs.observe(container);
 
-    // --- Pointer/touch drag to rotate ---
+    // --- Drag to rotate (pointer-first, touch fallback for older browsers) ---
+    let activePointerId: number | null = null;
     const beginDrag = (clientX: number, clientY: number) => {
       mouseRef.current = {
         isDown: true,
@@ -662,7 +663,8 @@ export function GlobeView({
       rotationRef.current.ambientBlend = 0;
     };
     const onDown = (e: PointerEvent) => {
-      e.preventDefault();
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      activePointerId = e.pointerId;
       beginDrag(e.clientX, e.clientY);
       try {
         (e.currentTarget as Element).setPointerCapture?.(e.pointerId);
@@ -705,10 +707,14 @@ export function GlobeView({
       mouseRef.current.prevT = now;
     };
     const onMove = (e: PointerEvent) => {
-      e.preventDefault();
+      if (activePointerId !== null && e.pointerId !== activePointerId) return;
+      if (e.pointerType === "touch" && mouseRef.current.isDown) {
+        e.preventDefault();
+      }
       applyDrag(e.clientX, e.clientY);
     };
     const onUp = () => {
+      activePointerId = null;
       mouseRef.current.isDown = false;
       rotationRef.current.interacting = false;
     };
@@ -842,26 +848,19 @@ export function GlobeView({
     };
 
     const el = renderer.domElement;
+    const hasPointerSupport = typeof PointerEvent !== "undefined";
     el.style.touchAction = "none";
     container.style.touchAction = "none";
     el.addEventListener("pointerdown", onDown);
-    el.addEventListener("pointermove", onMove);
-    el.addEventListener("pointerup", onUp);
-    el.addEventListener("pointercancel", onUp);
-    el.addEventListener("pointerleave", onUp);
-    el.addEventListener("touchstart", onTouchStart, { passive: false });
-    el.addEventListener("touchmove", onTouchMove, { passive: false });
-    el.addEventListener("touchend", onTouchEnd, { passive: true });
-    el.addEventListener("touchcancel", onTouchEnd, { passive: true });
-    container.addEventListener("pointerdown", onDown);
-    container.addEventListener("pointermove", onMove);
-    container.addEventListener("pointerup", onUp);
-    container.addEventListener("pointercancel", onUp);
-    container.addEventListener("pointerleave", onUp);
-    container.addEventListener("touchstart", onTouchStart, { passive: false });
-    container.addEventListener("touchmove", onTouchMove, { passive: false });
-    container.addEventListener("touchend", onTouchEnd, { passive: true });
-    container.addEventListener("touchcancel", onTouchEnd, { passive: true });
+    window.addEventListener("pointermove", onMove, { passive: false });
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
+    if (!hasPointerSupport) {
+      el.addEventListener("touchstart", onTouchStart, { passive: false });
+      window.addEventListener("touchmove", onTouchMove, { passive: false });
+      window.addEventListener("touchend", onTouchEnd, { passive: true });
+      window.addEventListener("touchcancel", onTouchEnd, { passive: true });
+    }
     el.addEventListener("click", onClk);
     el.addEventListener("wheel", onWheel, { passive: false });
     container.addEventListener("wheel", onWheel, { passive: false });
@@ -870,23 +869,15 @@ export function GlobeView({
       cancelAnimationFrame(frameRef.current);
       resizeObs.disconnect();
       el.removeEventListener("pointerdown", onDown);
-      el.removeEventListener("pointermove", onMove);
-      el.removeEventListener("pointerup", onUp);
-      el.removeEventListener("pointercancel", onUp);
-      el.removeEventListener("pointerleave", onUp);
-      el.removeEventListener("touchstart", onTouchStart);
-      el.removeEventListener("touchmove", onTouchMove);
-      el.removeEventListener("touchend", onTouchEnd);
-      el.removeEventListener("touchcancel", onTouchEnd);
-      container.removeEventListener("pointerdown", onDown);
-      container.removeEventListener("pointermove", onMove);
-      container.removeEventListener("pointerup", onUp);
-      container.removeEventListener("pointercancel", onUp);
-      container.removeEventListener("pointerleave", onUp);
-      container.removeEventListener("touchstart", onTouchStart);
-      container.removeEventListener("touchmove", onTouchMove);
-      container.removeEventListener("touchend", onTouchEnd);
-      container.removeEventListener("touchcancel", onTouchEnd);
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
+      if (!hasPointerSupport) {
+        el.removeEventListener("touchstart", onTouchStart);
+        window.removeEventListener("touchmove", onTouchMove);
+        window.removeEventListener("touchend", onTouchEnd);
+        window.removeEventListener("touchcancel", onTouchEnd);
+      }
       el.removeEventListener("click", onClk);
       el.removeEventListener("wheel", onWheel);
       container.removeEventListener("wheel", onWheel);
