@@ -6,7 +6,6 @@ import {
   categoryOrder,
   categoryBadge,
   freshnessLabel,
-  freshnessConfidence,
 } from "@/lib/severity";
 import { ExternalLink, Clock, Building2 } from "lucide-react";
 
@@ -52,9 +51,8 @@ export function AlertFeed({ alerts, selectedId, onSelect }: Props) {
               </span>
             </div>
             {group.alerts.map((alert) => {
-              const fresh = freshnessConfidence(alert.freshness_hours);
-              const isSelected = selectedId === alert.alert_id;
-              return (
+          const isSelected = selectedId === alert.alert_id;
+          return (
                 <button
                   key={alert.alert_id}
                   onClick={() => onSelect(alert.alert_id)}
@@ -68,24 +66,21 @@ export function AlertFeed({ alerts, selectedId, onSelect }: Props) {
                         severityBg[alert.severity]
                       }`}
                     >
-                      {severityLabel[alert.severity]}
-                    </span>
-                    <span className={`text-[10px] font-mono ${fresh.color}`}>
-                      {fresh.label}
-                    </span>
-                  </div>
-                  <p className="text-sm text-siem-text leading-snug line-clamp-2 mb-1.5">
-                    {alert.title}
-                  </p>
+                  {severityLabel[alert.severity]}
+                </span>
+              </div>
+              <p className="text-sm text-siem-text leading-snug line-clamp-2 mb-1.5">
+                {alert.title}
+              </p>
                   <div className="flex items-center gap-3 text-[11px] text-siem-muted">
                     <span className="flex items-center gap-1">
                       <Building2 size={10} />
                       {alert.source.authority_name}
                     </span>
                     <span className="flex items-center gap-1">
-                      <Clock size={10} />
-                      {freshnessLabel(alert.freshness_hours)}
-                    </span>
+                  <Clock size={10} />
+                  {freshnessLabel(alert.freshness_hours)}
+                </span>
                     <span className="px-1.5 py-0.5 bg-white/5 rounded text-[10px]">
                       {categoryLabels[alert.category]}
                     </span>
