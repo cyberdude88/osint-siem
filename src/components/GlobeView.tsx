@@ -29,6 +29,27 @@ function latLngToVector3(
   );
 }
 
+function vector3ToLatLng(vec: THREE.Vector3): { lat: number; lng: number } {
+  const v = vec.clone().normalize();
+  const phi = Math.acos(v.y);
+  const theta = Math.atan2(v.z, v.x);
+  const lat = 90 - (phi * 180) / Math.PI;
+  const lng = ((theta * 180) / Math.PI + 540) % 360 - 180;
+  return { lat, lng };
+}
+
+function latLngToRegion(lat: number, lng: number): string | null {
+  // Coarse continent buckets (good enough for region filtering)
+  if (lat >= 7 && lat <= 83 && lng >= -168 && lng <= -52) return "North America";
+  if (lat >= -56 && lat <= 13 && lng >= -82 && lng <= -35) return "South America";
+  if (lat >= 35 && lat <= 72 && lng >= -11 && lng <= 40) return "Europe";
+  if (lat >= -35 && lat <= 37 && lng >= -17 && lng <= 51) return "Africa";
+  if (lat >= 5 && lat <= 77 && lng >= 40 && lng <= 180) return "Asia";
+  if (lat >= -50 && lat <= 10 && lng >= 110 && lng <= 180) return "Oceania";
+  if (lat < -60) return "Antarctica";
+  return null;
+}
+
 /** Convert a GeoJSON MultiLineString / Polygon ring coords into THREE.Line segments */
 function coordsToLine(
   coords: number[][],
@@ -86,15 +107,21 @@ export function GlobeView({
   const containerRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const globeGroupRef = useRef<THREE.Group | null>(null);
+  const oceanRef = useRef<THREE.Mesh | null>(null);
   const pointMeshesRef = useRef<Map<string, THREE.Mesh>>(new Map());
   const frameRef = useRef<number>(0);
   const mouseRef = useRef({ isDown: false, prevX: 0, prevY: 0 });
   const rotationRef = useRef({ autoRotate: true, x: 0.35, y: 0 });
   const regionFilterRef = useRef(regionFilter);
+  const regionSetRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     regionFilterRef.current = regionFilter;
   }, [regionFilter]);
+
+  useEffect(() => {
+    regionSetRef.current = new Set(regions.map(([r]) => r));
+  }, [regions]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -132,7 +159,9 @@ export function GlobeView({
       emissive: 0x050a14,
       shininess: 5,
     });
-    globeGroup.add(new THREE.Mesh(oceanGeo, oceanMat));
+    const oceanMesh = new THREE.Mesh(oceanGeo, oceanMat);
+    globeGroup.add(oceanMesh);
+    oceanRef.current = oceanMesh;
 
     // --- Atmosphere glow ---
     const glowGeo = new THREE.SphereGeometry(1.12, 64, 64);
@@ -395,7 +424,18 @@ export function GlobeView({
       if (hits.length > 0) {
         const id = hits[0].object.userData.alertId;
         if (id) onSelect(id);
+        return;
       }
+      const ocean = oceanRef.current;
+      if (!ocean) return;
+      const globeHits = raycaster.intersectObject(ocean);
+      if (globeHits.length === 0) return;
+      const hitPoint = globeHits[0].point;
+      const { lat, lng } = vector3ToLatLng(hitPoint);
+      const region = latLngToRegion(lat, lng);
+      if (!region) return;
+      if (!regionSetRef.current.has(region)) return;
+      onRegionChange(region);
     };
 
     const el = renderer.domElement;
