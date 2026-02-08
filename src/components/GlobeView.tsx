@@ -711,16 +711,18 @@ export function GlobeView({
       const normalized = e.deltaY * deltaScale;
       if (normalized === 0) return;
       const dir = normalized > 0 ? 1 : -1;
-      const baseIntensity = Math.max(0.25, Math.min(1.2, Math.abs(normalized) / 140));
+      const baseIntensity = Math.max(0.4, Math.min(1.45, Math.abs(normalized) / 120));
       const zoomNorm = Math.max(
         0,
         Math.min(1, (zoomRef.current.current - ZOOM_MIN) / (ZOOM_MAX - ZOOM_MIN))
       );
-      // Bell-curve sensitivity: very fine near-surface, strongest mid/far distance.
+      // Bell-curve + far-distance boost:
+      // high sensitivity when far out, progressively finer near the globe.
       const sigma = 0.28;
       const center = 0.82;
       const bell = Math.exp(-((zoomNorm - center) ** 2) / (2 * sigma * sigma));
-      const zoomSensitivity = 0.26 + bell * 1.6;
+      const farBoost = Math.pow(zoomNorm, 2.35);
+      const zoomSensitivity = 0.18 + bell * 1.45 + farBoost * 1.75;
       adjustZoom(dir * ZOOM_STEP * baseIntensity * zoomSensitivity);
     };
 
