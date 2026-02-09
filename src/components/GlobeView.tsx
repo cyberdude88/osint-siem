@@ -31,7 +31,7 @@ const REGION_CENTROIDS: Record<string, { lat: number; lng: number; scale: number
   Africa: { lat: 5, lng: 20, scale: 1.28 },
   Asia: { lat: 34, lng: 95, scale: 1.62 },
   Oceania: { lat: -22, lng: 140, scale: 1.08 },
-  Caribbean: { lat: 18, lng: -72, scale: 0.68 },
+  Caribbean: { lat: 20, lng: -86, scale: 0.9 },
   International: { lat: 20, lng: 0, scale: 1.8 },
 };
 
@@ -83,8 +83,9 @@ function vector3ToLatLng(vec: THREE.Vector3): { lat: number; lng: number } {
 }
 
 function latLngToRegion(lat: number, lng: number): string | null {
-  // Caribbean first (overlaps N/S America bounding boxes)
-  if (lat >= 10 && lat <= 27 && lng >= -90 && lng <= -58) return "Caribbean";
+  // Caribbean first (overlaps N/S America bounding boxes).
+  // Include Mexico + Central America in Caribbean interaction zone.
+  if (lat >= 7 && lat <= 33 && lng >= -117 && lng <= -58) return "Caribbean";
   // Continental regions — ordered narrow-to-wide to avoid swallowing smaller areas
   if (lat >= 7 && lat <= 84 && lng >= -170 && lng <= -50) return "North America";
   if (lat >= -57 && lat <= 15 && lng >= -82 && lng <= -33) return "South America";
