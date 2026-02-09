@@ -3205,6 +3205,13 @@ function scoreIncidentRelevance(alert, context = {}) {
   if (alert.category === "wanted_suspect" || alert.category === "missing_person") {
     addSignal(0.09, "law-enforcement incident category");
   }
+  if (
+    alert.category === "humanitarian_tasking" ||
+    alert.category === "conflict_monitoring" ||
+    alert.category === "humanitarian_security"
+  ) {
+    addSignal(0.08, "humanitarian incident/tasking category");
+  }
   if (alert.category === "fraud_alert") addSignal(0.07, "fraud incident category");
 
   const hasTechnical = hasAnyPattern(text, TECHNICAL_SIGNAL_PATTERNS);
@@ -3352,6 +3359,12 @@ function defaultSeverity(category) {
     case "missing_person":
       return "critical";
     case "public_appeal":
+      return "high";
+    case "humanitarian_tasking":
+      return "high";
+    case "conflict_monitoring":
+      return "medium";
+    case "humanitarian_security":
       return "high";
     case "public_safety":
       return "medium";

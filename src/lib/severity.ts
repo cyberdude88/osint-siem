@@ -29,6 +29,9 @@ export const categoryLabels: Record<AlertCategory, string> = {
   wanted_suspect: "Wanted Suspect",
   public_appeal: "Public Appeal",
   cyber_advisory: "Cyber Advisory",
+  humanitarian_tasking: "Humanitarian Tasking",
+  conflict_monitoring: "Conflict Monitoring",
+  humanitarian_security: "Humanitarian Security",
   terrorism_tip: "Terrorism Tip",
   fraud_alert: "Fraud Alert",
   public_safety: "Public Safety",
@@ -36,6 +39,9 @@ export const categoryLabels: Record<AlertCategory, string> = {
 };
 
 export const categoryOrder: AlertCategory[] = [
+  "humanitarian_tasking",
+  "humanitarian_security",
+  "conflict_monitoring",
   "cyber_advisory",
   "wanted_suspect",
   "missing_person",
@@ -48,6 +54,9 @@ export const categoryOrder: AlertCategory[] = [
 
 export const categoryBadge: Record<AlertCategory, string> = {
   cyber_advisory: "bg-sky-500/15 text-sky-300 border-sky-500/30",
+  humanitarian_tasking: "bg-teal-500/15 text-teal-300 border-teal-500/30",
+  conflict_monitoring: "bg-fuchsia-500/15 text-fuchsia-300 border-fuchsia-500/30",
+  humanitarian_security: "bg-blue-500/15 text-blue-300 border-blue-500/30",
   wanted_suspect: "bg-rose-500/15 text-rose-300 border-rose-500/30",
   missing_person: "bg-amber-500/15 text-amber-300 border-amber-500/30",
   public_appeal: "bg-indigo-500/15 text-indigo-300 border-indigo-500/30",
@@ -62,6 +71,9 @@ export const categoryIcons: Record<AlertCategory, string> = {
   wanted_suspect: "ShieldAlert",
   public_appeal: "Megaphone",
   cyber_advisory: "ShieldCheck",
+  humanitarian_tasking: "MapPinned",
+  conflict_monitoring: "Radar",
+  humanitarian_security: "Shield",
   terrorism_tip: "AlertTriangle",
   fraud_alert: "BadgeDollarSign",
   public_safety: "Siren",

@@ -24,6 +24,32 @@ interface Props {
 
 export function AlertDetail({ alert, onClose }: Props) {
   if (!alert) return null;
+  const playbook =
+    alert.category === "cyber_advisory"
+      ? [
+          "Pivot domains/IPs in passive DNS, WHOIS history, and certificate transparency.",
+          "Search malware/hash indicators in public sandboxes and open threat intel feeds.",
+          "Document overlaps with known campaigns and map affected sectors/regions.",
+        ]
+      : alert.category === "missing_person" || alert.category === "wanted_suspect"
+      ? [
+          "Extract names, aliases, locations, vehicles, and timeline references from the bulletin.",
+          "Cross-check only with official/verified public posts and avoid reposting unverified claims.",
+          "Package evidence links and report through official authority channels listed below.",
+        ]
+      : alert.category === "humanitarian_tasking" ||
+        alert.category === "humanitarian_security" ||
+        alert.category === "conflict_monitoring"
+      ? [
+          "Map incident location and nearby critical infrastructure using open geodata sources.",
+          "Validate claims with multi-source corroboration (satellite, media, local official notices).",
+          "Share structured findings with aid partners using minimal sensitive personal data.",
+        ]
+      : [
+          "Collect key entities (people, places, orgs, infrastructure) from the bulletin.",
+          "Corroborate across independent public sources and time-stamp your evidence.",
+          "Submit concise findings via the official reporting path when relevant.",
+        ];
 
   return (
     <div className="flex flex-col h-full">
@@ -146,6 +172,20 @@ export function AlertDetail({ alert, onClose }: Props) {
             </div>
           </div>
         )}
+
+        <div className="rounded-lg border border-siem-border bg-white/5 p-3 space-y-2">
+          <div className="text-[10px] uppercase tracking-wider text-siem-muted">
+            How To Help (OSINT Playbook)
+          </div>
+          <ol className="space-y-1.5 text-[11px] text-siem-text list-decimal pl-4">
+            {playbook.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ol>
+          <p className="text-[10px] text-siem-muted">
+            Do not contact suspects or victims directly. Use only official channels.
+          </p>
+        </div>
 
         {/* Go To Alert */}
         <a
