@@ -1001,7 +1001,12 @@ export function GlobeView({
       const globeHits = raycaster.intersectObject(ocean);
       if (globeHits.length === 0) return;
       const hitPoint = globeHits[0].point;
-      const { lat, lng } = vector3ToLatLng(hitPoint);
+      // Transform from world space to globe-local space to account for rotation
+      const globeGroup = globeGroupRef.current;
+      const localPoint = globeGroup
+        ? globeGroup.worldToLocal(hitPoint.clone())
+        : hitPoint;
+      const { lat, lng } = vector3ToLatLng(localPoint);
       const overlapped = findPixelClusterAt(clickPx, HOTSPOT_PIXEL_RADIUS * 1.35);
       const nearby = findNearbyVisibleAlertsAt(lat, lng);
       if (!openHotspotFromCluster(overlapped) && !openHotspotFromCluster(nearby)) {
