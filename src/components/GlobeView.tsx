@@ -14,6 +14,8 @@ const MOMENTUM_FRICTION = 2.6;
 const ZOOM_MIN = 1.03;
 const ZOOM_MAX = 4.6;
 const ZOOM_STEP = 0.06;
+const PINCH_ZOOM_SENSITIVITY = 0.0027;
+const PINCH_ZOOM_STEP_CAP = 0.16;
 const ZOOM_EASE = 7.5;
 const INITIAL_TILT_X = 0.06;
 const DRAG_SENSITIVITY_MIN = 0.0016;
@@ -650,6 +652,24 @@ export function GlobeView({
 
     // --- Drag to rotate (pointer-first, touch fallback for older browsers) ---
     let activePointerId: number | null = null;
+    const touchPointers = new Map<number, { x: number; y: number }>();
+    let pinchDistance = 0;
+    let fallbackPinchDistance = 0;
+    const getDistance = (a: { x: number; y: number }, b: { x: number; y: number }) =>
+      Math.hypot(b.x - a.x, b.y - a.y);
+    const applyPinchDelta = (deltaPx: number) => {
+      const pinchStep = Math.max(
+        -PINCH_ZOOM_STEP_CAP,
+        Math.min(PINCH_ZOOM_STEP_CAP, deltaPx * PINCH_ZOOM_SENSITIVITY)
+      );
+      // Finger spread (distance up) should zoom in, pinch (distance down) should zoom out.
+      adjustZoom(-pinchStep);
+      mouseRef.current.moved = true;
+    };
+    const stopInteracting = () => {
+      mouseRef.current.isDown = false;
+      rotationRef.current.interacting = false;
+    };
     const beginDrag = (clientX: number, clientY: number) => {
       mouseRef.current = {
         isDown: true,
@@ -664,6 +684,17 @@ export function GlobeView({
     };
     const onDown = (e: PointerEvent) => {
       if (e.pointerType === "mouse" && e.button !== 0) return;
+      if (e.pointerType === "touch") {
+        touchPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        if (touchPointers.size >= 2) {
+          const [a, b] = Array.from(touchPointers.values());
+          pinchDistance = getDistance(a, b);
+          activePointerId = null;
+          stopInteracting();
+          e.preventDefault();
+          return;
+        }
+      }
       activePointerId = e.pointerId;
       beginDrag(e.clientX, e.clientY);
       try {
@@ -707,32 +738,108 @@ export function GlobeView({
       mouseRef.current.prevT = now;
     };
     const onMove = (e: PointerEvent) => {
-      if (activePointerId !== null && e.pointerId !== activePointerId) return;
-      if (e.pointerType === "touch" && mouseRef.current.isDown) {
-        e.preventDefault();
+      if (e.pointerType === "touch") {
+        if (touchPointers.has(e.pointerId)) {
+          touchPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        }
+        if (touchPointers.size >= 2) {
+          const [a, b] = Array.from(touchPointers.values());
+          const nextDistance = getDistance(a, b);
+          if (pinchDistance > 0) {
+            applyPinchDelta(nextDistance - pinchDistance);
+          }
+          pinchDistance = nextDistance;
+          activePointerId = null;
+          stopInteracting();
+          e.preventDefault();
+          return;
+        }
+        pinchDistance = 0;
+        if (activePointerId !== null && e.pointerId !== activePointerId) return;
+        if (mouseRef.current.isDown) {
+          e.preventDefault();
+        }
+      } else if (activePointerId !== null && e.pointerId !== activePointerId) {
+        return;
       }
       applyDrag(e.clientX, e.clientY);
     };
-    const onUp = () => {
+    const onUp = (e: PointerEvent) => {
+      if (e.pointerType === "touch") {
+        touchPointers.delete(e.pointerId);
+        if (touchPointers.size < 2) {
+          pinchDistance = 0;
+        }
+        if (activePointerId === e.pointerId) {
+          activePointerId = null;
+          stopInteracting();
+        }
+        if (touchPointers.size === 1 && activePointerId === null) {
+          const [id, p] = Array.from(touchPointers.entries())[0];
+          activePointerId = id;
+          beginDrag(p.x, p.y);
+          return;
+        }
+        if (touchPointers.size === 0) {
+          stopInteracting();
+        }
+        return;
+      }
       activePointerId = null;
-      mouseRef.current.isDown = false;
-      rotationRef.current.interacting = false;
+      stopInteracting();
     };
     const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length >= 2) {
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+        fallbackPinchDistance = Math.hypot(
+          t2.clientX - t1.clientX,
+          t2.clientY - t1.clientY
+        );
+        stopInteracting();
+        e.preventDefault();
+        return;
+      }
       const t = e.touches[0];
       if (!t) return;
       e.preventDefault();
       beginDrag(t.clientX, t.clientY);
     };
     const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length >= 2) {
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+        const nextDistance = Math.hypot(
+          t2.clientX - t1.clientX,
+          t2.clientY - t1.clientY
+        );
+        if (fallbackPinchDistance > 0) {
+          applyPinchDelta(nextDistance - fallbackPinchDistance);
+        }
+        fallbackPinchDistance = nextDistance;
+        stopInteracting();
+        e.preventDefault();
+        return;
+      }
       if (!mouseRef.current.isDown) return;
       const t = e.touches[0];
       if (!t) return;
       e.preventDefault();
       applyDrag(t.clientX, t.clientY);
     };
-    const onTouchEnd = () => {
-      onUp();
+    const onTouchEnd = (e: TouchEvent) => {
+      if (e.touches.length >= 2) return;
+      fallbackPinchDistance = 0;
+      if (e.touches.length === 1) {
+        const t = e.touches[0];
+        beginDrag(t.clientX, t.clientY);
+        return;
+      }
+      activePointerId = null;
+      stopInteracting();
+    };
+    const onGesture = (e: Event) => {
+      e.preventDefault();
     };
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
@@ -864,6 +971,12 @@ export function GlobeView({
     el.addEventListener("click", onClk);
     el.addEventListener("wheel", onWheel, { passive: false });
     container.addEventListener("wheel", onWheel, { passive: false });
+    el.addEventListener("gesturestart", onGesture, { passive: false });
+    el.addEventListener("gesturechange", onGesture, { passive: false });
+    el.addEventListener("gestureend", onGesture, { passive: false });
+    container.addEventListener("gesturestart", onGesture, { passive: false });
+    container.addEventListener("gesturechange", onGesture, { passive: false });
+    container.addEventListener("gestureend", onGesture, { passive: false });
 
     return () => {
       cancelAnimationFrame(frameRef.current);
@@ -881,6 +994,12 @@ export function GlobeView({
       el.removeEventListener("click", onClk);
       el.removeEventListener("wheel", onWheel);
       container.removeEventListener("wheel", onWheel);
+      el.removeEventListener("gesturestart", onGesture);
+      el.removeEventListener("gesturechange", onGesture);
+      el.removeEventListener("gestureend", onGesture);
+      container.removeEventListener("gesturestart", onGesture);
+      container.removeEventListener("gesturechange", onGesture);
+      container.removeEventListener("gestureend", onGesture);
       container.removeChild(el);
       renderer.dispose();
       glowTexture.dispose();
