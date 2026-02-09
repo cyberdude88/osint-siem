@@ -487,15 +487,22 @@ export function GlobeView({
       severity: string;
       alertId: string;
       baseGlow: number;
+      baseDotOpacity: number;
     }[] = [];
     alerts.forEach((alert, idx) => {
       const pos = latLngToVector3(alert.lat, alert.lng, 1.02);
+      const isInformational = alert.severity === "info" || alert.category === "informational";
       const size =
         alert.severity === "critical"
           ? 0.018
           : alert.severity === "high"
           ? 0.014
+          : isInformational
+          ? 0.009
           : 0.011;
+      const baseDotOpacity = isInformational ? 0.46 : 0.95;
+      const baseCoreOpacity = isInformational ? 0.42 : 0.85;
+      const baseGlowOpacity = isInformational ? 0.06 : 0.2;
       const color = new THREE.Color(severityColors[alert.severity]);
       const glowColor = color.clone().lerp(new THREE.Color(0xfff3cc), 0.78);
 
@@ -507,7 +514,7 @@ export function GlobeView({
         shininess: 85,
         specular: new THREE.Color(0xffffff),
         transparent: true,
-        opacity: 0.95,
+        opacity: baseDotOpacity,
         depthWrite: false,
       });
       const dotMesh = new THREE.Mesh(dotGeo, dotMat);
@@ -521,7 +528,7 @@ export function GlobeView({
       const coreMat = new THREE.MeshBasicMaterial({
         color: 0xffffff,
         transparent: true,
-        opacity: 0.85,
+        opacity: baseCoreOpacity,
       });
       const coreMesh = new THREE.Mesh(coreGeo, coreMat);
       dotMesh.add(coreMesh);
@@ -531,7 +538,7 @@ export function GlobeView({
         map: glowTexture,
         color: glowColor,
         transparent: true,
-        opacity: 0.2,
+        opacity: baseGlowOpacity,
         blending: THREE.AdditiveBlending,
         depthWrite: false,
         side: THREE.DoubleSide,
@@ -546,6 +553,7 @@ export function GlobeView({
         phase: idx * 0.8,
         region: alert.source.region,
         baseGlow,
+        baseGlowOpacity,
         alertId: alert.alert_id,
       };
       globeGroup.add(gm);
@@ -555,6 +563,7 @@ export function GlobeView({
         severity: alert.severity,
         alertId: alert.alert_id,
         baseGlow,
+        baseDotOpacity,
       });
     });
     pointMeshesRef.current = pointMeshes;
@@ -634,9 +643,10 @@ export function GlobeView({
         if (!gm.visible) return;
         const { baseGlow } = gm.userData as {
           baseGlow: number;
+          baseGlowOpacity?: number;
         };
         gm.scale.set(baseGlow * glowScaleBase, baseGlow * glowScaleBase, 1);
-        const base = 0.13;
+        const base = (gm.userData as { baseGlowOpacity?: number }).baseGlowOpacity ?? 0.13;
         (gm.material as THREE.MeshBasicMaterial).opacity = base * glowOpacityScale;
       });
 
@@ -650,7 +660,8 @@ export function GlobeView({
         const selectedBoost = entry.alertId === selected ? 1.9 : 1;
         const dotScale = dotScaleBase * selectedBoost;
         entry.mesh.scale.set(dotScale, dotScale, dotScale);
-        (entry.mesh.material as THREE.MeshBasicMaterial).opacity = 1;
+        const mat = entry.mesh.material as THREE.MeshPhongMaterial;
+        mat.opacity = selectedBoost > 1 ? 1 : entry.baseDotOpacity;
       });
 
       const regionHighlightMesh = regionHighlightRef.current;

@@ -35,7 +35,7 @@ jobs:
         env:
           MISSING_PERSON_RELEVANCE_THRESHOLD: "0"
           FAIL_ON_CRITICAL_SOURCE_GAP: "0"
-          CRITICAL_SOURCE_PREFIXES: "interpol-red,interpol-yellow"
+          CRITICAL_SOURCE_PREFIXES: "cisa"
 
       - name: Build
         run: npm run build

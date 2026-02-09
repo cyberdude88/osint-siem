@@ -1,6 +1,7 @@
 export type Severity = "critical" | "high" | "medium" | "low" | "info";
 export type AlertStatus = "active" | "updated" | "removed" | "filtered";
 export type AlertCategory =
+  | "informational"
   | "missing_person"
   | "wanted_suspect"
   | "public_appeal"

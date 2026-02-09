@@ -25,6 +25,7 @@ export const severityLabel: Record<Severity, string> = {
 };
 
 export const categoryLabels: Record<AlertCategory, string> = {
+  informational: "INFORMATIONAL",
   missing_person: "Missing Person",
   wanted_suspect: "Wanted Suspect",
   public_appeal: "Public Appeal",
@@ -39,6 +40,7 @@ export const categoryLabels: Record<AlertCategory, string> = {
 };
 
 export const categoryOrder: AlertCategory[] = [
+  "informational",
   "humanitarian_tasking",
   "humanitarian_security",
   "conflict_monitoring",
@@ -53,6 +55,7 @@ export const categoryOrder: AlertCategory[] = [
 ];
 
 export const categoryBadge: Record<AlertCategory, string> = {
+  informational: "bg-cyan-500/15 text-cyan-300 border-cyan-500/30",
   cyber_advisory: "bg-sky-500/15 text-sky-300 border-sky-500/30",
   humanitarian_tasking: "bg-teal-500/15 text-teal-300 border-teal-500/30",
   conflict_monitoring: "bg-fuchsia-500/15 text-fuchsia-300 border-fuchsia-500/30",
@@ -67,6 +70,7 @@ export const categoryBadge: Record<AlertCategory, string> = {
 };
 
 export const categoryIcons: Record<AlertCategory, string> = {
+  informational: "Info",
   missing_person: "UserSearch",
   wanted_suspect: "ShieldAlert",
   public_appeal: "Megaphone",

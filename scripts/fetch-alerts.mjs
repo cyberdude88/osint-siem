@@ -3122,6 +3122,20 @@ const GENERAL_NEWS_PATTERNS = [
   /\b(?:partnership|memorandum|mou|initiative|campaign)\b/i,
 ];
 
+const SECURITY_CONTEXT_PATTERNS = [
+  /\b(?:cyber|cybersecurity|infosec|information security|it security)\b/i,
+  /\b(?:security posture|security controls?|threat intelligence)\b/i,
+  /\b(?:vulnerability|exploit|patch|advisory|defend|defensive)\b/i,
+  /\b(?:soc|siem|incident response|malware analysis)\b/i,
+];
+
+const ASSISTANCE_REQUEST_PATTERNS = [
+  /\b(?:report(?:\s+a)?(?:\s+crime)?|submit (?:a )?tip|tip[-\s]?off)\b/i,
+  /\b(?:contact (?:police|authorities|law enforcement)|hotline|helpline)\b/i,
+  /\b(?:if you have information|seeking information|appeal for help)\b/i,
+  /\b(?:missing|wanted|fugitive|amber alert)\b/i,
+];
+
 const IMPACT_SPECIFICITY_PATTERNS = [
   /\b(?:affected|impact(?:ed)?|disrupt(?:ed|ion)|outage|service interruption)\b/i,
   /\b(?:records|accounts|systems|devices|endpoints|victims|organizations)\b/i,
@@ -3331,6 +3345,63 @@ function isInformational(title) {
   return keywords.some((word) => t.includes(word));
 }
 
+function isSecurityInformationalNews(alert, context = {}) {
+  const title = String(alert?.title ?? "");
+  const summary = String(context.summary ?? "");
+  const author = String(context.author ?? "");
+  const tags = Array.isArray(context.tags) ? context.tags.map((t) => String(t)) : [];
+  const text = `${title}\n${summary}\n${author}\n${tags.join(" ")}\n${alert?.canonical_url ?? ""}`.toLowerCase();
+  const publicationType = inferPublicationType(alert, context.metaHints ?? {});
+  const authorityType = String(alert?.source?.authority_type ?? "").toLowerCase();
+
+  const hasSecurityContext = hasAnyPattern(text, SECURITY_CONTEXT_PATTERNS);
+  const hasIncidentOrCrime = hasAnyPattern(text, INCIDENT_DISCLOSURE_PATTERNS);
+  const hasHelpRequest = hasAnyPattern(text, ASSISTANCE_REQUEST_PATTERNS);
+  const hasGeneralNews = hasAnyPattern(text, GENERAL_NEWS_PATTERNS);
+  const hasNarrative = hasAnyPattern(text, NARRATIVE_NEWS_PATTERNS);
+  const hasImpactSpecifics = hasAnyPattern(text, IMPACT_SPECIFICITY_PATTERNS);
+
+  const sourceIsSecurityRelevant =
+    alert?.category === "cyber_advisory" ||
+    alert?.category === "private_sector" ||
+    publicationType === "cert_advisory" ||
+    authorityType === "cert" ||
+    authorityType === "private_sector" ||
+    authorityType === "regulatory";
+
+  return (
+    sourceIsSecurityRelevant &&
+    hasSecurityContext &&
+    !hasIncidentOrCrime &&
+    !hasHelpRequest &&
+    !hasImpactSpecifics &&
+    (hasGeneralNews || hasNarrative || publicationType === "news_media")
+  );
+}
+
+function normalizeInformationalSecurityAlert(alert, context = {}) {
+  if (!isSecurityInformationalNews(alert, context)) return alert;
+  const baseThreshold = clamp01(INCIDENT_RELEVANCE_THRESHOLD);
+  const currentScore = Number(alert?.triage?.relevance_score ?? 0);
+  const nextScore = Math.max(currentScore, baseThreshold);
+  return {
+    ...alert,
+    category: "informational",
+    severity: "info",
+    triage: {
+      ...(alert?.triage ?? {}),
+      relevance_score: Number(nextScore.toFixed(3)),
+      threshold: baseThreshold,
+      confidence: "medium",
+      disposition: "retained",
+      weak_signals: [
+        "reclassified as informational security/cybersecurity update",
+        ...((alert?.triage?.weak_signals ?? []).slice(0, 10)),
+      ],
+    },
+  };
+}
+
 function inferSeverity(title, fallback) {
   const t = title.toLowerCase();
   if (isInformational(t)) return "info";
@@ -3352,6 +3423,8 @@ function inferSeverity(title, fallback) {
 
 function defaultSeverity(category) {
   switch (category) {
+    case "informational":
+      return "info";
     case "cyber_advisory":
       return "high";
     case "wanted_suspect":
@@ -3890,7 +3963,7 @@ async function fetchRss(meta, now) {
       freshness_hours: hours,
       reporting: meta.reporting,
     };
-    return {
+    const scored = {
       ...alert,
       triage: scoreIncidentRelevance(alert, {
         summary: item.summary,
@@ -3899,6 +3972,12 @@ async function fetchRss(meta, now) {
         metaHints: { feedType: meta.type },
       }),
     };
+    return normalizeInformationalSecurityAlert(scored, {
+      summary: item.summary,
+      author: item.author,
+      tags: item.tags,
+      metaHints: { feedType: meta.type },
+    });
   }).filter(Boolean);
 }
 
@@ -3955,7 +4034,7 @@ async function fetchHtmlList(meta, now) {
         freshness_hours: hours,
         reporting: meta.reporting,
       };
-      return {
+      const scored = {
         ...alert,
         triage: scoreIncidentRelevance(alert, {
           summary: item.summary,
@@ -3963,6 +4042,11 @@ async function fetchHtmlList(meta, now) {
           metaHints: { feedType: meta.type },
         }),
       };
+      return normalizeInformationalSecurityAlert(scored, {
+        summary: item.summary,
+        tags: [],
+        metaHints: { feedType: meta.type },
+      });
     })
     .filter(Boolean);
 }
