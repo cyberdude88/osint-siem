@@ -8,17 +8,10 @@ type RegionBounds = {
 };
 
 export const CARIBBEAN_INTERACTION_BOUNDS: RegionBounds = {
-  latMin: 9,
-  latMax: 27,
-  lngMin: -89,
-  lngMax: -58,
-};
-
-const MEXICO_CENTRAL_AMERICA_BOUNDS: RegionBounds = {
   latMin: 5,
   latMax: 33,
   lngMin: -118,
-  lngMax: -76,
+  lngMax: -58,
 };
 
 function inBounds(lat: number, lng: number, bounds: RegionBounds): boolean {
@@ -31,9 +24,7 @@ function inBounds(lat: number, lng: number, bounds: RegionBounds): boolean {
 }
 
 export function latLngToRegion(lat: number, lng: number): string | null {
-  // Keep Mexico/Central America in North America interaction.
-  if (inBounds(lat, lng, MEXICO_CENTRAL_AMERICA_BOUNDS)) return "North America";
-  // Caribbean interaction zone for island states.
+  // Caribbean interaction zone includes Mexico + Central America + island states.
   if (inBounds(lat, lng, CARIBBEAN_INTERACTION_BOUNDS)) return "Caribbean";
   // Continental regions — ordered narrow-to-wide to avoid swallowing smaller areas
   if (lat >= 7 && lat <= 84 && lng >= -170 && lng <= -50) return "North America";
