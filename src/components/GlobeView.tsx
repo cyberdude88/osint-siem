@@ -641,14 +641,15 @@ export function GlobeView({
       const glowOpacityScale = 0.35 + zoomNorm * 0.65;
 
       // Keep surface glows static so they read as city lights, not VFX
+      // When "all" or a specific region is active, show dots based on region
+      // match alone — don't let AlertFeed's internal filters hide globe dots.
       const showAll = activeRegion === "all";
+      const regionActive = !showAll;
       glowMeshes.forEach((gm) => {
-        const alertId = (gm.userData as { alertId?: string }).alertId;
-        const isVisibleInStack = showAll || !alertId || visibleSet.has(alertId);
         const region = (gm.userData as { region?: string }).region;
         const isRegionVisible =
           showAll || !region || region === activeRegion;
-        gm.visible = isVisibleInStack && isRegionVisible;
+        gm.visible = isRegionVisible;
         if (!gm.visible) return;
         const { baseGlow } = gm.userData as {
           baseGlow: number;
@@ -660,11 +661,10 @@ export function GlobeView({
 
       // Keep dots stable (no visible pulsing)
       allDotMeshes.forEach((entry) => {
-        const isVisibleInStack = showAll || visibleSet.has(entry.alertId);
         const region = (entry.mesh.userData as { region?: string }).region;
         const isRegionVisible =
           showAll || !region || region === activeRegion;
-        entry.mesh.visible = isVisibleInStack && isRegionVisible;
+        entry.mesh.visible = isRegionVisible;
         if (!entry.mesh.visible) return;
         const selectedBoost = entry.alertId === selected ? 1.9 : 1;
         const dotScale = dotScaleBase * selectedBoost;
