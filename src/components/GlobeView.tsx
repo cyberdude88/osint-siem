@@ -3,6 +3,7 @@ import * as THREE from "three";
 import * as topojson from "topojson-client";
 import type { Alert } from "@/types/alert";
 import { categoryLabels, severityColors } from "@/lib/severity";
+import { alertMatchesRegionFilter, latLngToRegion } from "@/lib/regions";
 
 const WORLD_TOPO_URL =
   "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
@@ -80,28 +81,6 @@ function vector3ToLatLng(vec: THREE.Vector3): { lat: number; lng: number } {
   // Negate longitude to match latLngToVector3's inverted x-axis (x = -r*sin*cos)
   const lng = -(((theta * 180) / Math.PI + 540) % 360 - 180);
   return { lat, lng };
-}
-
-function latLngToRegion(lat: number, lng: number): string | null {
-  // Caribbean first (overlaps N/S America bounding boxes).
-  // Include Mexico + Central America in Caribbean interaction zone.
-  if (lat >= 7 && lat <= 33 && lng >= -117 && lng <= -58) return "Caribbean";
-  // Continental regions — ordered narrow-to-wide to avoid swallowing smaller areas
-  if (lat >= 7 && lat <= 84 && lng >= -170 && lng <= -50) return "North America";
-  if (lat >= -57 && lat <= 15 && lng >= -82 && lng <= -33) return "South America";
-  // Europe: extend south to include Mediterranean, east to cover Turkey/Scandinavia
-  if (lat >= 34 && lat <= 72 && lng >= -12 && lng <= 45) return "Europe";
-  // Africa: full continent including Madagascar
-  if (lat >= -36 && lat <= 38 && lng >= -18 && lng <= 52) return "Africa";
-  // Middle East bridges into Asia
-  if (lat >= 12 && lat <= 42 && lng >= 34 && lng <= 60) return "Asia";
-  // Asia: main body + far-east dateline wrap
-  if (lat >= -11 && lat <= 78 && lng >= 40 && lng <= 180) return "Asia";
-  if (lat >= 30 && lat <= 78 && lng >= -180 && lng <= -168) return "Asia";
-  // Oceania: Australia, NZ, Pacific islands
-  if (lat >= -50 && lat <= 0 && lng >= 110 && lng <= 180) return "Oceania";
-  if (lat >= -50 && lat <= 15 && lng >= 95 && lng <= 180) return "Oceania";
-  return null;
 }
 
 function createGlowTexture(): THREE.CanvasTexture {
@@ -647,9 +626,10 @@ export function GlobeView({
       const showAll = activeRegion === "all";
       const regionActive = !showAll;
       glowMeshes.forEach((gm) => {
-        const region = (gm.userData as { region?: string }).region;
+        const alertId = (gm.userData as { alertId?: string }).alertId;
+        const alert = alertId ? alertsById.get(alertId) : null;
         const isRegionVisible =
-          showAll || !region || region === activeRegion;
+          showAll || !alert || alertMatchesRegionFilter(alert, activeRegion);
         gm.visible = isRegionVisible;
         if (!gm.visible) return;
         const { baseGlow } = gm.userData as {
@@ -662,9 +642,9 @@ export function GlobeView({
 
       // Keep dots stable (no visible pulsing)
       allDotMeshes.forEach((entry) => {
-        const region = (entry.mesh.userData as { region?: string }).region;
+        const alert = alertsById.get(entry.alertId);
         const isRegionVisible =
-          showAll || !region || region === activeRegion;
+          showAll || !alert || alertMatchesRegionFilter(alert, activeRegion);
         entry.mesh.visible = isRegionVisible;
         if (!entry.mesh.visible) return;
         const selectedBoost = entry.alertId === selected ? 1.9 : 1;

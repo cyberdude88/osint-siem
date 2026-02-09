@@ -9,6 +9,7 @@ import {
   categoryBadge,
   freshnessLabel,
 } from "@/lib/severity";
+import { alertMatchesRegionFilter } from "@/lib/regions";
 import { Clock, Building2, ChevronDown, ChevronRight, Globe } from "lucide-react";
 
 interface Props {
@@ -55,7 +56,7 @@ export function AlertFeed({
   const regionFiltered =
     regionFilter === "all"
       ? alerts
-      : alerts.filter((a) => a.source.region === regionFilter);
+      : alerts.filter((a) => alertMatchesRegionFilter(a, regionFilter));
 
   const actionable = actionableOnly
     ? regionFiltered.filter((a) => a.reporting?.url || a.reporting?.phone)
