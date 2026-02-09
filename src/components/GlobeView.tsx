@@ -641,12 +641,13 @@ export function GlobeView({
       const glowOpacityScale = 0.35 + zoomNorm * 0.65;
 
       // Keep surface glows static so they read as city lights, not VFX
+      const showAll = activeRegion === "all";
       glowMeshes.forEach((gm) => {
         const alertId = (gm.userData as { alertId?: string }).alertId;
-        const isVisibleInStack = !alertId || visibleSet.has(alertId);
+        const isVisibleInStack = showAll || !alertId || visibleSet.has(alertId);
         const region = (gm.userData as { region?: string }).region;
         const isRegionVisible =
-          activeRegion === "all" || !region || region === activeRegion;
+          showAll || !region || region === activeRegion;
         gm.visible = isVisibleInStack && isRegionVisible;
         if (!gm.visible) return;
         const { baseGlow } = gm.userData as {
@@ -659,10 +660,10 @@ export function GlobeView({
 
       // Keep dots stable (no visible pulsing)
       allDotMeshes.forEach((entry) => {
-        const isVisibleInStack = visibleSet.has(entry.alertId);
+        const isVisibleInStack = showAll || visibleSet.has(entry.alertId);
         const region = (entry.mesh.userData as { region?: string }).region;
         const isRegionVisible =
-          activeRegion === "all" || !region || region === activeRegion;
+          showAll || !region || region === activeRegion;
         entry.mesh.visible = isVisibleInStack && isRegionVisible;
         if (!entry.mesh.visible) return;
         const selectedBoost = entry.alertId === selected ? 1.9 : 1;
