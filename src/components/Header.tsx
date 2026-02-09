@@ -1,10 +1,11 @@
-import { Shield, Globe } from "lucide-react";
+import { Shield, Globe, Send } from "lucide-react";
 
 interface Props {
   regionFilter: string;
+  onSubmitIntel: () => void;
 }
 
-export function Header({ regionFilter }: Props) {
+export function Header({ regionFilter, onSubmitIntel }: Props) {
   return (
     <div className="flex items-center justify-between px-3 md:px-6 py-2 md:py-2.5 bg-siem-panel border-b border-siem-border">
       <div className="flex items-center gap-2 md:gap-3 min-w-0">
@@ -21,6 +22,15 @@ export function Header({ regionFilter }: Props) {
         </div>
       </div>
       <div className="flex items-center gap-2 md:gap-4 shrink-0">
+        <button
+          type="button"
+          onClick={onSubmitIntel}
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-siem-accent/30 bg-siem-accent/12 text-[10px] md:text-xs text-siem-accent font-mono uppercase tracking-wider hover:bg-siem-accent/20 transition-colors"
+        >
+          <Send size={11} />
+          <span className="hidden sm:inline">Submit Intel</span>
+          <span className="sm:hidden">Intel</span>
+        </button>
         <div className="hidden sm:flex items-center gap-1.5 text-xs text-siem-muted">
           <Globe size={12} />
           <span className="font-mono uppercase">

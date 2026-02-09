@@ -24,6 +24,8 @@ function alertsAreEqual(a: Alert[], b: Alert[]): boolean {
     if (left.lat !== right.lat || left.lng !== right.lng) return false;
     if (left.source.region !== right.source.region) return false;
     if (left.canonical_url !== right.canonical_url) return false;
+    if (left.triage?.relevance_score !== right.triage?.relevance_score) return false;
+    if (left.triage?.disposition !== right.triage?.disposition) return false;
   }
   return true;
 }

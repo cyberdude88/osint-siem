@@ -1,5 +1,5 @@
 export type Severity = "critical" | "high" | "medium" | "low" | "info";
-export type AlertStatus = "active" | "updated" | "removed";
+export type AlertStatus = "active" | "updated" | "removed" | "filtered";
 export type AlertCategory =
   | "missing_person"
   | "wanted_suspect"
@@ -7,14 +7,16 @@ export type AlertCategory =
   | "cyber_advisory"
   | "terrorism_tip"
   | "fraud_alert"
-  | "public_safety";
+  | "public_safety"
+  | "private_sector";
 export type AuthorityType =
   | "police"
   | "national_security"
   | "intelligence"
   | "regulatory"
   | "public_safety_program"
-  | "cert";
+  | "cert"
+  | "private_sector";
 
 export interface AuthoritySource {
   source_id: string;
@@ -42,6 +44,7 @@ export interface Alert {
   lng: number;
   freshness_hours: number;
   reporting?: ReportingInfo;
+  triage?: AlertTriage;
 }
 
 export interface ReportingInfo {
@@ -50,4 +53,17 @@ export interface ReportingInfo {
   phone?: string;
   email?: string;
   notes?: string;
+}
+
+export interface AlertTriage {
+  relevance_score: number;
+  threshold: number;
+  confidence: "high" | "medium" | "low";
+  disposition: "retained" | "filtered_review";
+  publication_type?: string;
+  weak_signals?: string[];
+  metadata?: {
+    author?: string;
+    tags?: string[];
+  };
 }

@@ -32,6 +32,7 @@ export const categoryLabels: Record<AlertCategory, string> = {
   terrorism_tip: "Terrorism Tip",
   fraud_alert: "Fraud Alert",
   public_safety: "Public Safety",
+  private_sector: "Private Sector",
 };
 
 export const categoryOrder: AlertCategory[] = [
@@ -40,6 +41,7 @@ export const categoryOrder: AlertCategory[] = [
   "missing_person",
   "public_appeal",
   "fraud_alert",
+  "private_sector",
   "public_safety",
   "terrorism_tip",
 ];
@@ -52,6 +54,7 @@ export const categoryBadge: Record<AlertCategory, string> = {
   fraud_alert: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
   public_safety: "bg-violet-500/15 text-violet-300 border-violet-500/30",
   terrorism_tip: "bg-red-500/15 text-red-300 border-red-500/30",
+  private_sector: "bg-orange-500/15 text-orange-300 border-orange-500/30",
 };
 
 export const categoryIcons: Record<AlertCategory, string> = {
@@ -62,6 +65,7 @@ export const categoryIcons: Record<AlertCategory, string> = {
   terrorism_tip: "AlertTriangle",
   fraud_alert: "BadgeDollarSign",
   public_safety: "Siren",
+  private_sector: "Building",
 };
 
 export function freshnessLabel(hours: number): string {

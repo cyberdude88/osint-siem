@@ -4,6 +4,7 @@ import { StatsBar } from "@/components/StatsBar";
 import { GlobeView } from "@/components/GlobeView";
 import { AlertFeed } from "@/components/AlertFeed";
 import { AlertDetail } from "@/components/AlertDetail";
+import { SubmitIntelModal } from "@/components/SubmitIntelModal";
 import { useAlerts } from "@/hooks/useAlerts";
 
 export default function App() {
@@ -13,6 +14,7 @@ export default function App() {
   const [visibleAlertIds, setVisibleAlertIds] = useState<string[]>([]);
   const [mobilePane, setMobilePane] = useState<"map" | "stack">("map");
   const [isDesktopFeedOpen, setIsDesktopFeedOpen] = useState(true);
+  const [isSubmitOpen, setIsSubmitOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const selectedAlert = selectedId
     ? alerts.find((a) => a.alert_id === selectedId) ?? null
@@ -40,7 +42,7 @@ export default function App() {
   return (
     <div className="flex flex-col h-[100dvh] bg-siem-bg">
       {/* Top Bar */}
-      <Header regionFilter={regionFilter} />
+      <Header regionFilter={regionFilter} onSubmitIntel={() => setIsSubmitOpen(true)} />
       <StatsBar alerts={alerts} />
       <div className="md:hidden px-3 py-2 bg-siem-panel border-b border-siem-border">
         <div className="grid grid-cols-2 rounded-md border border-siem-border overflow-hidden">
@@ -143,6 +145,8 @@ export default function App() {
           </div>
         )}
       </div>
+
+      <SubmitIntelModal isOpen={isSubmitOpen} onClose={() => setIsSubmitOpen(false)} />
 
       {/* Bottom Status Bar */}
       <div className="flex items-center justify-between px-3 md:px-6 py-1.5 bg-siem-panel border-t border-siem-border text-[10px] text-siem-muted font-mono">

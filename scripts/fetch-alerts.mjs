@@ -5,10 +5,18 @@ import crypto from "node:crypto";
 const MAX_PER_SOURCE = Number.parseInt(process.env.MAX_PER_SOURCE ?? "20", 10);
 const OUTPUT_PATH = process.env.OUTPUT_PATH ?? "public/alerts.json";
 const STATE_OUTPUT_PATH = process.env.STATE_OUTPUT_PATH ?? "public/alerts-state.json";
+const FILTERED_OUTPUT_PATH =
+  process.env.FILTERED_OUTPUT_PATH ?? "public/alerts-filtered.json";
 const MAX_AGE_DAYS = Number.parseInt(process.env.MAX_AGE_DAYS ?? "180", 10);
 const REMOVED_RETENTION_DAYS = Number.parseInt(
   process.env.REMOVED_RETENTION_DAYS ?? "14",
   10
+);
+const INCIDENT_RELEVANCE_THRESHOLD = Number.parseFloat(
+  process.env.INCIDENT_RELEVANCE_THRESHOLD ?? "0.42"
+);
+const MISSING_PERSON_RELEVANCE_THRESHOLD = Number.parseFloat(
+  process.env.MISSING_PERSON_RELEVANCE_THRESHOLD ?? "0"
 );
 const WATCH =
   process.argv.includes("--watch") || process.env.WATCH === "1";
@@ -474,7 +482,7 @@ const sources = [
       base_url: "https://www.interpol.int",
     },
     feed_url: "https://ws-public.interpol.int/notices/v1/yellow?resultPerPage=200",
-    max_items: 120,
+    max_items: 5000,
     category: "missing_person",
     region_tag: "INT",
     lat: 45.76,
@@ -2174,6 +2182,106 @@ const sources = [
       notes: "Use official BSSN contact channels for incident reporting.",
     },
   },
+
+  // ── PRIVATE SECTOR: BleepingComputer (Global) ──────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "bleepingcomputer",
+      authority_name: "BleepingComputer",
+      country: "United States",
+      country_code: "US",
+      region: "North America",
+      authority_type: "private_sector",
+      base_url: "https://www.bleepingcomputer.com",
+    },
+    feed_url: "https://www.bleepingcomputer.com/feed/",
+    category: "private_sector",
+    region_tag: "US",
+    lat: 40.71,
+    lng: -74.01,
+    reporting: {
+      label: "Read Full Report",
+      url: "https://www.bleepingcomputer.com",
+      notes: "Private-sector cybersecurity news. Report incidents to relevant authorities.",
+    },
+  },
+
+  // ── PRIVATE SECTOR: Krebs on Security (Global) ────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "krebsonsecurity",
+      authority_name: "Krebs on Security",
+      country: "United States",
+      country_code: "US",
+      region: "North America",
+      authority_type: "private_sector",
+      base_url: "https://krebsonsecurity.com",
+    },
+    feed_url: "https://krebsonsecurity.com/feed/",
+    category: "private_sector",
+    region_tag: "US",
+    lat: 38.90,
+    lng: -77.04,
+    reporting: {
+      label: "Read Full Report",
+      url: "https://krebsonsecurity.com",
+      notes: "Investigative cybersecurity journalism by Brian Krebs.",
+    },
+  },
+
+  // ── PRIVATE SECTOR: The Hacker News (Global) ──────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "thehackernews",
+      authority_name: "The Hacker News",
+      country: "United States",
+      country_code: "US",
+      region: "North America",
+      authority_type: "private_sector",
+      base_url: "https://thehackernews.com",
+    },
+    feed_url: "https://feeds.feedburner.com/TheHackersNews",
+    category: "private_sector",
+    region_tag: "US",
+    lat: 37.39,
+    lng: -122.08,
+    reporting: {
+      label: "Read Full Report",
+      url: "https://thehackernews.com",
+      notes: "Cybersecurity news and analysis.",
+    },
+  },
+
+  // ── PRIVATE SECTOR: DataBreaches.net (Global) ─────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "databreaches-net",
+      authority_name: "DataBreaches.net",
+      country: "United States",
+      country_code: "US",
+      region: "North America",
+      authority_type: "private_sector",
+      base_url: "https://databreaches.net",
+    },
+    feed_url: "https://databreaches.net/feed/",
+    category: "private_sector",
+    region_tag: "US",
+    lat: 39.83,
+    lng: -98.58,
+    reporting: {
+      label: "Read Full Report",
+      url: "https://databreaches.net",
+      notes: "Data breach tracking and reporting.",
+    },
+  },
 ];
 
 function decodeXml(value) {
@@ -2203,6 +2311,40 @@ function getAtomLink(block) {
   return hrefMatch ? decodeXml(hrefMatch[1]) : "";
 }
 
+function getTagValues(block, tag) {
+  const regex = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, "gi");
+  return [...block.matchAll(regex)]
+    .map((match) => decodeXml(match[1]))
+    .filter(Boolean);
+}
+
+function getAuthor(block) {
+  const atomAuthor = block.match(
+    /<author[^>]*>[\s\S]*?<name[^>]*>([\s\S]*?)<\/name>[\s\S]*?<\/author>/i
+  );
+  if (atomAuthor?.[1]) {
+    return decodeXml(atomAuthor[1]);
+  }
+  return getTag(block, "author") || getTag(block, "dc:creator") || getTag(block, "creator");
+}
+
+function getSummary(block) {
+  return (
+    getTag(block, "description") ||
+    getTag(block, "summary") ||
+    getTag(block, "content") ||
+    getTag(block, "content:encoded")
+  );
+}
+
+function getCategories(block) {
+  const rssCategories = getTagValues(block, "category");
+  const atomCategories = [...block.matchAll(/<category[^>]*term=["']([^"']+)["'][^>]*\/?>/gi)]
+    .map((match) => decodeXml(match[1]))
+    .filter(Boolean);
+  return [...rssCategories, ...atomCategories];
+}
+
 function parseItems(xml) {
   if (xml.includes("<feed")) {
     const entries = [...xml.matchAll(/<entry[\s\S]*?<\/entry>/gi)].map((m) => m[0]);
@@ -2210,6 +2352,9 @@ function parseItems(xml) {
       title: getTag(entry, "title"),
       link: getAtomLink(entry),
       published: getTag(entry, "published") || getTag(entry, "updated"),
+      author: getAuthor(entry),
+      summary: getSummary(entry),
+      tags: getCategories(entry),
     }));
   }
 
@@ -2218,10 +2363,205 @@ function parseItems(xml) {
     title: getTag(item, "title"),
     link: getTag(item, "link") || getTag(item, "guid"),
     published: getTag(item, "pubDate") || getTag(item, "dc:date"),
+    author: getAuthor(item),
+    summary: getSummary(item),
+    tags: getCategories(item),
   }));
 }
 
-function isBlogContent(item) {
+const NEWS_MEDIA_SOURCE_IDS = new Set([
+  "cna-sg-crime",
+  "yonhap-kr",
+  "nhk-jp",
+  "scmp-hk",
+  "jamaica-observer",
+  "straitstimes-sg",
+]);
+
+const NEWS_MEDIA_DOMAINS = [
+  "channelnewsasia.com",
+  "yna.co.kr",
+  "nhk.or.jp",
+  "scmp.com",
+  "jamaicaobserver.com",
+  "straitstimes.com",
+];
+
+const TECHNICAL_SIGNAL_PATTERNS = [
+  /\bcve-\d{4}-\d{4,7}\b/i,
+  /\b(?:ioc|iocs|indicator(?:s)? of compromise)\b/i,
+  /\b(?:tactic|technique|ttp|mitre)\b/i,
+  /\b(?:hash|sha-?256|sha-?1|md5|yara|sigma)\b/i,
+  /\b(?:ip(?:v4|v6)?|domain|url|hostname|command and control|c2)\b/i,
+  /\b(?:vulnerability|exploit(?:ation)?|zero-?day|patch|mitigation|workaround)\b/i,
+];
+
+const INCIDENT_DISCLOSURE_PATTERNS = [
+  /\b(?:breach|data leak|compromis(?:e|ed)|intrusion|unauthori[sz]ed access)\b/i,
+  /\b(?:ransomware|malware|botnet|ddos|phishing|credential theft)\b/i,
+  /\b(?:attack|attacked|target(?:ed|ing)|incident response|security incident)\b/i,
+  /\b(?:arrest(?:ed)?|charged|indicted|wanted|fugitive|missing person|kidnapp(?:ed|ing)|homicide)\b/i,
+];
+
+const ACTIONABLE_PATTERNS = [
+  /\b(?:report|submit (?:a )?tip|contact|hotline|phone|email)\b/i,
+  /\b(?:apply update|upgrade|disable|block|monitor|detect|investigate)\b/i,
+  /\b(?:advisory|alert|warning|incident notice|public appeal)\b/i,
+];
+
+const NARRATIVE_NEWS_PATTERNS = [
+  /\b(?:opinion|editorial|commentary|analysis|explainer|podcast|interview)\b/i,
+  /\b(?:what we know|live updates|behind the scenes|feature story)\b/i,
+  /\b(?:market reaction|share price|investor)\b/i,
+];
+
+const GENERAL_NEWS_PATTERNS = [
+  /\b(?:announces?|launche[sd]?|conference|summit|webinar|event|awareness month)\b/i,
+  /\b(?:ceremony|speech|statement|newsletter|weekly roundup)\b/i,
+  /\b(?:partnership|memorandum|mou|initiative|campaign)\b/i,
+];
+
+const IMPACT_SPECIFICITY_PATTERNS = [
+  /\b(?:affected|impact(?:ed)?|disrupt(?:ed|ion)|outage|service interruption)\b/i,
+  /\b(?:records|accounts|systems|devices|endpoints|victims|organizations)\b/i,
+  /\b(?:on\s+\d{1,2}\s+\w+\s+\d{4}|timeline|between\s+\d{1,2}:\d{2})\b/i,
+  /\b\d{2,}\s+(?:records|users|systems|devices|victims|organizations)\b/i,
+];
+
+function clamp01(value) {
+  const numeric = Number.isFinite(value) ? value : 0.42;
+  return Math.max(0, Math.min(1, numeric));
+}
+
+function thresholdForAlert(alert, defaultThreshold) {
+  const category = String(alert?.category ?? "").toLowerCase();
+  if (category === "missing_person") {
+    return clamp01(MISSING_PERSON_RELEVANCE_THRESHOLD);
+  }
+  return defaultThreshold;
+}
+
+function extractDomain(urlValue) {
+  try {
+    return new URL(String(urlValue)).hostname.toLowerCase();
+  } catch {
+    return "";
+  }
+}
+
+function isNewsMediaSource(alert) {
+  const sourceId = String(alert?.source_id ?? "").toLowerCase();
+  if (NEWS_MEDIA_SOURCE_IDS.has(sourceId)) {
+    return true;
+  }
+  const host = extractDomain(alert?.canonical_url);
+  return NEWS_MEDIA_DOMAINS.some((domain) => host.includes(domain));
+}
+
+function inferPublicationType(alert, metaHints = {}) {
+  const authorityType = String(alert?.source?.authority_type ?? "").toLowerCase();
+  if (isNewsMediaSource(alert)) return "news_media";
+  if (authorityType === "cert") return "cert_advisory";
+  if (authorityType === "police") return "law_enforcement";
+  if (authorityType === "intelligence" || authorityType === "national_security") {
+    return "security_bulletin";
+  }
+  if (authorityType === "public_safety_program") return "public_safety_bulletin";
+  if (metaHints.feedType === "kev-json" || metaHints.feedType === "interpol-red-json") {
+    return "structured_incident_feed";
+  }
+  return "official_update";
+}
+
+function hasAnyPattern(text, patterns) {
+  return patterns.some((pattern) => pattern.test(text));
+}
+
+function scoreIncidentRelevance(alert, context = {}) {
+  const title = String(alert?.title ?? "");
+  const summary = String(context.summary ?? "");
+  const author = String(context.author ?? "");
+  const tags = Array.isArray(context.tags) ? context.tags.map((t) => String(t)) : [];
+  const text = `${title}\n${summary}\n${author}\n${tags.join(" ")}\n${alert?.canonical_url ?? ""}`.toLowerCase();
+  const publicationType = inferPublicationType(alert, context.metaHints ?? {});
+  const signals = [];
+  let score = 0.5;
+
+  const addSignal = (delta, reason) => {
+    score += delta;
+    signals.push(`${delta >= 0 ? "+" : ""}${delta.toFixed(2)} ${reason}`);
+  };
+
+  if (publicationType === "news_media") {
+    addSignal(-0.16, "publication type leans general-news");
+  } else if (publicationType === "cert_advisory" || publicationType === "structured_incident_feed") {
+    addSignal(0.08, "source metadata is incident-oriented");
+  } else if (publicationType === "law_enforcement") {
+    addSignal(0.06, "law-enforcement source metadata");
+  }
+
+  if (alert.category === "cyber_advisory") addSignal(0.09, "cyber advisory category");
+  if (alert.category === "wanted_suspect" || alert.category === "missing_person") {
+    addSignal(0.09, "law-enforcement incident category");
+  }
+  if (alert.category === "fraud_alert") addSignal(0.07, "fraud incident category");
+
+  const hasTechnical = hasAnyPattern(text, TECHNICAL_SIGNAL_PATTERNS);
+  const hasIncidentDisclosure = hasAnyPattern(text, INCIDENT_DISCLOSURE_PATTERNS);
+  const hasActionable = hasAnyPattern(text, ACTIONABLE_PATTERNS);
+  const hasSpecificImpact = hasAnyPattern(text, IMPACT_SPECIFICITY_PATTERNS);
+  const hasNarrative = hasAnyPattern(text, NARRATIVE_NEWS_PATTERNS);
+  const hasGeneralNews = hasAnyPattern(text, GENERAL_NEWS_PATTERNS);
+  const looksLikeBlog = isBlogAlert(alert);
+
+  if (hasTechnical) addSignal(0.16, "technical indicators or tactics present");
+  if (hasIncidentDisclosure) addSignal(0.16, "incident/crime disclosure language");
+  if (hasActionable) addSignal(0.1, "contains response/reporting actions");
+  if (hasSpecificImpact) addSignal(0.08, "specific impact/timeline/system details");
+
+  if (hasNarrative) addSignal(-0.18, "opinion/commentary phrasing");
+  if (hasGeneralNews) addSignal(-0.12, "general institutional/news language");
+  if (looksLikeBlog) addSignal(-0.1, "blog-style structure");
+
+  if (!hasTechnical && !hasIncidentDisclosure && (hasNarrative || hasGeneralNews)) {
+    addSignal(-0.08, "weak incident evidence relative to narrative cues");
+  }
+
+  const freshnessHours = Number(alert?.freshness_hours ?? 0);
+  if (freshnessHours > 0 && freshnessHours <= 24 && (hasIncidentDisclosure || hasTechnical)) {
+    addSignal(0.04, "fresh post with potential early-warning signal");
+  }
+
+  const threshold = clamp01(INCIDENT_RELEVANCE_THRESHOLD);
+  const relevance = Number(clamp01(score).toFixed(3));
+  const distance = Math.abs(relevance - threshold);
+  const confidence =
+    distance >= 0.25 ? "high" : distance >= 0.1 ? "medium" : "low";
+  const disposition = relevance >= threshold ? "retained" : "filtered_review";
+
+  return {
+    relevance_score: relevance,
+    threshold,
+    confidence,
+    disposition,
+    publication_type: publicationType,
+    weak_signals: signals.slice(0, 12),
+    metadata: {
+      author: author || undefined,
+      tags: tags.slice(0, 8),
+    },
+  };
+}
+
+const BLOG_FILTER_EXEMPT_SOURCES = new Set([
+  "bleepingcomputer",
+  "krebsonsecurity",
+  "thehackernews",
+  "databreaches-net",
+]);
+
+function isBlogContent(item, sourceId) {
+  if (sourceId && BLOG_FILTER_EXEMPT_SOURCES.has(sourceId)) return false;
   const title = String(item?.title ?? "").toLowerCase();
   const link = String(item?.link ?? "").toLowerCase();
   if (/\bblog\b/.test(title)) return true;
@@ -2232,6 +2572,7 @@ function isBlogContent(item) {
 }
 
 function isBlogAlert(alert) {
+  if (BLOG_FILTER_EXEMPT_SOURCES.has(alert?.source_id)) return false;
   const title = String(alert?.title ?? "").toLowerCase();
   const link = String(alert?.canonical_url ?? "").toLowerCase();
   if (/\bblog\b/.test(title)) return true;
@@ -2270,6 +2611,8 @@ function inferSeverity(title, fallback) {
   // Explicit severity keywords
   if (t.includes("critical") || t.includes("emergency") || t.includes("zero-day") || t.includes("0-day")) return "critical";
   if (t.includes("ransomware") || t.includes("actively exploited") || t.includes("exploitation")) return "critical";
+  if (t.includes("breach") || t.includes("data leak") || t.includes("crypto heist") || t.includes("million stolen")) return "critical";
+  if (t.includes("hack") || t.includes("compromise") || t.includes("vulnerability")) return "high";
   if (t.includes("high") || t.includes("severe") || t.includes("urgent")) return "high";
   if (t.includes("wanted") || t.includes("fugitive") || t.includes("murder") || t.includes("homicide")) return "critical";
   if (t.includes("missing") || t.includes("amber alert") || t.includes("kidnap")) return "critical";
@@ -2293,6 +2636,8 @@ function defaultSeverity(category) {
       return "high";
     case "public_safety":
       return "medium";
+    case "private_sector":
+      return "high";
     default:
       return "medium";
   }
@@ -2471,7 +2816,7 @@ function kevItemToAlert(entry, meta) {
     `${title} ${nvdLink} ${extractUrlLocationText(nvdLink)}`,
     `${meta.source.source_id}:${nvdLink}:${cve ?? ""}`
   );
-  return {
+  const alert = {
     alert_id: `${meta.source.source_id}-${hashId(nvdLink)}`,
     source_id: meta.source.source_id,
     source: meta.source,
@@ -2487,6 +2832,14 @@ function kevItemToAlert(entry, meta) {
     lng: jitter.lng,
     freshness_hours: hours,
     reporting: meta.reporting,
+  };
+  return {
+    ...alert,
+    triage: scoreIncidentRelevance(alert, {
+      summary: `${entry.vulnerabilityName ?? ""} ${entry.shortDescription ?? ""}`.trim(),
+      tags: [entry.knownRansomwareCampaign ? "known-ransomware-campaign" : ""].filter(Boolean),
+      metaHints: { feedType: meta.type },
+    }),
   };
 }
 
@@ -2516,6 +2869,9 @@ async function translateBatch(items) {
   for (const item of items) {
     if (NON_LATIN_RE.test(item.title)) {
       item.title = await translateToEnglish(item.title);
+    }
+    if (item.summary && NON_LATIN_RE.test(item.summary)) {
+      item.summary = await translateToEnglish(item.summary);
     }
     results.push(item);
   }
@@ -2565,7 +2921,6 @@ async function fetchRss(meta, now) {
   );
   let items = parseItems(xml)
     .filter((item) => item.title && item.link)
-    .filter((item) => !isBlogContent(item))
     .slice(0, limit);
 
   // Auto-translate non-English titles
@@ -2582,7 +2937,7 @@ async function fetchRss(meta, now) {
       `${item.title} ${item.link} ${extractUrlLocationText(item.link)}`,
       `${meta.source.source_id}:${item.link}`
     );
-    return {
+    const alert = {
       alert_id: `${meta.source.source_id}-${hashId(item.link)}`,
       source_id: meta.source.source_id,
       source: meta.source,
@@ -2598,6 +2953,15 @@ async function fetchRss(meta, now) {
       lng: jitter.lng,
       freshness_hours: hours,
       reporting: meta.reporting,
+    };
+    return {
+      ...alert,
+      triage: scoreIncidentRelevance(alert, {
+        summary: item.summary,
+        author: item.author,
+        tags: item.tags,
+        metaHints: { feedType: meta.type },
+      }),
     };
   }).filter(Boolean);
 }
@@ -2633,25 +2997,52 @@ async function fetchKev(meta) {
 
 async function fetchInterpolNotices(meta, now) {
   const limit = Math.max(1, Number(meta?.max_items ?? MAX_PER_SOURCE));
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 15000);
-  let response;
-  try {
-    response = await fetch(meta.feed_url, {
-      signal: controller.signal,
-      headers: {
-        "User-Agent": "osint-siem-bot/1.0",
-        Accept: "application/json",
-      },
-    });
-  } finally {
-    clearTimeout(timer);
+  const headers = {
+    "User-Agent": "osint-siem-bot/1.0",
+    Accept: "application/json",
+  };
+  const seenPageUrls = new Set();
+  const notices = [];
+  let nextPageUrl = meta.feed_url;
+  let pageCount = 0;
+  const MAX_INTERPOL_PAGES = 200;
+
+  while (
+    nextPageUrl &&
+    notices.length < limit &&
+    pageCount < MAX_INTERPOL_PAGES &&
+    !seenPageUrls.has(nextPageUrl)
+  ) {
+    seenPageUrls.add(nextPageUrl);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 15000);
+    let response;
+    try {
+      response = await fetch(nextPageUrl, {
+        signal: controller.signal,
+        headers,
+      });
+    } finally {
+      clearTimeout(timer);
+    }
+    if (!response.ok) {
+      throw new Error(`interpol fetch failed ${response.status} ${nextPageUrl}`);
+    }
+    const data = await response.json();
+    const pageNotices = Array.isArray(data?._embedded?.notices) ? data._embedded.notices : [];
+    if (pageNotices.length === 0) break;
+    notices.push(...pageNotices);
+    pageCount += 1;
+    const nextHref = String(data?._links?.next?.href ?? "").trim();
+    nextPageUrl = nextHref
+      ? new URL(nextHref, "https://ws-public.interpol.int").toString()
+      : null;
   }
-  if (!response.ok) {
-    throw new Error(`interpol fetch failed ${response.status} ${meta.feed_url}`);
-  }
-  const data = await response.json();
-  const notices = Array.isArray(data?._embedded?.notices) ? data._embedded.notices : [];
+
+  const noticeTitlePrefix =
+    meta.type === "interpol-yellow-json"
+      ? "INTERPOL Yellow Notice"
+      : "INTERPOL Red Notice";
 
   return notices.slice(0, limit).map((notice) => {
     const forename = String(notice.forename ?? "").trim();
@@ -2661,16 +3052,14 @@ async function fetchInterpolNotices(meta, now) {
     const canonicalUrl = rawHref
       ? new URL(rawHref, "https://ws-public.interpol.int").toString()
       : meta.source.base_url;
-    const title = label
-      ? `INTERPOL Red Notice: ${label}`
-      : "INTERPOL Red Notice";
+    const title = label ? `${noticeTitlePrefix}: ${label}` : noticeTitlePrefix;
     const jitter = resolveInterpolNoticeCoords(
       meta,
       notice,
       `${title} ${extractUrlLocationText(canonicalUrl)}`,
       `${meta.source.source_id}:${canonicalUrl}`
     );
-    return {
+    const alert = {
       alert_id: `${meta.source.source_id}-${hashId(canonicalUrl + title)}`,
       source_id: meta.source.source_id,
       source: meta.source,
@@ -2686,6 +3075,19 @@ async function fetchInterpolNotices(meta, now) {
       lng: jitter.lng,
       freshness_hours: 1,
       reporting: meta.reporting,
+    };
+    return {
+      ...alert,
+      triage: scoreIncidentRelevance(alert, {
+        summary: `${notice?.issuing_entity ?? ""} ${notice?.place_of_birth ?? ""}`.trim(),
+        tags: [
+          ...(Array.isArray(notice?.nationalities) ? notice.nationalities : []),
+          ...(Array.isArray(notice?.countries_likely_to_be_visited)
+            ? notice.countries_likely_to_be_visited
+            : []),
+        ],
+        metaHints: { feedType: meta.type },
+      }),
     };
   });
 }
@@ -2708,17 +3110,36 @@ async function buildAlerts() {
     }
   }
 
-  const sanitized = alerts.filter((a) => !isBlogAlert(a));
-  const deduped = [];
-  const seen = new Set();
-  for (const alert of sanitized) {
+  const dedupedByKey = new Map();
+  for (const alert of alerts) {
     const key = `${alert.canonical_url}|${alert.title}`.toLowerCase();
-    if (seen.has(key)) continue;
-    seen.add(key);
-    deduped.push(alert);
+    const current = dedupedByKey.get(key);
+    const currentScore = Number(current?.triage?.relevance_score ?? -1);
+    const nextScore = Number(alert?.triage?.relevance_score ?? -1);
+    if (!current || nextScore > currentScore) {
+      dedupedByKey.set(key, alert);
+    }
   }
-  deduped.sort((a, b) => new Date(b.first_seen).getTime() - new Date(a.first_seen).getTime());
-  return deduped;
+  const deduped = [...dedupedByKey.values()];
+  const threshold = clamp01(INCIDENT_RELEVANCE_THRESHOLD);
+  const active = deduped.filter(
+    (alert) =>
+      Number(alert?.triage?.relevance_score ?? 0) >=
+      thresholdForAlert(alert, threshold)
+  );
+  const filtered = deduped.filter(
+    (alert) =>
+      Number(alert?.triage?.relevance_score ?? 0) <
+      thresholdForAlert(alert, threshold)
+  );
+  active.sort((a, b) => new Date(b.first_seen).getTime() - new Date(a.first_seen).getTime());
+  filtered.sort((a, b) => {
+    const scoreDelta =
+      Number(b?.triage?.relevance_score ?? 0) - Number(a?.triage?.relevance_score ?? 0);
+    if (scoreDelta !== 0) return scoreDelta;
+    return new Date(b.first_seen).getTime() - new Date(a.first_seen).getTime();
+  });
+  return { active, filtered };
 }
 
 async function readAlertsFile(path) {
@@ -2731,12 +3152,14 @@ async function readAlertsFile(path) {
   }
 }
 
-function reconcileAlerts(activeAlerts, previousState, now) {
+function reconcileAlerts(activeAlerts, filteredAlerts, previousState, now) {
   const nowIso = now.toISOString();
   const nowMs = now.getTime();
   const retentionCutoff = nowMs - REMOVED_RETENTION_DAYS * 86400000;
   const previousById = new Map(previousState.map((a) => [a.alert_id, a]));
-  const activeById = new Map(activeAlerts.map((a) => [a.alert_id, a]));
+  const presentById = new Map(
+    [...activeAlerts, ...filteredAlerts].map((a) => [a.alert_id, a])
+  );
 
   const currentActive = activeAlerts.map((a) => {
     const prev = previousById.get(a.alert_id);
@@ -2748,9 +3171,19 @@ function reconcileAlerts(activeAlerts, previousState, now) {
     };
   });
 
+  const currentFiltered = filteredAlerts.map((a) => {
+    const prev = previousById.get(a.alert_id);
+    return {
+      ...a,
+      status: "filtered",
+      first_seen: prev?.first_seen ?? a.first_seen,
+      last_seen: nowIso,
+    };
+  });
+
   const removedNew = previousState
-    .filter((prev) => prev.status !== "removed")
-    .filter((prev) => !activeById.has(prev.alert_id))
+    .filter((prev) => prev.status !== "removed" && prev.status !== "filtered")
+    .filter((prev) => !presentById.has(prev.alert_id))
     .map((prev) => ({
       ...prev,
       status: "removed",
@@ -2759,54 +3192,71 @@ function reconcileAlerts(activeAlerts, previousState, now) {
 
   const removedCarry = previousState
     .filter((prev) => prev.status === "removed")
-    .filter((prev) => !activeById.has(prev.alert_id))
+    .filter((prev) => !presentById.has(prev.alert_id))
     .filter((prev) => {
       const t = new Date(prev.last_seen).getTime();
       return Number.isFinite(t) && t >= retentionCutoff;
     });
 
-  const state = [...currentActive, ...removedNew, ...removedCarry].sort(
+  const state = [...currentActive, ...currentFiltered, ...removedNew, ...removedCarry].sort(
     (a, b) => new Date(b.last_seen).getTime() - new Date(a.last_seen).getTime()
   );
 
-  return { currentActive, state };
+  return { currentActive, currentFiltered, state };
 }
 
-async function writeAlerts(activeAlerts, stateAlerts) {
+async function writeAlerts(activeAlerts, filteredAlerts, stateAlerts) {
   await mkdir(dirname(OUTPUT_PATH), { recursive: true });
   await mkdir(dirname(STATE_OUTPUT_PATH), { recursive: true });
+  await mkdir(dirname(FILTERED_OUTPUT_PATH), { recursive: true });
   await writeFile(OUTPUT_PATH, JSON.stringify(activeAlerts, null, 2) + "\n", "utf8");
+  await writeFile(
+    FILTERED_OUTPUT_PATH,
+    JSON.stringify(filteredAlerts, null, 2) + "\n",
+    "utf8"
+  );
   await writeFile(STATE_OUTPUT_PATH, JSON.stringify(stateAlerts, null, 2) + "\n", "utf8");
   const removedCount = stateAlerts.filter((a) => a.status === "removed").length;
+  const filteredCount = filteredAlerts.length;
   console.log(
-    `Wrote ${activeAlerts.length} active alerts -> ${OUTPUT_PATH} (${removedCount} removed tracked in ${STATE_OUTPUT_PATH})`
+    `Wrote ${activeAlerts.length} active alerts -> ${OUTPUT_PATH} (${filteredCount} filtered in ${FILTERED_OUTPUT_PATH}, ${removedCount} removed tracked in ${STATE_OUTPUT_PATH})`
   );
 }
 
 async function main() {
-  const active = await buildAlerts();
+  const { active, filtered } = await buildAlerts();
   const previous =
     (await readAlertsFile(STATE_OUTPUT_PATH)).length > 0
       ? await readAlertsFile(STATE_OUTPUT_PATH)
       : await readAlertsFile(OUTPUT_PATH);
-  const { currentActive, state } = reconcileAlerts(active, previous, new Date());
-  await writeAlerts(currentActive, state);
+  const { currentActive, currentFiltered, state } = reconcileAlerts(
+    active,
+    filtered,
+    previous,
+    new Date()
+  );
+  await writeAlerts(currentActive, currentFiltered, state);
 
   if (WATCH) {
     console.log(`Watching feeds every ${Math.round(INTERVAL_MS / 1000)}s...`);
     setInterval(async () => {
       try {
-        const nextActive = await buildAlerts();
+        const { active: nextActive, filtered: nextFiltered } = await buildAlerts();
         const prevState =
           (await readAlertsFile(STATE_OUTPUT_PATH)).length > 0
             ? await readAlertsFile(STATE_OUTPUT_PATH)
             : await readAlertsFile(OUTPUT_PATH);
-        const { currentActive: activeNow, state: stateNow } = reconcileAlerts(
+        const {
+          currentActive: activeNow,
+          currentFiltered: filteredNow,
+          state: stateNow,
+        } = reconcileAlerts(
           nextActive,
+          nextFiltered,
           prevState,
           new Date()
         );
-        await writeAlerts(activeNow, stateNow);
+        await writeAlerts(activeNow, filteredNow, stateNow);
       } catch (error) {
         console.warn(`WARN refresh: ${error.message}`);
       }

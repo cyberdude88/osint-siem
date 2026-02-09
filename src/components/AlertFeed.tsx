@@ -181,6 +181,11 @@ export function AlertFeed({
                 New
               </span>
             )}
+            {typeof alert.triage?.relevance_score === "number" && (
+              <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] uppercase tracking-wider rounded border border-siem-border text-siem-muted bg-white/5">
+                Rel {Math.round(alert.triage.relevance_score * 100)}
+              </span>
+            )}
           </div>
           <span className="text-[10px] text-siem-muted font-mono uppercase tracking-wider">
             {queueLabel} #{position + 1}
