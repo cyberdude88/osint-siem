@@ -45,6 +45,12 @@ export function AlertDetail({ alert, onClose }: Props) {
           "Validate claims with multi-source corroboration (satellite, media, local official notices).",
           "Share structured findings with aid partners using minimal sensitive personal data.",
         ]
+      : alert.category === "education_digital_capacity"
+      ? [
+          "Extract target geography, school/audience scope, skills requested, and deadline/status.",
+          "Validate that the opportunity is active and identify official contact/onboarding channels.",
+          "Prepare a scoped contribution plan (training, cyber hygiene, tooling, mentorship) and report via official path.",
+        ]
       : [
           "Collect key entities (people, places, orgs, infrastructure) from the bulletin.",
           "Corroborate across independent public sources and time-stamp your evidence.",

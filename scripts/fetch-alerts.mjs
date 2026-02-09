@@ -3226,6 +3226,9 @@ function scoreIncidentRelevance(alert, context = {}) {
   ) {
     addSignal(0.08, "humanitarian incident/tasking category");
   }
+  if (alert.category === "education_digital_capacity") {
+    addSignal(0.07, "education and digital capacity category");
+  }
   if (alert.category === "fraud_alert") addSignal(0.07, "fraud incident category");
 
   const hasTechnical = hasAnyPattern(text, TECHNICAL_SIGNAL_PATTERNS);
@@ -3439,6 +3442,8 @@ function defaultSeverity(category) {
       return "medium";
     case "humanitarian_security":
       return "high";
+    case "education_digital_capacity":
+      return "medium";
     case "public_safety":
       return "medium";
     case "private_sector":

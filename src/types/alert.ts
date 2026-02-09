@@ -6,6 +6,7 @@ export type AlertCategory =
   | "wanted_suspect"
   | "public_appeal"
   | "cyber_advisory"
+  | "education_digital_capacity"
   | "humanitarian_tasking"
   | "conflict_monitoring"
   | "humanitarian_security"
