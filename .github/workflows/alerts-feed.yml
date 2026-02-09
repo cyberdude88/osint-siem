@@ -29,17 +29,23 @@ jobs:
       - name: Fetch alerts
         run: node scripts/fetch-alerts.mjs
         env:
-          MAX_PER_SOURCE: "6"
+          MAX_PER_SOURCE: "20"
           OUTPUT_PATH: "public/alerts.json"
+          FILTERED_OUTPUT_PATH: "public/alerts-filtered.json"
+          STATE_OUTPUT_PATH: "public/alerts-state.json"
+          SOURCE_HEALTH_OUTPUT_PATH: "public/source-health.json"
+          MISSING_PERSON_RELEVANCE_THRESHOLD: "0"
+          FAIL_ON_CRITICAL_SOURCE_GAP: "1"
+          CRITICAL_SOURCE_PREFIXES: "interpol-red,interpol-yellow"
 
       - name: Commit updates
         run: |
-          if git diff --quiet -- public/alerts.json; then
+          if git diff --quiet -- public/alerts.json public/alerts-filtered.json public/alerts-state.json public/source-health.json; then
             echo "No changes"
             exit 0
           fi
           git config user.name "osint-siem-bot"
           git config user.email "osint-siem-bot@users.noreply.github.com"
-          git add public/alerts.json
+          git add public/alerts.json public/alerts-filtered.json public/alerts-state.json public/source-health.json
           git commit -m "chore: update alerts feed"
           git push

@@ -32,6 +32,10 @@ jobs:
 
       - name: Fetch alerts
         run: node scripts/fetch-alerts.mjs
+        env:
+          MISSING_PERSON_RELEVANCE_THRESHOLD: "0"
+          FAIL_ON_CRITICAL_SOURCE_GAP: "1"
+          CRITICAL_SOURCE_PREFIXES: "interpol-red,interpol-yellow"
 
       - name: Build
         run: npm run build

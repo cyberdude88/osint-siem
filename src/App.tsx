@@ -14,8 +14,11 @@ export default function App() {
   const [visibleAlertIds, setVisibleAlertIds] = useState<string[]>([]);
   const [mobilePane, setMobilePane] = useState<"map" | "stack">("map");
   const [isDesktopFeedOpen, setIsDesktopFeedOpen] = useState(true);
+  const [feedVisible, setFeedVisible] = useState(true);
+  const feedToggled = useRef(false);
   const [isSubmitOpen, setIsSubmitOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
+  const feedRef = useRef<HTMLDivElement>(null);
   const selectedAlert = selectedId
     ? alerts.find((a) => a.alert_id === selectedId) ?? null
     : null;
@@ -27,6 +30,22 @@ export default function App() {
     el.addEventListener("animationend", () => {
       setSelectedId(null);
     }, { once: true });
+  }, []);
+
+  const handleHideFeed = useCallback(() => {
+    feedToggled.current = true;
+    setFeedVisible(false);
+    const el = feedRef.current;
+    if (!el) { setIsDesktopFeedOpen(false); return; }
+    el.addEventListener("animationend", () => {
+      setIsDesktopFeedOpen(false);
+    }, { once: true });
+  }, []);
+
+  const handleShowFeed = useCallback(() => {
+    feedToggled.current = true;
+    setIsDesktopFeedOpen(true);
+    setFeedVisible(true);
   }, []);
 
   useEffect(() => {
@@ -76,21 +95,21 @@ export default function App() {
         {!isDesktopFeedOpen && (
           <button
             type="button"
-            onClick={() => setIsDesktopFeedOpen(true)}
+            onClick={handleShowFeed}
             className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-10 items-center gap-1 rounded-md border border-siem-border bg-siem-panel/85 px-2 py-1.5 text-[10px] font-mono uppercase tracking-wider text-siem-text hover:bg-siem-accent/12 hover:text-siem-accent transition-colors"
           >
             &#8250; Stack
           </button>
         )}
         {/* Left Panel: Alert Feed */}
+        {(isDesktopFeedOpen || mobilePane === "stack") && (
         <div
+          ref={feedRef}
           className={`${
             mobilePane === "stack" ? "flex" : "hidden"
-          } md:flex w-full ${
-            isDesktopFeedOpen
-              ? "md:w-[340px] md:min-w-[300px] md:border-r md:border-siem-border"
-              : "md:w-0 md:min-w-0 md:border-r-0"
-          } bg-siem-panel flex-col min-h-0 overflow-hidden transition-[width] duration-300 relative`}
+          } md:flex w-full md:w-[340px] md:min-w-[300px] md:border-r md:border-siem-border bg-siem-panel flex-col min-h-0 overflow-hidden relative${
+            feedToggled.current ? (feedVisible ? " feed-panel-open" : " feed-panel-closed") : ""
+          }`}
         >
           {isLoading ? (
             <div className="flex-1 flex items-center justify-center text-siem-muted text-sm">
@@ -104,10 +123,11 @@ export default function App() {
               regionFilter={regionFilter}
               onRegionChange={setRegionFilter}
               onVisibleAlertIdsChange={setVisibleAlertIds}
-              onHideDesktop={() => setIsDesktopFeedOpen(false)}
+              onHideDesktop={handleHideFeed}
             />
           )}
         </div>
+        )}
 
         {/* Center: Globe (full remaining width) */}
         <div

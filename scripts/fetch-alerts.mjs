@@ -7,6 +7,8 @@ const OUTPUT_PATH = process.env.OUTPUT_PATH ?? "public/alerts.json";
 const STATE_OUTPUT_PATH = process.env.STATE_OUTPUT_PATH ?? "public/alerts-state.json";
 const FILTERED_OUTPUT_PATH =
   process.env.FILTERED_OUTPUT_PATH ?? "public/alerts-filtered.json";
+const SOURCE_HEALTH_OUTPUT_PATH =
+  process.env.SOURCE_HEALTH_OUTPUT_PATH ?? "public/source-health.json";
 const MAX_AGE_DAYS = Number.parseInt(process.env.MAX_AGE_DAYS ?? "180", 10);
 const REMOVED_RETENTION_DAYS = Number.parseInt(
   process.env.REMOVED_RETENTION_DAYS ?? "14",
@@ -18,6 +20,13 @@ const INCIDENT_RELEVANCE_THRESHOLD = Number.parseFloat(
 const MISSING_PERSON_RELEVANCE_THRESHOLD = Number.parseFloat(
   process.env.MISSING_PERSON_RELEVANCE_THRESHOLD ?? "0"
 );
+const FAIL_ON_CRITICAL_SOURCE_GAP =
+  process.env.FAIL_ON_CRITICAL_SOURCE_GAP === "1";
+const CRITICAL_SOURCE_PREFIXES = (process.env.CRITICAL_SOURCE_PREFIXES ??
+  "interpol-red,interpol-yellow")
+  .split(",")
+  .map((value) => value.trim())
+  .filter(Boolean);
 const WATCH =
   process.argv.includes("--watch") || process.env.WATCH === "1";
 const INTERVAL_MS = Number.parseInt(process.env.INTERVAL_MS ?? "900000", 10);
@@ -3628,15 +3637,22 @@ async function fetchKev(meta) {
     .filter(Boolean);
 }
 
-async function fetchInterpolNotices(meta, now) {
-  const limit = Math.max(1, Number(meta?.max_items ?? MAX_PER_SOURCE));
-  const headers = {
-    "User-Agent": "osint-siem-bot/1.0",
-    Accept: "application/json",
-  };
+function interpolNoticeMatchesCountryCode(notice, countryCode) {
+  const normalizedCode = String(countryCode ?? "").trim().toUpperCase();
+  if (!normalizedCode) return false;
+  const values = [
+    ...(Array.isArray(notice?.nationalities) ? notice.nationalities : []),
+    ...(Array.isArray(notice?.countries_likely_to_be_visited)
+      ? notice.countries_likely_to_be_visited
+      : []),
+  ];
+  return values.some((value) => String(value ?? "").trim().toUpperCase() === normalizedCode);
+}
+
+async function fetchInterpolPages(startUrl, limit, headers) {
   const seenPageUrls = new Set();
   const notices = [];
-  let nextPageUrl = meta.feed_url;
+  let nextPageUrl = startUrl;
   let pageCount = 0;
   const MAX_INTERPOL_PAGES = 200;
 
@@ -3670,6 +3686,48 @@ async function fetchInterpolNotices(meta, now) {
     nextPageUrl = nextHref
       ? new URL(nextHref, "https://ws-public.interpol.int").toString()
       : null;
+  }
+
+  return notices;
+}
+
+async function fetchInterpolNotices(meta, now) {
+  const limit = Math.max(1, Number(meta?.max_items ?? MAX_PER_SOURCE));
+  const headers = {
+    "User-Agent": "osint-siem-bot/1.0",
+    Accept: "application/json",
+  };
+  const primaryNotices = await fetchInterpolPages(meta.feed_url, limit, headers);
+  let notices = primaryNotices;
+  let fallbackUsed = false;
+
+  // Some nationality-filtered INTERPOL queries can return empty despite matching notices.
+  // Fallback: query the parent feed and client-filter by nationality code.
+  const url = new URL(meta.feed_url);
+  const nationalityCode = String(url.searchParams.get("nationality") ?? "")
+    .trim()
+    .toUpperCase();
+  if (notices.length === 0 && nationalityCode) {
+    url.searchParams.delete("nationality");
+    const fallbackPoolLimit = Math.max(limit * 5, 1000);
+    const fallbackNotices = await fetchInterpolPages(
+      url.toString(),
+      fallbackPoolLimit,
+      headers
+    );
+    const filteredFallback = fallbackNotices.filter((notice) =>
+      interpolNoticeMatchesCountryCode(notice, nationalityCode)
+    );
+    if (filteredFallback.length > 0) {
+      notices = filteredFallback;
+      fallbackUsed = true;
+    }
+  }
+
+  if (fallbackUsed) {
+    console.warn(
+      `WARN ${meta.source.authority_name}: primary nationality query returned empty; used client-side filtered fallback`
+    );
   }
 
   const noticeTitlePrefix =
@@ -3738,8 +3796,11 @@ async function fetchInterpolNotices(meta, now) {
 async function buildAlerts() {
   const now = new Date();
   const alerts = [];
+  const sourceHealth = [];
 
   for (const entry of sources) {
+    const sourceId = entry.source.source_id;
+    const startedAt = new Date().toISOString();
     try {
       const batch =
         entry.type === "kev-json"
@@ -3748,8 +3809,29 @@ async function buildAlerts() {
           ? await fetchInterpolNotices(entry, now)
           : await fetchRss(entry, now);
       alerts.push(...batch);
+      sourceHealth.push({
+        source_id: sourceId,
+        authority_name: entry.source.authority_name,
+        type: entry.type,
+        status: "ok",
+        fetched_count: batch.length,
+        feed_url: entry.feed_url,
+        started_at: startedAt,
+        finished_at: new Date().toISOString(),
+      });
     } catch (error) {
       console.warn(`WARN ${entry.source.authority_name}: ${error.message}`);
+      sourceHealth.push({
+        source_id: sourceId,
+        authority_name: entry.source.authority_name,
+        type: entry.type,
+        status: "error",
+        fetched_count: 0,
+        feed_url: entry.feed_url,
+        error: error.message,
+        started_at: startedAt,
+        finished_at: new Date().toISOString(),
+      });
     }
   }
 
@@ -3782,7 +3864,19 @@ async function buildAlerts() {
     if (scoreDelta !== 0) return scoreDelta;
     return new Date(b.first_seen).getTime() - new Date(a.first_seen).getTime();
   });
-  return { active, filtered };
+  const activeBySource = active.reduce((acc, alert) => {
+    acc[alert.source_id] = (acc[alert.source_id] ?? 0) + 1;
+    return acc;
+  }, {});
+  const filteredBySource = filtered.reduce((acc, alert) => {
+    acc[alert.source_id] = (acc[alert.source_id] ?? 0) + 1;
+    return acc;
+  }, {});
+  sourceHealth.forEach((entry) => {
+    entry.active_count = activeBySource[entry.source_id] ?? 0;
+    entry.filtered_count = filteredBySource[entry.source_id] ?? 0;
+  });
+  return { active, filtered, sourceHealth };
 }
 
 async function readAlertsFile(path) {
@@ -3848,10 +3942,31 @@ function reconcileAlerts(activeAlerts, filteredAlerts, previousState, now) {
   return { currentActive, currentFiltered, state };
 }
 
-async function writeAlerts(activeAlerts, filteredAlerts, stateAlerts) {
+function assertCriticalSourceCoverage(sourceHealth) {
+  if (!FAIL_ON_CRITICAL_SOURCE_GAP || CRITICAL_SOURCE_PREFIXES.length === 0) return;
+  const missingPrefixes = CRITICAL_SOURCE_PREFIXES.filter((prefix) => {
+    const matched = sourceHealth.filter(
+      (entry) =>
+        entry.source_id === prefix || entry.source_id.startsWith(`${prefix}-`)
+    );
+    const totalFetched = matched.reduce(
+      (sum, entry) => sum + Number(entry.fetched_count ?? 0),
+      0
+    );
+    return totalFetched === 0;
+  });
+  if (missingPrefixes.length > 0) {
+    throw new Error(
+      `critical source coverage gap: no records fetched for ${missingPrefixes.join(", ")}`
+    );
+  }
+}
+
+async function writeAlerts(activeAlerts, filteredAlerts, stateAlerts, sourceHealth) {
   await mkdir(dirname(OUTPUT_PATH), { recursive: true });
   await mkdir(dirname(STATE_OUTPUT_PATH), { recursive: true });
   await mkdir(dirname(FILTERED_OUTPUT_PATH), { recursive: true });
+  await mkdir(dirname(SOURCE_HEALTH_OUTPUT_PATH), { recursive: true });
   await writeFile(OUTPUT_PATH, JSON.stringify(activeAlerts, null, 2) + "\n", "utf8");
   await writeFile(
     FILTERED_OUTPUT_PATH,
@@ -3859,15 +3974,30 @@ async function writeAlerts(activeAlerts, filteredAlerts, stateAlerts) {
     "utf8"
   );
   await writeFile(STATE_OUTPUT_PATH, JSON.stringify(stateAlerts, null, 2) + "\n", "utf8");
+  const healthDoc = {
+    generated_at: new Date().toISOString(),
+    critical_source_prefixes: CRITICAL_SOURCE_PREFIXES,
+    fail_on_critical_source_gap: FAIL_ON_CRITICAL_SOURCE_GAP,
+    total_sources: sourceHealth.length,
+    sources_ok: sourceHealth.filter((entry) => entry.status === "ok").length,
+    sources_error: sourceHealth.filter((entry) => entry.status === "error").length,
+    sources: sourceHealth,
+  };
+  await writeFile(
+    SOURCE_HEALTH_OUTPUT_PATH,
+    JSON.stringify(healthDoc, null, 2) + "\n",
+    "utf8"
+  );
   const removedCount = stateAlerts.filter((a) => a.status === "removed").length;
   const filteredCount = filteredAlerts.length;
   console.log(
-    `Wrote ${activeAlerts.length} active alerts -> ${OUTPUT_PATH} (${filteredCount} filtered in ${FILTERED_OUTPUT_PATH}, ${removedCount} removed tracked in ${STATE_OUTPUT_PATH})`
+    `Wrote ${activeAlerts.length} active alerts -> ${OUTPUT_PATH} (${filteredCount} filtered in ${FILTERED_OUTPUT_PATH}, ${removedCount} removed tracked in ${STATE_OUTPUT_PATH}, source health in ${SOURCE_HEALTH_OUTPUT_PATH})`
   );
 }
 
 async function main() {
-  const { active, filtered } = await buildAlerts();
+  const { active, filtered, sourceHealth } = await buildAlerts();
+  assertCriticalSourceCoverage(sourceHealth);
   const previous =
     (await readAlertsFile(STATE_OUTPUT_PATH)).length > 0
       ? await readAlertsFile(STATE_OUTPUT_PATH)
@@ -3878,13 +4008,18 @@ async function main() {
     previous,
     new Date()
   );
-  await writeAlerts(currentActive, currentFiltered, state);
+  await writeAlerts(currentActive, currentFiltered, state, sourceHealth);
 
   if (WATCH) {
     console.log(`Watching feeds every ${Math.round(INTERVAL_MS / 1000)}s...`);
     setInterval(async () => {
       try {
-        const { active: nextActive, filtered: nextFiltered } = await buildAlerts();
+        const {
+          active: nextActive,
+          filtered: nextFiltered,
+          sourceHealth: nextSourceHealth,
+        } = await buildAlerts();
+        assertCriticalSourceCoverage(nextSourceHealth);
         const prevState =
           (await readAlertsFile(STATE_OUTPUT_PATH)).length > 0
             ? await readAlertsFile(STATE_OUTPUT_PATH)
@@ -3899,7 +4034,7 @@ async function main() {
           prevState,
           new Date()
         );
-        await writeAlerts(activeNow, filteredNow, stateNow);
+        await writeAlerts(activeNow, filteredNow, stateNow, nextSourceHealth);
       } catch (error) {
         console.warn(`WARN refresh: ${error.message}`);
       }
