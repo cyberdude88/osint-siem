@@ -24,6 +24,15 @@ const HOTSPOT_RADIUS_KM = 260;
 const HOTSPOT_MIN_ALERTS = 2;
 const HOTSPOT_PIXEL_RADIUS = 22;
 const CLICK_DRAG_THRESHOLD_PX = 4;
+const REGION_CENTROIDS: Record<string, { lat: number; lng: number; scale: number }> = {
+  "North America": { lat: 45, lng: -100, scale: 1.42 },
+  "South America": { lat: -15, lng: -60, scale: 1.2 },
+  Europe: { lat: 52, lng: 15, scale: 0.96 },
+  Africa: { lat: 5, lng: 20, scale: 1.28 },
+  Asia: { lat: 34, lng: 95, scale: 1.62 },
+  Oceania: { lat: -22, lng: 140, scale: 1.08 },
+  Antarctica: { lat: -82, lng: 0, scale: 1.36 },
+};
 
 interface Props {
   alerts: Alert[];
@@ -283,6 +292,7 @@ export function GlobeView({
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const globeGroupRef = useRef<THREE.Group | null>(null);
   const oceanRef = useRef<THREE.Mesh | null>(null);
+  const regionHighlightRef = useRef<THREE.Mesh | null>(null);
   const pointMeshesRef = useRef<Map<string, THREE.Mesh>>(new Map());
   const frameRef = useRef<number>(0);
   const mouseRef = useRef({
@@ -558,6 +568,24 @@ export function GlobeView({
     });
     pointMeshesRef.current = pointMeshes;
 
+    // --- Region spotlight (continent highlight on filter selection) ---
+    const regionHighlightMat = new THREE.MeshBasicMaterial({
+      map: glowTexture,
+      color: new THREE.Color(0x66c4ff),
+      transparent: true,
+      opacity: 0.32,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    });
+    const regionHighlight = new THREE.Mesh(
+      new THREE.PlaneGeometry(1, 1),
+      regionHighlightMat
+    );
+    regionHighlight.visible = false;
+    globeGroup.add(regionHighlight);
+    regionHighlightRef.current = regionHighlight;
+
     // --- Initial tilt (persisted) ---
     globeGroup.rotation.x = rotationRef.current.x;
     globeGroup.rotation.y = rotationRef.current.y;
@@ -605,30 +633,52 @@ export function GlobeView({
       glowMeshes.forEach((gm) => {
         const alertId = (gm.userData as { alertId?: string }).alertId;
         const isVisibleInStack = !alertId || visibleSet.has(alertId);
-        gm.visible = isVisibleInStack;
-        if (!isVisibleInStack) return;
+        const region = (gm.userData as { region?: string }).region;
+        const isRegionVisible =
+          activeRegion === "all" || !region || region === activeRegion;
+        gm.visible = isVisibleInStack && isRegionVisible;
+        if (!gm.visible) return;
         const { baseGlow } = gm.userData as {
           baseGlow: number;
         };
         gm.scale.set(baseGlow * glowScaleBase, baseGlow * glowScaleBase, 1);
         const base = 0.13;
-        const region = (gm.userData as { region?: string }).region;
-        const dim = activeRegion === "all" || !region || region === activeRegion ? 1 : 0.15;
-        (gm.material as THREE.MeshBasicMaterial).opacity = base * dim * glowOpacityScale;
+        (gm.material as THREE.MeshBasicMaterial).opacity = base * glowOpacityScale;
       });
 
       // Keep dots stable (no visible pulsing)
       allDotMeshes.forEach((entry) => {
         const isVisibleInStack = visibleSet.has(entry.alertId);
-        entry.mesh.visible = isVisibleInStack;
-        if (!isVisibleInStack) return;
         const region = (entry.mesh.userData as { region?: string }).region;
-        const dim = activeRegion === "all" || !region || region === activeRegion ? 1 : 0.15;
+        const isRegionVisible =
+          activeRegion === "all" || !region || region === activeRegion;
+        entry.mesh.visible = isVisibleInStack && isRegionVisible;
+        if (!entry.mesh.visible) return;
         const selectedBoost = entry.alertId === selected ? 1.9 : 1;
         const dotScale = dotScaleBase * selectedBoost;
         entry.mesh.scale.set(dotScale, dotScale, dotScale);
-        (entry.mesh.material as THREE.MeshBasicMaterial).opacity = dim;
+        (entry.mesh.material as THREE.MeshBasicMaterial).opacity = 1;
       });
+
+      const regionHighlightMesh = regionHighlightRef.current;
+      if (regionHighlightMesh) {
+        const target = REGION_CENTROIDS[activeRegion];
+        if (!target || activeRegion === "all") {
+          regionHighlightMesh.visible = false;
+        } else {
+          const base = latLngToVector3(target.lat, target.lng, 1.012);
+          regionHighlightMesh.visible = true;
+          regionHighlightMesh.position.copy(base);
+          const normal = base.clone().normalize();
+          regionHighlightMesh.quaternion.setFromUnitVectors(
+            new THREE.Vector3(0, 0, 1),
+            normal
+          );
+          const pulse = 1 + Math.sin(t * 1.2) * 0.04;
+          const scale = target.scale * pulse;
+          regionHighlightMesh.scale.set(scale, scale, 1);
+        }
+      }
 
       // Fade in US state lines as user zooms closer to North America details.
       const stateFade = Math.max(0, Math.min(1, (2.45 - zoomLevel) / 0.9));
@@ -1005,6 +1055,7 @@ export function GlobeView({
       glowTexture.dispose();
       surfaceTexture?.dispose();
       usStateMat.dispose();
+      regionHighlightMat.dispose();
     };
   }, [alerts, onSelect]);
 
@@ -1115,7 +1166,7 @@ export function GlobeView({
         ))}
       </div>
       <div className="hidden md:block absolute top-4 left-1/2 -translate-x-1/2 text-[10px] text-siem-muted/50 uppercase tracking-widest pointer-events-none">
-        Drag to rotate &middot; Scroll to zoom &middot; Click alert points
+        Drag to rotate &middot; Scroll to zoom &middot; Click a continent to filter
       </div>
       <div className="absolute bottom-3 right-3 md:bottom-4 md:right-4 flex items-center gap-1.5 bg-siem-panel/80 backdrop-blur-sm px-2 py-2 rounded-lg border border-siem-border">
         <button
