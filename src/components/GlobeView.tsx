@@ -1020,7 +1020,11 @@ export function GlobeView({
       }
       // Resolve clicked point to a data-backed region
       const detectedRegion = latLngToRegion(lat, lng);
-      if (!detectedRegion) return;
+      if (!detectedRegion) {
+        // Clicked ocean — reset to show all alerts
+        if (regionFilterRef.current !== "all") onRegionChange("all");
+        return;
+      }
       // Only select regions that actually have alerts in the current dataset
       const dataRegions = regionsRef.current;
       const region = dataRegions.has(detectedRegion) ? detectedRegion : null;
