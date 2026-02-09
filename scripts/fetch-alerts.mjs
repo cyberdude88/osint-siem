@@ -4241,9 +4241,44 @@ async function fetchInterpolNotices(meta, now) {
   });
 }
 
+function createStaticInterpolEntry(now) {
+  return {
+    alert_id: "interpol-hub-static",
+    source_id: "interpol-hub",
+    source: {
+      source_id: "interpol-hub",
+      authority_name: "INTERPOL Notices Hub",
+      country: "France",
+      country_code: "FR",
+      region: "International",
+      authority_type: "police",
+      base_url: "https://www.interpol.int",
+    },
+    title: "INTERPOL Red & Yellow Notices — Browse Wanted & Missing Persons",
+    canonical_url: "https://www.interpol.int/How-we-work/Notices/View-Red-Notices",
+    first_seen: now.toISOString(),
+    last_seen: now.toISOString(),
+    status: "active",
+    category: "wanted_suspect",
+    severity: "critical",
+    region_tag: "INT",
+    lat: 45.764,
+    lng: 4.8357,
+    freshness_hours: 1,
+    reporting: {
+      label: "Browse INTERPOL Notices",
+      url: "https://www.interpol.int/How-we-work/Notices/View-Red-Notices",
+      notes:
+        "Red Notices: wanted persons. Yellow Notices: missing persons. " +
+        "Browse directly — https://www.interpol.int/How-we-work/Notices/View-Yellow-Notices",
+    },
+    triage: { relevance_score: 1, reasoning: "Permanent INTERPOL hub link" },
+  };
+}
+
 async function buildAlerts() {
   const now = new Date();
-  const alerts = [];
+  const alerts = [createStaticInterpolEntry(now)];
   const sourceHealth = [];
   const sourceEntries = await getAllSources();
 
