@@ -77,23 +77,29 @@ function vector3ToLatLng(vec: THREE.Vector3): { lat: number; lng: number } {
   const phi = Math.acos(v.y);
   const theta = Math.atan2(v.z, v.x);
   const lat = 90 - (phi * 180) / Math.PI;
-  const lng = ((theta * 180) / Math.PI + 540) % 360 - 180;
+  // Negate longitude to match latLngToVector3's inverted x-axis (x = -r*sin*cos)
+  const lng = -(((theta * 180) / Math.PI + 540) % 360 - 180);
   return { lat, lng };
 }
 
 function latLngToRegion(lat: number, lng: number): string | null {
   // Caribbean first (overlaps N/S America bounding boxes)
-  if (lat >= 10 && lat <= 27 && lng >= -86 && lng <= -59) return "Caribbean";
-  // Continental regions (ordered by specificity)
-  if (lat >= 7 && lat <= 83 && lng >= -168 && lng <= -52) return "North America";
-  if (lat >= -56 && lat <= 13 && lng >= -82 && lng <= -35) return "South America";
-  if (lat >= 35 && lat <= 72 && lng >= -11 && lng <= 40) return "Europe";
-  if (lat >= -35 && lat <= 37 && lng >= -17 && lng <= 51) return "Africa";
-  // Asia: include both eastern hemisphere and far-east Russia/Japan near dateline
-  if (lat >= -10 && lat <= 77 && lng >= 40 && lng <= 180) return "Asia";
-  if (lat >= 30 && lat <= 77 && lng >= -180 && lng <= -168) return "Asia";
+  if (lat >= 10 && lat <= 27 && lng >= -90 && lng <= -58) return "Caribbean";
+  // Continental regions — ordered narrow-to-wide to avoid swallowing smaller areas
+  if (lat >= 7 && lat <= 84 && lng >= -170 && lng <= -50) return "North America";
+  if (lat >= -57 && lat <= 15 && lng >= -82 && lng <= -33) return "South America";
+  // Europe: extend south to include Mediterranean, east to cover Turkey/Scandinavia
+  if (lat >= 34 && lat <= 72 && lng >= -12 && lng <= 45) return "Europe";
+  // Africa: full continent including Madagascar
+  if (lat >= -36 && lat <= 38 && lng >= -18 && lng <= 52) return "Africa";
+  // Middle East bridges into Asia
+  if (lat >= 12 && lat <= 42 && lng >= 34 && lng <= 60) return "Asia";
+  // Asia: main body + far-east dateline wrap
+  if (lat >= -11 && lat <= 78 && lng >= 40 && lng <= 180) return "Asia";
+  if (lat >= 30 && lat <= 78 && lng >= -180 && lng <= -168) return "Asia";
+  // Oceania: Australia, NZ, Pacific islands
   if (lat >= -50 && lat <= 0 && lng >= 110 && lng <= 180) return "Oceania";
-  if (lat >= -50 && lat <= 10 && lng >= 95 && lng <= 180) return "Oceania";
+  if (lat >= -50 && lat <= 15 && lng >= 95 && lng <= 180) return "Oceania";
   return null;
 }
 
