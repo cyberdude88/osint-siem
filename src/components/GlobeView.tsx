@@ -316,7 +316,6 @@ export function GlobeView({
   const regionFilterRef = useRef(regionFilter);
   const selectedIdRef = useRef<string | null>(selectedId);
   const visibleAlertIdsRef = useRef<Set<string>>(new Set(visibleAlertIds));
-  const regionSetRef = useRef<Set<string>>(new Set());
   const adjustZoom = (delta: number) => {
     const next = zoomRef.current.target + delta;
     zoomRef.current.target = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, next));
@@ -333,10 +332,6 @@ export function GlobeView({
   useEffect(() => {
     visibleAlertIdsRef.current = new Set(visibleAlertIds);
   }, [visibleAlertIds]);
-
-  useEffect(() => {
-    regionSetRef.current = new Set(regions.map(([r]) => r));
-  }, [regions]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -1004,8 +999,8 @@ export function GlobeView({
       if (!openHotspotFromCluster(overlapped) && !openHotspotFromCluster(nearby)) {
         closeHotspot();
       }
-      if (!regionSetRef.current.has(region)) return;
-      onRegionChange(region);
+      const currentRegion = regionFilterRef.current;
+      onRegionChange(currentRegion === region ? "all" : region);
     };
 
     const el = renderer.domElement;
