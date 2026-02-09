@@ -1,10 +1,15 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import crypto from "node:crypto";
 
 const MAX_PER_SOURCE = Number.parseInt(process.env.MAX_PER_SOURCE ?? "20", 10);
 const OUTPUT_PATH = process.env.OUTPUT_PATH ?? "public/alerts.json";
+const STATE_OUTPUT_PATH = process.env.STATE_OUTPUT_PATH ?? "public/alerts-state.json";
 const MAX_AGE_DAYS = Number.parseInt(process.env.MAX_AGE_DAYS ?? "180", 10);
+const REMOVED_RETENTION_DAYS = Number.parseInt(
+  process.env.REMOVED_RETENTION_DAYS ?? "14",
+  10
+);
 const WATCH =
   process.argv.includes("--watch") || process.env.WATCH === "1";
 const INTERVAL_MS = Number.parseInt(process.env.INTERVAL_MS ?? "900000", 10);
@@ -2716,22 +2721,92 @@ async function buildAlerts() {
   return deduped;
 }
 
-async function writeAlerts(alerts) {
+async function readAlertsFile(path) {
+  try {
+    const raw = await readFile(path, "utf8");
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function reconcileAlerts(activeAlerts, previousState, now) {
+  const nowIso = now.toISOString();
+  const nowMs = now.getTime();
+  const retentionCutoff = nowMs - REMOVED_RETENTION_DAYS * 86400000;
+  const previousById = new Map(previousState.map((a) => [a.alert_id, a]));
+  const activeById = new Map(activeAlerts.map((a) => [a.alert_id, a]));
+
+  const currentActive = activeAlerts.map((a) => {
+    const prev = previousById.get(a.alert_id);
+    return {
+      ...a,
+      status: "active",
+      first_seen: prev?.first_seen ?? a.first_seen,
+      last_seen: nowIso,
+    };
+  });
+
+  const removedNew = previousState
+    .filter((prev) => prev.status !== "removed")
+    .filter((prev) => !activeById.has(prev.alert_id))
+    .map((prev) => ({
+      ...prev,
+      status: "removed",
+      last_seen: nowIso,
+    }));
+
+  const removedCarry = previousState
+    .filter((prev) => prev.status === "removed")
+    .filter((prev) => !activeById.has(prev.alert_id))
+    .filter((prev) => {
+      const t = new Date(prev.last_seen).getTime();
+      return Number.isFinite(t) && t >= retentionCutoff;
+    });
+
+  const state = [...currentActive, ...removedNew, ...removedCarry].sort(
+    (a, b) => new Date(b.last_seen).getTime() - new Date(a.last_seen).getTime()
+  );
+
+  return { currentActive, state };
+}
+
+async function writeAlerts(activeAlerts, stateAlerts) {
   await mkdir(dirname(OUTPUT_PATH), { recursive: true });
-  await writeFile(OUTPUT_PATH, JSON.stringify(alerts, null, 2) + "\n", "utf8");
-  console.log(`Wrote ${alerts.length} alerts -> ${OUTPUT_PATH}`);
+  await mkdir(dirname(STATE_OUTPUT_PATH), { recursive: true });
+  await writeFile(OUTPUT_PATH, JSON.stringify(activeAlerts, null, 2) + "\n", "utf8");
+  await writeFile(STATE_OUTPUT_PATH, JSON.stringify(stateAlerts, null, 2) + "\n", "utf8");
+  const removedCount = stateAlerts.filter((a) => a.status === "removed").length;
+  console.log(
+    `Wrote ${activeAlerts.length} active alerts -> ${OUTPUT_PATH} (${removedCount} removed tracked in ${STATE_OUTPUT_PATH})`
+  );
 }
 
 async function main() {
-  const alerts = await buildAlerts();
-  await writeAlerts(alerts);
+  const active = await buildAlerts();
+  const previous =
+    (await readAlertsFile(STATE_OUTPUT_PATH)).length > 0
+      ? await readAlertsFile(STATE_OUTPUT_PATH)
+      : await readAlertsFile(OUTPUT_PATH);
+  const { currentActive, state } = reconcileAlerts(active, previous, new Date());
+  await writeAlerts(currentActive, state);
 
   if (WATCH) {
     console.log(`Watching feeds every ${Math.round(INTERVAL_MS / 1000)}s...`);
     setInterval(async () => {
       try {
-        const next = await buildAlerts();
-        await writeAlerts(next);
+        const nextActive = await buildAlerts();
+        const prevState =
+          (await readAlertsFile(STATE_OUTPUT_PATH)).length > 0
+            ? await readAlertsFile(STATE_OUTPUT_PATH)
+            : await readAlertsFile(OUTPUT_PATH);
+        const { currentActive: activeNow, state: stateNow } = reconcileAlerts(
+          nextActive,
+          prevState,
+          new Date()
+        );
+        await writeAlerts(activeNow, stateNow);
       } catch (error) {
         console.warn(`WARN refresh: ${error.message}`);
       }
