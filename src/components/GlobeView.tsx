@@ -31,7 +31,8 @@ const REGION_CENTROIDS: Record<string, { lat: number; lng: number; scale: number
   Africa: { lat: 5, lng: 20, scale: 1.28 },
   Asia: { lat: 34, lng: 95, scale: 1.62 },
   Oceania: { lat: -22, lng: 140, scale: 1.08 },
-  Antarctica: { lat: -82, lng: 0, scale: 1.36 },
+  Caribbean: { lat: 18, lng: -72, scale: 0.68 },
+  International: { lat: 20, lng: 0, scale: 1.8 },
 };
 
 interface Props {
@@ -81,14 +82,18 @@ function vector3ToLatLng(vec: THREE.Vector3): { lat: number; lng: number } {
 }
 
 function latLngToRegion(lat: number, lng: number): string | null {
-  // Coarse continent buckets (good enough for region filtering)
+  // Caribbean first (overlaps N/S America bounding boxes)
+  if (lat >= 10 && lat <= 27 && lng >= -86 && lng <= -59) return "Caribbean";
+  // Continental regions (ordered by specificity)
   if (lat >= 7 && lat <= 83 && lng >= -168 && lng <= -52) return "North America";
   if (lat >= -56 && lat <= 13 && lng >= -82 && lng <= -35) return "South America";
   if (lat >= 35 && lat <= 72 && lng >= -11 && lng <= 40) return "Europe";
   if (lat >= -35 && lat <= 37 && lng >= -17 && lng <= 51) return "Africa";
-  if (lat >= 5 && lat <= 77 && lng >= 40 && lng <= 180) return "Asia";
-  if (lat >= -50 && lat <= 10 && lng >= 110 && lng <= 180) return "Oceania";
-  if (lat < -60) return "Antarctica";
+  // Asia: include both eastern hemisphere and far-east Russia/Japan near dateline
+  if (lat >= -10 && lat <= 77 && lng >= 40 && lng <= 180) return "Asia";
+  if (lat >= 30 && lat <= 77 && lng >= -180 && lng <= -168) return "Asia";
+  if (lat >= -50 && lat <= 0 && lng >= 110 && lng <= 180) return "Oceania";
+  if (lat >= -50 && lat <= 10 && lng >= 95 && lng <= 180) return "Oceania";
   return null;
 }
 
@@ -314,6 +319,7 @@ export function GlobeView({
     ambientBlend: 1,
   });
   const regionFilterRef = useRef(regionFilter);
+  const regionsRef = useRef<Set<string>>(new Set(regions.map(([r]) => r)));
   const selectedIdRef = useRef<string | null>(selectedId);
   const visibleAlertIdsRef = useRef<Set<string>>(new Set(visibleAlertIds));
   const adjustZoom = (delta: number) => {
@@ -324,6 +330,10 @@ export function GlobeView({
   useEffect(() => {
     regionFilterRef.current = regionFilter;
   }, [regionFilter]);
+
+  useEffect(() => {
+    regionsRef.current = new Set(regions.map(([r]) => r));
+  }, [regions]);
 
   useEffect(() => {
     selectedIdRef.current = selectedId;
@@ -992,13 +1002,18 @@ export function GlobeView({
       if (globeHits.length === 0) return;
       const hitPoint = globeHits[0].point;
       const { lat, lng } = vector3ToLatLng(hitPoint);
-      const region = latLngToRegion(lat, lng);
-      if (!region) return;
       const overlapped = findPixelClusterAt(clickPx, HOTSPOT_PIXEL_RADIUS * 1.35);
       const nearby = findNearbyVisibleAlertsAt(lat, lng);
       if (!openHotspotFromCluster(overlapped) && !openHotspotFromCluster(nearby)) {
         closeHotspot();
       }
+      // Resolve clicked point to a data-backed region
+      const detectedRegion = latLngToRegion(lat, lng);
+      if (!detectedRegion) return;
+      // Only select regions that actually have alerts in the current dataset
+      const dataRegions = regionsRef.current;
+      const region = dataRegions.has(detectedRegion) ? detectedRegion : null;
+      if (!region) return;
       const currentRegion = regionFilterRef.current;
       onRegionChange(currentRegion === region ? "all" : region);
     };
