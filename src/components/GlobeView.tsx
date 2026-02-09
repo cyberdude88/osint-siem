@@ -747,10 +747,14 @@ export function GlobeView({
       }
       activePointerId = e.pointerId;
       beginDrag(e.clientX, e.clientY);
-      try {
-        (e.currentTarget as Element).setPointerCapture?.(e.pointerId);
-      } catch {
-        // Ignore capture errors on unsupported environments.
+      // Pointer capture is useful for mouse drag continuity, but can interfere
+      // with multi-touch pinch tracking on some touch browsers.
+      if (e.pointerType !== "touch") {
+        try {
+          (e.currentTarget as Element).setPointerCapture?.(e.pointerId);
+        } catch {
+          // Ignore capture errors on unsupported environments.
+        }
       }
     };
     const applyDrag = (clientX: number, clientY: number) => {
