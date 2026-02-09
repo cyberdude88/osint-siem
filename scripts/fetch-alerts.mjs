@@ -161,6 +161,15 @@ const COUNTRY_CENTROIDS = {
   egypt: [26.8206, 30.8025],
   nigeria: [9.082, 8.6753],
   kenya: [-0.0236, 37.9062],
+  tanzania: [-6.369, 34.8888],
+  madagascar: [-18.7669, 46.8691],
+  uganda: [1.3733, 32.2903],
+  rwanda: [-1.9403, 29.8739],
+  zambia: [-13.1339, 27.8493],
+  zimbabwe: [-19.0154, 29.1549],
+  botswana: [-22.3285, 24.6849],
+  namibia: [-22.9576, 18.4904],
+  mozambique: [-18.6657, 35.5296],
   morocco: [31.7917, -7.0926],
   algeria: [28.0339, 1.6596],
   ghana: [7.9465, -1.0232],
@@ -320,6 +329,15 @@ const ISO2_COUNTRY_HINTS = {
   EG: "egypt",
   NG: "nigeria",
   KE: "kenya",
+  TZ: "tanzania",
+  MG: "madagascar",
+  UG: "uganda",
+  RW: "rwanda",
+  ZM: "zambia",
+  ZW: "zimbabwe",
+  BW: "botswana",
+  NA: "namibia",
+  MZ: "mozambique",
   MA: "morocco",
   DZ: "algeria",
   GH: "ghana",
@@ -473,6 +491,121 @@ const sources = [
   {
     type: "interpol-yellow-json",
     source: {
+      source_id: "interpol-yellow-za",
+      authority_name: "INTERPOL Yellow Notices (South Africa-linked)",
+      country: "South Africa",
+      country_code: "ZA",
+      region: "Africa",
+      authority_type: "police",
+      base_url: "https://www.interpol.int",
+    },
+    feed_url: "https://ws-public.interpol.int/notices/v1/yellow?resultPerPage=200&nationality=za",
+    max_items: 1200,
+    category: "missing_person",
+    region_tag: "ZA",
+    lat: -30.5595,
+    lng: 22.9375,
+    reporting: {
+      label: "Contact INTERPOL",
+      url: "https://www.interpol.int/Contacts",
+      notes: "Use official national police channels for emergencies.",
+    },
+  },
+  {
+    type: "interpol-yellow-json",
+    source: {
+      source_id: "interpol-yellow-ma",
+      authority_name: "INTERPOL Yellow Notices (Morocco-linked)",
+      country: "Morocco",
+      country_code: "MA",
+      region: "Africa",
+      authority_type: "police",
+      base_url: "https://www.interpol.int",
+    },
+    feed_url: "https://ws-public.interpol.int/notices/v1/yellow?resultPerPage=200&nationality=ma",
+    max_items: 1200,
+    category: "missing_person",
+    region_tag: "MA",
+    lat: 31.7917,
+    lng: -7.0926,
+    reporting: {
+      label: "Contact INTERPOL",
+      url: "https://www.interpol.int/Contacts",
+      notes: "Use official national police channels for emergencies.",
+    },
+  },
+  {
+    type: "interpol-yellow-json",
+    source: {
+      source_id: "interpol-yellow-tz",
+      authority_name: "INTERPOL Yellow Notices (Tanzania-linked)",
+      country: "Tanzania",
+      country_code: "TZ",
+      region: "Africa",
+      authority_type: "police",
+      base_url: "https://www.interpol.int",
+    },
+    feed_url: "https://ws-public.interpol.int/notices/v1/yellow?resultPerPage=200&nationality=tz",
+    max_items: 1200,
+    category: "missing_person",
+    region_tag: "TZ",
+    lat: -6.369,
+    lng: 34.8888,
+    reporting: {
+      label: "Contact INTERPOL",
+      url: "https://www.interpol.int/Contacts",
+      notes: "Use official national police channels for emergencies.",
+    },
+  },
+  {
+    type: "interpol-yellow-json",
+    source: {
+      source_id: "interpol-yellow-mg",
+      authority_name: "INTERPOL Yellow Notices (Madagascar-linked)",
+      country: "Madagascar",
+      country_code: "MG",
+      region: "Africa",
+      authority_type: "police",
+      base_url: "https://www.interpol.int",
+    },
+    feed_url: "https://ws-public.interpol.int/notices/v1/yellow?resultPerPage=200&nationality=mg",
+    max_items: 1200,
+    category: "missing_person",
+    region_tag: "MG",
+    lat: -18.7669,
+    lng: 46.8691,
+    reporting: {
+      label: "Contact INTERPOL",
+      url: "https://www.interpol.int/Contacts",
+      notes: "Use official national police channels for emergencies.",
+    },
+  },
+  {
+    type: "interpol-yellow-json",
+    source: {
+      source_id: "interpol-yellow-ng",
+      authority_name: "INTERPOL Yellow Notices (Sub-Saharan focus, Nigeria-linked)",
+      country: "Nigeria",
+      country_code: "NG",
+      region: "Africa",
+      authority_type: "police",
+      base_url: "https://www.interpol.int",
+    },
+    feed_url: "https://ws-public.interpol.int/notices/v1/yellow?resultPerPage=200&nationality=ng",
+    max_items: 1200,
+    category: "missing_person",
+    region_tag: "NG",
+    lat: 9.082,
+    lng: 8.6753,
+    reporting: {
+      label: "Contact INTERPOL",
+      url: "https://www.interpol.int/Contacts",
+      notes: "Use official national police channels for emergencies.",
+    },
+  },
+  {
+    type: "interpol-yellow-json",
+    source: {
       source_id: "interpol-yellow",
       authority_name: "INTERPOL Yellow Notices",
       country: "France",
@@ -482,7 +615,7 @@ const sources = [
       base_url: "https://www.interpol.int",
     },
     feed_url: "https://ws-public.interpol.int/notices/v1/yellow?resultPerPage=200",
-    max_items: 5000,
+    max_items: 8000,
     category: "missing_person",
     region_tag: "INT",
     lat: 45.76,
@@ -1461,6 +1594,35 @@ const sources = [
       phone: "10111 (Emergency) / 08600 10111 (Crime Stop)",
     },
   },
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "missing-children-za",
+      authority_name: "Missing Children South Africa",
+      country: "South Africa",
+      country_code: "ZA",
+      region: "Africa",
+      authority_type: "public_safety_program",
+      base_url: "https://missingchildren.org.za",
+    },
+    feed_url: "https://missingchildren.org.za/feed/",
+    feed_urls: [
+      "https://missingchildren.org.za/feed/",
+      "https://missingchildren.org.za/category/missing-children/feed/",
+      "https://missingchildren.org.za/category/cases/feed/",
+    ],
+    category: "missing_person",
+    region_tag: "ZA",
+    lat: -29.0,
+    lng: 24.0,
+    reporting: {
+      label: "Report to Missing Children SA",
+      url: "https://missingchildren.org.za/report/",
+      phone: "+27 72 647 7464",
+      notes: "Coordinate directly with SAPS in emergency situations.",
+    },
+  },
 
   // ── Crimestoppers UK (Europe) ───────────────────────────────────
   {
@@ -1645,6 +1807,447 @@ const sources = [
       label: "Report to Carabineros",
       url: "https://www.carabineros.cl/",
       phone: "133 (Emergency)",
+    },
+  },
+
+  // ── Policía Nacional del Perú (South America) ───────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "pnp-pe",
+      authority_name: "Policía Nacional del Perú",
+      country: "Peru",
+      country_code: "PE",
+      region: "South America",
+      authority_type: "police",
+      base_url: "https://www.policia.gob.pe",
+    },
+    feed_url: "https://www.policia.gob.pe/feed/",
+    feed_urls: [
+      "https://www.policia.gob.pe/feed/",
+      "https://www.policia.gob.pe/rss",
+      "https://www.gob.pe/institucion/pnp/noticias.rss",
+    ],
+    category: "public_appeal",
+    region_tag: "PE",
+    lat: -12.05,
+    lng: -77.04,
+    reporting: {
+      label: "Report to PNP Peru",
+      url: "https://www.policia.gob.pe/denuncia/",
+      phone: "105 (Emergency)",
+    },
+  },
+
+  // ── Policía Nacional Ecuador (South America) ────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "policia-ec",
+      authority_name: "Policía Nacional Ecuador",
+      country: "Ecuador",
+      country_code: "EC",
+      region: "South America",
+      authority_type: "police",
+      base_url: "https://www.policia.gob.ec",
+    },
+    feed_url: "https://www.policia.gob.ec/feed/",
+    feed_urls: [
+      "https://www.policia.gob.ec/feed/",
+      "https://www.policia.gob.ec/rss",
+      "https://www.policia.gob.ec/category/noticias/feed/",
+    ],
+    category: "public_appeal",
+    region_tag: "EC",
+    lat: -0.18,
+    lng: -78.47,
+    reporting: {
+      label: "Report to Policía Ecuador",
+      url: "https://www.policia.gob.ec/servicios/",
+      phone: "911 (Emergency) / 1800-DELITO",
+    },
+  },
+
+  // ── Policía Boliviana (South America) ───────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "policia-bo",
+      authority_name: "Policía Boliviana",
+      country: "Bolivia",
+      country_code: "BO",
+      region: "South America",
+      authority_type: "police",
+      base_url: "https://www.policia.bo",
+    },
+    feed_url: "https://www.policia.bo/feed/",
+    feed_urls: [
+      "https://www.policia.bo/feed/",
+      "https://www.policia.bo/rss",
+      "https://www.policia.bo/category/noticias/feed/",
+    ],
+    category: "public_appeal",
+    region_tag: "BO",
+    lat: -16.5,
+    lng: -68.15,
+    reporting: {
+      label: "Report to Policía Boliviana",
+      url: "https://www.policia.bo/",
+      phone: "110 (Emergency)",
+    },
+  },
+
+  // ── Policía Nacional Paraguay (South America) ───────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "policia-py",
+      authority_name: "Policía Nacional Paraguay",
+      country: "Paraguay",
+      country_code: "PY",
+      region: "South America",
+      authority_type: "police",
+      base_url: "https://www.policianacional.gov.py",
+    },
+    feed_url: "https://www.policianacional.gov.py/feed/",
+    feed_urls: [
+      "https://www.policianacional.gov.py/feed/",
+      "https://www.policianacional.gov.py/rss",
+      "https://www.policianacional.gov.py/category/noticias/feed/",
+    ],
+    category: "public_appeal",
+    region_tag: "PY",
+    lat: -25.29,
+    lng: -57.64,
+    reporting: {
+      label: "Report to Policía Paraguay",
+      url: "https://www.policianacional.gov.py/",
+      phone: "911 (Emergency)",
+    },
+  },
+
+  // ── Cibercrimen Chile / PDI (South America) ─────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "pdi-ciberchile",
+      authority_name: "PDI Chile Cibercrimen",
+      country: "Chile",
+      country_code: "CL",
+      region: "South America",
+      authority_type: "police",
+      base_url: "https://www.pdichile.cl",
+    },
+    feed_url: "https://www.pdichile.cl/feed/",
+    feed_urls: [
+      "https://www.pdichile.cl/feed/",
+      "https://www.pdichile.cl/rss",
+      "https://www.pdichile.cl/instituci%C3%B3n/noticias/feed",
+    ],
+    category: "cyber_advisory",
+    region_tag: "CL",
+    lat: -33.45,
+    lng: -70.66,
+    reporting: {
+      label: "Report Cybercrime to PDI",
+      url: "https://www.pdichile.cl/",
+      phone: "134 (PDI Emergency)",
+    },
+  },
+
+  // ── Fiscalía Argentina (South America) ──────────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "fiscales-ar",
+      authority_name: "Ministerio Público Fiscal Argentina",
+      country: "Argentina",
+      country_code: "AR",
+      region: "South America",
+      authority_type: "regulatory",
+      base_url: "https://www.fiscales.gob.ar",
+    },
+    feed_url: "https://www.fiscales.gob.ar/feed/",
+    feed_urls: [
+      "https://www.fiscales.gob.ar/feed/",
+      "https://www.fiscales.gob.ar/category/noticias/feed/",
+      "https://www.fiscales.gob.ar/category/cibercrimen/feed/",
+    ],
+    category: "public_safety",
+    region_tag: "AR",
+    lat: -34.61,
+    lng: -58.38,
+    reporting: {
+      label: "Report to Fiscalía Argentina",
+      url: "https://www.mpf.gob.ar/",
+      phone: "137 (Emergency advisory line)",
+    },
+  },
+
+  // ── NGO / Nonprofit: Missing Children Chile ─────────────────────
+  {
+    type: "rss",
+    followRedirects: true,
+    source: {
+      source_id: "missing-cl-ngo",
+      authority_name: "Fundación Extraviados Chile",
+      country: "Chile",
+      country_code: "CL",
+      region: "South America",
+      authority_type: "public_safety_program",
+      base_url: "https://www.extraviados.cl",
+    },
+    feed_url: "https://www.extraviados.cl/feed/",
+    feed_urls: [
+      "https://www.extraviados.cl/feed/",
+      "https://www.extraviados.cl/category/casos-vigentes/feed/",
+    ],
+    category: "missing_person",
+    region_tag: "CL",
+    lat: -33.43,
+    lng: -70.65,
+    reporting: {
+      label: "Report Missing Person in Chile",
+      url: "https://www.extraviados.cl/",
+      notes: "Coordinate with local police for urgent leads.",
+    },
+  },
+
+  // ── INTERPOL: South America Country-Specific Notices ────────────
+  {
+    type: "interpol-red-json",
+    source: {
+      source_id: "interpol-red-br",
+      authority_name: "INTERPOL Red Notices (Brazil-linked)",
+      country: "Brazil",
+      country_code: "BR",
+      region: "South America",
+      authority_type: "police",
+      base_url: "https://www.interpol.int",
+    },
+    feed_url: "https://ws-public.interpol.int/notices/v1/red?resultPerPage=200&nationality=br",
+    max_items: 160,
+    category: "wanted_suspect",
+    region_tag: "BR",
+    lat: -14.23,
+    lng: -51.92,
+    reporting: {
+      label: "Contact INTERPOL / Polícia Federal",
+      url: "https://www.interpol.int/Contacts",
+      notes: "Use official country police channels for emergencies.",
+    },
+  },
+  {
+    type: "interpol-yellow-json",
+    source: {
+      source_id: "interpol-yellow-br",
+      authority_name: "INTERPOL Yellow Notices (Brazil-linked)",
+      country: "Brazil",
+      country_code: "BR",
+      region: "South America",
+      authority_type: "police",
+      base_url: "https://www.interpol.int",
+    },
+    feed_url: "https://ws-public.interpol.int/notices/v1/yellow?resultPerPage=200&nationality=br",
+    max_items: 220,
+    category: "missing_person",
+    region_tag: "BR",
+    lat: -14.23,
+    lng: -51.92,
+    reporting: {
+      label: "Contact INTERPOL / Polícia Federal",
+      url: "https://www.interpol.int/Contacts",
+      notes: "Use official country police channels for emergencies.",
+    },
+  },
+  {
+    type: "interpol-red-json",
+    source: {
+      source_id: "interpol-red-ar",
+      authority_name: "INTERPOL Red Notices (Argentina-linked)",
+      country: "Argentina",
+      country_code: "AR",
+      region: "South America",
+      authority_type: "police",
+      base_url: "https://www.interpol.int",
+    },
+    feed_url: "https://ws-public.interpol.int/notices/v1/red?resultPerPage=200&nationality=ar",
+    max_items: 120,
+    category: "wanted_suspect",
+    region_tag: "AR",
+    lat: -38.41,
+    lng: -63.61,
+    reporting: {
+      label: "Contact INTERPOL / Argentine Police",
+      url: "https://www.interpol.int/Contacts",
+      notes: "Use official country police channels for emergencies.",
+    },
+  },
+  {
+    type: "interpol-yellow-json",
+    source: {
+      source_id: "interpol-yellow-ar",
+      authority_name: "INTERPOL Yellow Notices (Argentina-linked)",
+      country: "Argentina",
+      country_code: "AR",
+      region: "South America",
+      authority_type: "police",
+      base_url: "https://www.interpol.int",
+    },
+    feed_url: "https://ws-public.interpol.int/notices/v1/yellow?resultPerPage=200&nationality=ar",
+    max_items: 160,
+    category: "missing_person",
+    region_tag: "AR",
+    lat: -38.41,
+    lng: -63.61,
+    reporting: {
+      label: "Contact INTERPOL / Argentine Police",
+      url: "https://www.interpol.int/Contacts",
+      notes: "Use official country police channels for emergencies.",
+    },
+  },
+  {
+    type: "interpol-red-json",
+    source: {
+      source_id: "interpol-red-co",
+      authority_name: "INTERPOL Red Notices (Colombia-linked)",
+      country: "Colombia",
+      country_code: "CO",
+      region: "South America",
+      authority_type: "police",
+      base_url: "https://www.interpol.int",
+    },
+    feed_url: "https://ws-public.interpol.int/notices/v1/red?resultPerPage=200&nationality=co",
+    max_items: 120,
+    category: "wanted_suspect",
+    region_tag: "CO",
+    lat: 4.57,
+    lng: -74.29,
+    reporting: {
+      label: "Contact INTERPOL / Colombia Police",
+      url: "https://www.interpol.int/Contacts",
+      notes: "Use official country police channels for emergencies.",
+    },
+  },
+  {
+    type: "interpol-yellow-json",
+    source: {
+      source_id: "interpol-yellow-co",
+      authority_name: "INTERPOL Yellow Notices (Colombia-linked)",
+      country: "Colombia",
+      country_code: "CO",
+      region: "South America",
+      authority_type: "police",
+      base_url: "https://www.interpol.int",
+    },
+    feed_url: "https://ws-public.interpol.int/notices/v1/yellow?resultPerPage=200&nationality=co",
+    max_items: 180,
+    category: "missing_person",
+    region_tag: "CO",
+    lat: 4.57,
+    lng: -74.29,
+    reporting: {
+      label: "Contact INTERPOL / Colombia Police",
+      url: "https://www.interpol.int/Contacts",
+      notes: "Use official country police channels for emergencies.",
+    },
+  },
+  {
+    type: "interpol-red-json",
+    source: {
+      source_id: "interpol-red-pe",
+      authority_name: "INTERPOL Red Notices (Peru-linked)",
+      country: "Peru",
+      country_code: "PE",
+      region: "South America",
+      authority_type: "police",
+      base_url: "https://www.interpol.int",
+    },
+    feed_url: "https://ws-public.interpol.int/notices/v1/red?resultPerPage=200&nationality=pe",
+    max_items: 120,
+    category: "wanted_suspect",
+    region_tag: "PE",
+    lat: -9.19,
+    lng: -75.01,
+    reporting: {
+      label: "Contact INTERPOL / Peru Police",
+      url: "https://www.interpol.int/Contacts",
+      notes: "Use official country police channels for emergencies.",
+    },
+  },
+  {
+    type: "interpol-yellow-json",
+    source: {
+      source_id: "interpol-yellow-pe",
+      authority_name: "INTERPOL Yellow Notices (Peru-linked)",
+      country: "Peru",
+      country_code: "PE",
+      region: "South America",
+      authority_type: "police",
+      base_url: "https://www.interpol.int",
+    },
+    feed_url: "https://ws-public.interpol.int/notices/v1/yellow?resultPerPage=200&nationality=pe",
+    max_items: 180,
+    category: "missing_person",
+    region_tag: "PE",
+    lat: -9.19,
+    lng: -75.01,
+    reporting: {
+      label: "Contact INTERPOL / Peru Police",
+      url: "https://www.interpol.int/Contacts",
+      notes: "Use official country police channels for emergencies.",
+    },
+  },
+  {
+    type: "interpol-red-json",
+    source: {
+      source_id: "interpol-red-cl",
+      authority_name: "INTERPOL Red Notices (Chile-linked)",
+      country: "Chile",
+      country_code: "CL",
+      region: "South America",
+      authority_type: "police",
+      base_url: "https://www.interpol.int",
+    },
+    feed_url: "https://ws-public.interpol.int/notices/v1/red?resultPerPage=200&nationality=cl",
+    max_items: 100,
+    category: "wanted_suspect",
+    region_tag: "CL",
+    lat: -35.67,
+    lng: -71.54,
+    reporting: {
+      label: "Contact INTERPOL / Chile Police",
+      url: "https://www.interpol.int/Contacts",
+      notes: "Use official country police channels for emergencies.",
+    },
+  },
+  {
+    type: "interpol-yellow-json",
+    source: {
+      source_id: "interpol-yellow-cl",
+      authority_name: "INTERPOL Yellow Notices (Chile-linked)",
+      country: "Chile",
+      country_code: "CL",
+      region: "South America",
+      authority_type: "police",
+      base_url: "https://www.interpol.int",
+    },
+    feed_url: "https://ws-public.interpol.int/notices/v1/yellow?resultPerPage=200&nationality=cl",
+    max_items: 160,
+    category: "missing_person",
+    region_tag: "CL",
+    lat: -35.67,
+    lng: -71.54,
+    reporting: {
+      label: "Contact INTERPOL / Chile Police",
+      url: "https://www.interpol.int/Contacts",
+      notes: "Use official country police channels for emergencies.",
     },
   },
 
@@ -2745,6 +3348,36 @@ function inferCountryFromIsoCodes(values) {
   return null;
 }
 
+function inferCountryHintFromIsoCodes(values) {
+  const list = Array.isArray(values) ? values : [values];
+  for (const value of list) {
+    const code = String(value ?? "").trim().toUpperCase();
+    const name = ISO2_COUNTRY_HINTS[code];
+    if (!name) continue;
+    return { code, name };
+  }
+  return null;
+}
+
+function toDisplayCountryName(countryName) {
+  return String(countryName ?? "")
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((token) => token.charAt(0).toUpperCase() + token.slice(1))
+    .join(" ");
+}
+
+function inferRegionFromCoords(lat, lng) {
+  if (lat >= 7 && lat <= 83 && lng >= -168 && lng <= -52) return "North America";
+  if (lat >= -56 && lat <= 13 && lng >= -82 && lng <= -35) return "South America";
+  if (lat >= 35 && lat <= 72 && lng >= -11 && lng <= 40) return "Europe";
+  if (lat >= -35 && lat <= 37 && lng >= -17 && lng <= 51) return "Africa";
+  if (lat >= 5 && lat <= 77 && lng >= 40 && lng <= 180) return "Asia";
+  if (lat >= -50 && lat <= 10 && lng >= 110 && lng <= 180) return "Oceania";
+  if (lat < -60) return "Antarctica";
+  return "International";
+}
+
 function extractUrlLocationText(urlValue) {
   try {
     const url = new URL(String(urlValue));
@@ -3059,10 +3692,20 @@ async function fetchInterpolNotices(meta, now) {
       `${title} ${extractUrlLocationText(canonicalUrl)}`,
       `${meta.source.source_id}:${canonicalUrl}`
     );
+    const countryHint =
+      inferCountryHintFromIsoCodes(notice?.countries_likely_to_be_visited) ||
+      inferCountryHintFromIsoCodes(notice?.nationalities);
+    const derivedRegion = inferRegionFromCoords(jitter.lat, jitter.lng);
+    const derivedSource = {
+      ...meta.source,
+      country: countryHint ? toDisplayCountryName(countryHint.name) : meta.source.country,
+      country_code: countryHint?.code ?? meta.source.country_code,
+      region: derivedRegion || meta.source.region,
+    };
     const alert = {
       alert_id: `${meta.source.source_id}-${hashId(canonicalUrl + title)}`,
       source_id: meta.source.source_id,
-      source: meta.source,
+      source: derivedSource,
       title,
       canonical_url: canonicalUrl,
       first_seen: now.toISOString(),
@@ -3070,7 +3713,7 @@ async function fetchInterpolNotices(meta, now) {
       status: "active",
       category: meta.category,
       severity: "critical",
-      region_tag: meta.region_tag,
+      region_tag: countryHint?.code ?? meta.region_tag,
       lat: jitter.lat,
       lng: jitter.lng,
       freshness_hours: 1,
