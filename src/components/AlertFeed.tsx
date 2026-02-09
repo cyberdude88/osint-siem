@@ -146,12 +146,10 @@ export function AlertFeed({
   const activeNavigatorGroup =
     navigatorGroups.find((group) => group.key === activeNavigatorGroupKey) ?? null;
 
+  // Keep globe visibility aligned with current filters, not only the active navigator bucket.
   const visibleAlertIds = useMemo(
-    () =>
-      viewMode === "navigator" && activeNavigatorGroup
-        ? activeNavigatorGroup.alerts.map((a) => a.alert_id)
-        : facetFiltered.map((a) => a.alert_id),
-    [activeNavigatorGroup, facetFiltered, viewMode]
+    () => facetFiltered.map((a) => a.alert_id),
+    [facetFiltered]
   );
 
   useEffect(() => {
