@@ -30,9 +30,11 @@ export function AlertFeed({
   onVisibleAlertIdsChange,
   onHideDesktop,
 }: Props) {
+  const [viewMode, setViewMode] = useState<"navigator" | "timeline">("navigator");
   const [actionableOnly, setActionableOnly] = useState(true);
   const [categoryFilter, setCategoryFilter] = useState<AlertCategory | "all">("all");
   const [severityFilter, setSeverityFilter] = useState<Severity | "all">("all");
+  const [activeNavigatorGroupKey, setActiveNavigatorGroupKey] = useState<string | null>(null);
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set());
   const [isRefreshingList, setIsRefreshingList] = useState(false);
   const [newAlertIds, setNewAlertIds] = useState<Set<string>>(new Set());
@@ -82,9 +84,73 @@ export function AlertFeed({
     }))
     .filter((group) => group.alerts.length > 0);
 
+  const navigatorGroups = useMemo(() => {
+    const buckets = new Map<
+      string,
+      {
+        key: string;
+        region: string;
+        category: AlertCategory;
+        alerts: Alert[];
+        total: number;
+        critical: number;
+      }
+    >();
+    facetFiltered.forEach((alert) => {
+      const key = `${alert.source.region}::${alert.category}`;
+      const existing = buckets.get(key);
+      if (existing) {
+        existing.alerts.push(alert);
+        existing.total += 1;
+        if (alert.severity === "critical") existing.critical += 1;
+        return;
+      }
+      buckets.set(key, {
+        key,
+        region: alert.source.region,
+        category: alert.category,
+        alerts: [alert],
+        total: 1,
+        critical: alert.severity === "critical" ? 1 : 0,
+      });
+    });
+    return [...buckets.values()]
+      .map((group) => ({
+        ...group,
+        alerts: [...group.alerts].sort(
+          (a, b) => new Date(b.first_seen).getTime() - new Date(a.first_seen).getTime()
+        ),
+      }))
+      .sort((a, b) => {
+        const criticalDelta = b.critical - a.critical;
+        if (criticalDelta !== 0) return criticalDelta;
+        return b.total - a.total;
+      });
+  }, [facetFiltered]);
+
+  useEffect(() => {
+    if (navigatorGroups.length === 0) {
+      setActiveNavigatorGroupKey(null);
+      return;
+    }
+    if (
+      activeNavigatorGroupKey &&
+      navigatorGroups.some((group) => group.key === activeNavigatorGroupKey)
+    ) {
+      return;
+    }
+    setActiveNavigatorGroupKey(navigatorGroups[0].key);
+  }, [activeNavigatorGroupKey, navigatorGroups]);
+
+  const activeNavigatorGroup =
+    navigatorGroups.find((group) => group.key === activeNavigatorGroupKey) ?? null;
+
   const visibleAlertIds = useMemo(
-    () => facetFiltered.map((a) => a.alert_id),
-    [facetFiltered]
+    () =>
+      viewMode === "navigator" && activeNavigatorGroup
+        ? activeNavigatorGroup.alerts.map((a) => a.alert_id)
+        : facetFiltered.map((a) => a.alert_id),
+    [activeNavigatorGroup, facetFiltered, viewMode]
   );
 
   useEffect(() => {
@@ -321,72 +387,192 @@ export function AlertFeed({
           isRefreshingList ? "animate-alert-list-refresh" : ""
         }`}
       >
-        {grouped.map((group) => (
-          <section
-            key={group.category}
-            className="rounded-lg border border-siem-border bg-siem-panel/35 overflow-hidden"
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => setViewMode("navigator")}
+            className={`rounded border px-2 py-1.5 text-[10px] font-mono uppercase tracking-wider transition-colors ${
+              viewMode === "navigator"
+                ? "bg-siem-accent/18 text-siem-accent border-siem-accent/35"
+                : "bg-white/5 text-siem-muted border-siem-border hover:bg-siem-accent/10 hover:text-siem-accent"
+            }`}
           >
-            <button
-              type="button"
-              onClick={() => toggleSection(group.category)}
-              className="w-full flex items-center justify-between px-3 py-2 border-b border-siem-border bg-siem-panel/70 hover:bg-siem-accent/10 transition-colors"
-            >
-              <div className="flex items-center gap-2">
-                {collapsedSections.has(group.category) ? (
-                  <ChevronRight size={12} className="text-siem-muted" />
-                ) : (
-                  <ChevronDown size={12} className="text-siem-muted" />
-                )}
-              <span
-                className={`inline-flex items-center px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded border ${categoryBadge[group.category]}`}
-              >
-                {categoryLabels[group.category]}
-              </span>
+            Case Navigator
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("timeline")}
+            className={`rounded border px-2 py-1.5 text-[10px] font-mono uppercase tracking-wider transition-colors ${
+              viewMode === "timeline"
+                ? "bg-siem-accent/18 text-siem-accent border-siem-accent/35"
+                : "bg-white/5 text-siem-muted border-siem-border hover:bg-siem-accent/10 hover:text-siem-accent"
+            }`}
+          >
+            Timeline
+          </button>
+        </div>
+        {viewMode === "navigator" ? (
+          <>
+            <div className="grid grid-cols-3 gap-2 text-[10px] font-mono uppercase tracking-wide">
+              <div className="rounded border border-siem-border bg-white/5 px-2 py-1">
+                <span className="text-siem-muted">Cases</span>{" "}
+                <span className="text-siem-text">{facetFiltered.length}</span>
               </div>
-              <span className="text-[10px] text-siem-muted font-mono uppercase tracking-wide">
-                {group.alerts.length}
-              </span>
-            </button>
-            {!collapsedSections.has(group.category) && (
-              <div className="p-2 space-y-2">
-                {group.alerts.map((alert, idx) => renderAlertCard(alert, "Stack", idx))}
-              </div>
-            )}
-          </section>
-        ))}
-        {infoAlerts.length > 0 && (
-          <section className="rounded-lg border border-siem-border bg-siem-panel/35 overflow-hidden">
-            <button
-              type="button"
-              onClick={() => toggleSection("informational")}
-              className="w-full flex items-center justify-between px-3 py-2 border-b border-siem-border bg-siem-panel/70 hover:bg-siem-accent/10 transition-colors"
-            >
-              <div className="flex items-center gap-2">
-                {collapsedSections.has("informational") ? (
-                  <ChevronRight size={12} className="text-siem-muted" />
-                ) : (
-                  <ChevronDown size={12} className="text-siem-muted" />
-                )}
-                <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded border bg-cyan-500/15 text-cyan-300 border-cyan-500/30">
-                  Informational / Traffic
+              <div className="rounded border border-siem-border bg-white/5 px-2 py-1">
+                <span className="text-siem-muted">Critical</span>{" "}
+                <span className="text-siem-text">
+                  {facetFiltered.filter((a) => a.severity === "critical").length}
                 </span>
               </div>
-              <span className="text-[10px] text-siem-muted font-mono uppercase tracking-wide">
-                {infoAlerts.length}
-              </span>
-            </button>
-            {!collapsedSections.has("informational") && (
-              <div className="p-2 space-y-2">
-                {infoAlerts.map((alert, idx) => renderAlertCard(alert, "Stack", idx))}
+              <div className="rounded border border-siem-border bg-white/5 px-2 py-1">
+                <span className="text-siem-muted">Countries</span>{" "}
+                <span className="text-siem-text">
+                  {new Set(facetFiltered.map((a) => a.source.country_code)).size}
+                </span>
               </div>
+            </div>
+            {navigatorGroups.length > 0 && (
+              <section className="rounded-lg border border-siem-border bg-siem-panel/35 overflow-hidden">
+                <div className="px-3 py-2 border-b border-siem-border bg-siem-panel/70 text-[10px] font-mono uppercase tracking-wider text-siem-muted">
+                  Navigate By Region + Case Type
+                </div>
+                <div className="p-2 space-y-1.5 max-h-[200px] overflow-y-auto">
+                  {navigatorGroups.map((group) => (
+                    <button
+                      key={group.key}
+                      type="button"
+                      onClick={() => setActiveNavigatorGroupKey(group.key)}
+                      className={`w-full text-left rounded border px-2 py-1.5 transition-colors ${
+                        activeNavigatorGroupKey === group.key
+                          ? "bg-siem-accent/12 border-siem-accent/35"
+                          : "bg-white/5 border-siem-border hover:bg-siem-accent/8"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-[10px] text-siem-text uppercase tracking-wide truncate">
+                          {group.region}
+                        </span>
+                        <span className="text-[10px] text-siem-muted font-mono">{group.total}</span>
+                      </div>
+                      <div className="mt-1 flex items-center justify-between gap-2">
+                        <span
+                          className={`inline-flex items-center px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded border ${categoryBadge[group.category]}`}
+                        >
+                          {categoryLabels[group.category]}
+                        </span>
+                        {group.critical > 0 && (
+                          <span className="text-[10px] text-red-300 font-mono">
+                            {group.critical} critical
+                          </span>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </section>
             )}
-          </section>
+            {activeNavigatorGroup && (
+              <section className="rounded-lg border border-siem-border bg-siem-panel/35 overflow-hidden">
+                <div className="px-3 py-2 border-b border-siem-border bg-siem-panel/70 flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="text-[10px] uppercase tracking-wider text-siem-muted">Case Queue</p>
+                    <p className="text-xs text-siem-text truncate">
+                      {activeNavigatorGroup.region} •{" "}
+                      {categoryLabels[activeNavigatorGroup.category]}
+                    </p>
+                  </div>
+                  <span className="text-[10px] text-siem-muted font-mono">
+                    {activeNavigatorGroup.total}
+                  </span>
+                </div>
+                <div className="p-2 space-y-2">
+                  {activeNavigatorGroup.alerts.map((alert, idx) =>
+                    renderAlertCard(alert, "Case", idx)
+                  )}
+                </div>
+              </section>
+            )}
+          </>
+        ) : (
+          <>
+            {grouped.map((group) => (
+              <section
+                key={group.category}
+                className="rounded-lg border border-siem-border bg-siem-panel/35 overflow-hidden"
+              >
+                <button
+                  type="button"
+                  onClick={() => toggleSection(group.category)}
+                  className="w-full flex items-center justify-between px-3 py-2 border-b border-siem-border bg-siem-panel/70 hover:bg-siem-accent/10 transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    {collapsedSections.has(group.category) ? (
+                      <ChevronRight size={12} className="text-siem-muted" />
+                    ) : (
+                      <ChevronDown size={12} className="text-siem-muted" />
+                    )}
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded border ${categoryBadge[group.category]}`}
+                    >
+                      {categoryLabels[group.category]}
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-siem-muted font-mono uppercase tracking-wide">
+                    {group.alerts.length}
+                  </span>
+                </button>
+                {!collapsedSections.has(group.category) && (
+                  <div className="p-2 space-y-2">
+                    {group.alerts.map((alert, idx) => renderAlertCard(alert, "Stack", idx))}
+                  </div>
+                )}
+              </section>
+            ))}
+            {infoAlerts.length > 0 && (
+              <section className="rounded-lg border border-siem-border bg-siem-panel/35 overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => toggleSection("informational")}
+                  className="w-full flex items-center justify-between px-3 py-2 border-b border-siem-border bg-siem-panel/70 hover:bg-siem-accent/10 transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    {collapsedSections.has("informational") ? (
+                      <ChevronRight size={12} className="text-siem-muted" />
+                    ) : (
+                      <ChevronDown size={12} className="text-siem-muted" />
+                    )}
+                    <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded border bg-cyan-500/15 text-cyan-300 border-cyan-500/30">
+                      Informational / Traffic
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-siem-muted font-mono uppercase tracking-wide">
+                    {infoAlerts.length}
+                  </span>
+                </button>
+                {!collapsedSections.has("informational") && (
+                  <div className="p-2 space-y-2">
+                    {infoAlerts.map((alert, idx) => renderAlertCard(alert, "Stack", idx))}
+                  </div>
+                )}
+              </section>
+            )}
+          </>
         )}
         {facetFiltered.length === 0 && (
           <div className="rounded-lg border border-siem-border bg-siem-panel/35 p-4 text-center">
-            <p className="text-xs text-siem-muted uppercase tracking-wider">
-              No alerts match current queue filters
-            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setActionableOnly(false);
+                setCategoryFilter("all");
+                setSeverityFilter("all");
+                onRegionChange("all");
+              }}
+              className="rounded border border-siem-border bg-white/5 px-2 py-1 text-[10px] text-siem-muted hover:bg-siem-accent/10 hover:text-siem-accent mb-2"
+            >
+              Reset filters
+            </button>
+            <p className="text-xs text-siem-muted uppercase tracking-wider">No cases match current filters</p>
           </div>
         )}
       </div>
