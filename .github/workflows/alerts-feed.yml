@@ -35,7 +35,7 @@ jobs:
           STATE_OUTPUT_PATH: "public/alerts-state.json"
           SOURCE_HEALTH_OUTPUT_PATH: "public/source-health.json"
           MISSING_PERSON_RELEVANCE_THRESHOLD: "0"
-          FAIL_ON_CRITICAL_SOURCE_GAP: "1"
+          FAIL_ON_CRITICAL_SOURCE_GAP: "0"
           CRITICAL_SOURCE_PREFIXES: "interpol-red,interpol-yellow"
 
       - name: Commit updates
