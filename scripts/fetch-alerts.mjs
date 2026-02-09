@@ -9,6 +9,8 @@ const FILTERED_OUTPUT_PATH =
   process.env.FILTERED_OUTPUT_PATH ?? "public/alerts-filtered.json";
 const SOURCE_HEALTH_OUTPUT_PATH =
   process.env.SOURCE_HEALTH_OUTPUT_PATH ?? "public/source-health.json";
+const SOURCE_REGISTRY_PATH =
+  process.env.SOURCE_REGISTRY_PATH ?? "registry/source_registry.json";
 const MAX_AGE_DAYS = Number.parseInt(process.env.MAX_AGE_DAYS ?? "180", 10);
 const REMOVED_RETENTION_DAYS = Number.parseInt(
   process.env.REMOVED_RETENTION_DAYS ?? "14",
@@ -30,6 +32,7 @@ const CRITICAL_SOURCE_PREFIXES = (process.env.CRITICAL_SOURCE_PREFIXES ??
 const WATCH =
   process.argv.includes("--watch") || process.env.WATCH === "1";
 const INTERVAL_MS = Number.parseInt(process.env.INTERVAL_MS ?? "900000", 10);
+let externalSourcesCache = null;
 
 const US_STATE_CENTROIDS = {
   alabama: [32.806671, -86.79113],
@@ -3514,6 +3517,87 @@ function hashToUnit(value) {
   return Number.parseInt(hex, 16) / 0xffffffff;
 }
 
+function normalizeHeadline(value) {
+  return String(value ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function compareAlertPreference(a, b) {
+  const scoreA = Number(a?.triage?.relevance_score ?? 0);
+  const scoreB = Number(b?.triage?.relevance_score ?? 0);
+  if (scoreA !== scoreB) return scoreB - scoreA;
+  const seenA = new Date(a?.first_seen ?? 0).getTime();
+  const seenB = new Date(b?.first_seen ?? 0).getTime();
+  if (seenA !== seenB) return seenB - seenA;
+  const urlLenA = String(a?.canonical_url ?? "").length;
+  const urlLenB = String(b?.canonical_url ?? "").length;
+  return urlLenA - urlLenB;
+}
+
+function buildVariantCollapseKey(alert) {
+  const titleNorm = normalizeHeadline(alert?.title);
+  if (!titleNorm || titleNorm.length < 24) return null;
+  const sourceId = String(alert?.source_id ?? "").toLowerCase();
+  if (!sourceId) return null;
+  try {
+    const url = new URL(String(alert?.canonical_url ?? ""));
+    const host = url.hostname.toLowerCase().replace(/^www\./, "");
+    const path = url.pathname.replace(/\/+$/, "");
+    const segments = path.split("/").filter(Boolean);
+    const leaf = segments[segments.length - 1] ?? "";
+    if (!/-\d+$/.test(leaf)) return null;
+    const familyLeaf = leaf.replace(/-\d+$/, "");
+    const familyPath = `/${segments.slice(0, -1).concat(familyLeaf).join("/")}`;
+    return `${sourceId}|${host}${familyPath}|${titleNorm}`;
+  } catch {
+    return null;
+  }
+}
+
+function collapseRecurringHeadlineVariants(alerts) {
+  const byVariant = new Map();
+  const passthrough = [];
+  for (const alert of alerts) {
+    const key = buildVariantCollapseKey(alert);
+    if (!key) {
+      passthrough.push(alert);
+      continue;
+    }
+    const list = byVariant.get(key) ?? [];
+    list.push(alert);
+    byVariant.set(key, list);
+  }
+
+  const kept = [...passthrough];
+  const suppressed = [];
+  for (const list of byVariant.values()) {
+    if (list.length === 1) {
+      kept.push(list[0]);
+      continue;
+    }
+    list.sort(compareAlertPreference);
+    kept.push(list[0]);
+    suppressed.push(...list.slice(1));
+  }
+  return { kept, suppressed };
+}
+
+function summarizeTitleDuplicates(alerts) {
+  const counts = new Map();
+  for (const alert of alerts) {
+    const key = normalizeHeadline(alert?.title);
+    if (!key) continue;
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  return [...counts.entries()]
+    .filter(([, count]) => count > 1)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 25)
+    .map(([title, count]) => ({ title, count }));
+}
+
 function jitterCoords(lat, lng, seed, minRadiusKm = 22, maxRadiusKm = 77) {
   // Spread alerts around a base point so multiple notices don't collapse into one dot.
   const angle = hashToUnit(`${seed}:a`) * Math.PI * 2;
@@ -3759,6 +3843,99 @@ async function translateBatch(items) {
   return results;
 }
 
+function stripHtmlTags(value) {
+  return String(value ?? "")
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, "\"")
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function parseHtmlAnchors(html, baseUrl) {
+  const anchors = [];
+  const seen = new Set();
+  const anchorRe = /<a\b[^>]*href=(["'])(.*?)\1[^>]*>([\s\S]*?)<\/a>/gi;
+  let match;
+  while ((match = anchorRe.exec(html)) !== null) {
+    const rawHref = String(match[2] ?? "").trim();
+    if (!rawHref || rawHref.startsWith("#")) continue;
+    const title = stripHtmlTags(match[3] ?? "");
+    if (!title || title.length < 8) continue;
+    let link;
+    try {
+      link = new URL(rawHref, baseUrl).toString();
+    } catch {
+      continue;
+    }
+    if (seen.has(link)) continue;
+    seen.add(link);
+    anchors.push({ title, link, summary: "" });
+  }
+  return anchors;
+}
+
+function normalizeExternalSource(entry) {
+  if (!entry || typeof entry !== "object") return null;
+  const source = entry.source;
+  if (!source || typeof source !== "object") return null;
+  if (!source.source_id || !source.authority_name || !entry.type || !entry.category) {
+    return null;
+  }
+  const normalized = {
+    ...entry,
+    source: {
+      ...source,
+      source_id: String(source.source_id),
+      authority_name: String(source.authority_name),
+      country: String(source.country ?? "Unknown"),
+      country_code: String(source.country_code ?? "XX"),
+      region: String(source.region ?? "International"),
+      authority_type: String(source.authority_type ?? "public_safety_program"),
+      base_url: String(source.base_url ?? entry.feed_url ?? ""),
+    },
+  };
+  return normalized;
+}
+
+async function loadExternalSources() {
+  if (externalSourcesCache) return externalSourcesCache;
+  try {
+    const raw = await readFile(SOURCE_REGISTRY_PATH, "utf8");
+    const parsed = JSON.parse(raw);
+    const list = Array.isArray(parsed) ? parsed : [];
+    const normalized = list
+      .map(normalizeExternalSource)
+      .filter(Boolean);
+    externalSourcesCache = normalized;
+    return normalized;
+  } catch (error) {
+    console.warn(`WARN source registry: ${error.message}`);
+    externalSourcesCache = [];
+    return [];
+  }
+}
+
+async function getAllSources() {
+  const extra = await loadExternalSources();
+  if (extra.length === 0) return sources;
+  const seen = new Set();
+  const merged = [];
+  for (const entry of [...sources, ...extra]) {
+    const id = String(entry?.source?.source_id ?? "");
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    merged.push(entry);
+  }
+  return merged;
+}
+
 async function fetchFeed(url, followRedirects = false) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 15000);
@@ -3845,6 +4022,71 @@ async function fetchRss(meta, now) {
       }),
     };
   }).filter(Boolean);
+}
+
+async function fetchHtmlList(meta, now) {
+  const limit = Math.max(1, Number(meta?.max_items ?? MAX_PER_SOURCE));
+  const { xml: html, feedUrl } = await fetchFeedWithFallback(
+    meta.feed_urls ?? [meta.feed_url],
+    meta.followRedirects ?? true
+  );
+  let items = parseHtmlAnchors(html, feedUrl);
+  const includeKeywords = Array.isArray(meta?.include_keywords)
+    ? meta.include_keywords.map((value) => String(value).toLowerCase()).filter(Boolean)
+    : [];
+  const excludeKeywords = Array.isArray(meta?.exclude_keywords)
+    ? meta.exclude_keywords.map((value) => String(value).toLowerCase()).filter(Boolean)
+    : [];
+  if (includeKeywords.length > 0) {
+    items = items.filter((item) => {
+      const hay = `${item.title} ${item.link}`.toLowerCase();
+      return includeKeywords.some((keyword) => hay.includes(keyword));
+    });
+  }
+  if (excludeKeywords.length > 0) {
+    items = items.filter((item) => {
+      const hay = `${item.title} ${item.link}`.toLowerCase();
+      return !excludeKeywords.some((keyword) => hay.includes(keyword));
+    });
+  }
+  items = items.slice(0, limit);
+
+  return items
+    .map((item) => {
+      const publishedAt = now;
+      const hours = Math.max(1, Math.round((now - publishedAt) / 36e5));
+      const jitter = resolveCoords(
+        meta,
+        `${item.title} ${item.link} ${extractUrlLocationText(item.link)}`,
+        `${meta.source.source_id}:${item.link}`
+      );
+      const alert = {
+        alert_id: `${meta.source.source_id}-${hashId(item.link)}`,
+        source_id: meta.source.source_id,
+        source: meta.source,
+        title: item.title,
+        canonical_url: item.link,
+        first_seen: publishedAt.toISOString(),
+        last_seen: now.toISOString(),
+        status: "active",
+        category: meta.category,
+        severity: inferSeverity(item.title, defaultSeverity(meta.category)),
+        region_tag: meta.region_tag,
+        lat: jitter.lat,
+        lng: jitter.lng,
+        freshness_hours: hours,
+        reporting: meta.reporting,
+      };
+      return {
+        ...alert,
+        triage: scoreIncidentRelevance(alert, {
+          summary: item.summary,
+          tags: [],
+          metaHints: { feedType: meta.type },
+        }),
+      };
+    })
+    .filter(Boolean);
 }
 
 async function fetchKev(meta) {
@@ -4036,8 +4278,9 @@ async function buildAlerts() {
   const now = new Date();
   const alerts = [];
   const sourceHealth = [];
+  const sourceEntries = await getAllSources();
 
-  for (const entry of sources) {
+  for (const entry of sourceEntries) {
     const sourceId = entry.source.source_id;
     const startedAt = new Date().toISOString();
     try {
@@ -4046,6 +4289,8 @@ async function buildAlerts() {
           ? await fetchKev(entry)
           : entry.type === "interpol-red-json" || entry.type === "interpol-yellow-json"
           ? await fetchInterpolNotices(entry, now)
+          : entry.type === "html-list"
+          ? await fetchHtmlList(entry, now)
           : await fetchRss(entry, now);
       alerts.push(...batch);
       sourceHealth.push({
@@ -4085,13 +4330,17 @@ async function buildAlerts() {
     }
   }
   const deduped = [...dedupedByKey.values()];
+  const {
+    kept: variantCollapsed,
+    suppressed: suppressedVariants,
+  } = collapseRecurringHeadlineVariants(deduped);
   const threshold = clamp01(INCIDENT_RELEVANCE_THRESHOLD);
-  const active = deduped.filter(
+  const active = variantCollapsed.filter(
     (alert) =>
       Number(alert?.triage?.relevance_score ?? 0) >=
       thresholdForAlert(alert, threshold)
   );
-  const filtered = deduped.filter(
+  const filtered = variantCollapsed.filter(
     (alert) =>
       Number(alert?.triage?.relevance_score ?? 0) <
       thresholdForAlert(alert, threshold)
@@ -4115,7 +4364,18 @@ async function buildAlerts() {
     entry.active_count = activeBySource[entry.source_id] ?? 0;
     entry.filtered_count = filteredBySource[entry.source_id] ?? 0;
   });
-  return { active, filtered, sourceHealth };
+  const duplicateHeadlineSamples = summarizeTitleDuplicates(active);
+  const duplicateAudit = {
+    suppressed_variant_duplicates: suppressedVariants.length,
+    repeated_title_groups_in_active: duplicateHeadlineSamples.length,
+    repeated_title_samples: duplicateHeadlineSamples,
+  };
+  if (suppressedVariants.length > 0) {
+    console.log(
+      `Suppressed ${suppressedVariants.length} recurring headline variants`
+    );
+  }
+  return { active, filtered, sourceHealth, duplicateAudit };
 }
 
 async function readAlertsFile(path) {
@@ -4201,7 +4461,13 @@ function assertCriticalSourceCoverage(sourceHealth) {
   }
 }
 
-async function writeAlerts(activeAlerts, filteredAlerts, stateAlerts, sourceHealth) {
+async function writeAlerts(
+  activeAlerts,
+  filteredAlerts,
+  stateAlerts,
+  sourceHealth,
+  duplicateAudit
+) {
   await mkdir(dirname(OUTPUT_PATH), { recursive: true });
   await mkdir(dirname(STATE_OUTPUT_PATH), { recursive: true });
   await mkdir(dirname(FILTERED_OUTPUT_PATH), { recursive: true });
@@ -4220,6 +4486,7 @@ async function writeAlerts(activeAlerts, filteredAlerts, stateAlerts, sourceHeal
     total_sources: sourceHealth.length,
     sources_ok: sourceHealth.filter((entry) => entry.status === "ok").length,
     sources_error: sourceHealth.filter((entry) => entry.status === "error").length,
+    duplicate_audit: duplicateAudit,
     sources: sourceHealth,
   };
   await writeFile(
@@ -4235,7 +4502,7 @@ async function writeAlerts(activeAlerts, filteredAlerts, stateAlerts, sourceHeal
 }
 
 async function main() {
-  const { active, filtered, sourceHealth } = await buildAlerts();
+  const { active, filtered, sourceHealth, duplicateAudit } = await buildAlerts();
   assertCriticalSourceCoverage(sourceHealth);
   const previous =
     (await readAlertsFile(STATE_OUTPUT_PATH)).length > 0
@@ -4247,7 +4514,13 @@ async function main() {
     previous,
     new Date()
   );
-  await writeAlerts(currentActive, currentFiltered, state, sourceHealth);
+  await writeAlerts(
+    currentActive,
+    currentFiltered,
+    state,
+    sourceHealth,
+    duplicateAudit
+  );
 
   if (WATCH) {
     console.log(`Watching feeds every ${Math.round(INTERVAL_MS / 1000)}s...`);
@@ -4257,6 +4530,7 @@ async function main() {
           active: nextActive,
           filtered: nextFiltered,
           sourceHealth: nextSourceHealth,
+          duplicateAudit: nextDuplicateAudit,
         } = await buildAlerts();
         assertCriticalSourceCoverage(nextSourceHealth);
         const prevState =
@@ -4273,7 +4547,13 @@ async function main() {
           prevState,
           new Date()
         );
-        await writeAlerts(activeNow, filteredNow, stateNow, nextSourceHealth);
+        await writeAlerts(
+          activeNow,
+          filteredNow,
+          stateNow,
+          nextSourceHealth,
+          nextDuplicateAudit
+        );
       } catch (error) {
         console.warn(`WARN refresh: ${error.message}`);
       }
