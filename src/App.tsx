@@ -59,7 +59,13 @@ export default function App() {
   }, [alerts]);
 
   return (
-    <div className="flex flex-col h-[100dvh] bg-siem-bg">
+    <div
+      className="flex flex-col h-[100dvh] bg-siem-bg"
+      style={{
+        backgroundImage:
+          "radial-gradient(1200px 520px at 14% -8%, rgba(140, 24, 40, 0.34), transparent 58%), radial-gradient(900px 460px at 88% 112%, rgba(110, 14, 28, 0.3), transparent 60%), linear-gradient(165deg, #1a0508 0%, #130408 45%, #0c0306 100%)",
+      }}
+    >
       {/* Top Bar */}
       <Header regionFilter={regionFilter} onSubmitIntel={() => setIsSubmitOpen(true)} />
       <StatsBar alerts={alerts} />

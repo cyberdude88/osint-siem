@@ -280,6 +280,7 @@ export function GlobeView({
     return [...counts.entries()].sort((a, b) => b[1] - a[1]);
   }, [alerts]);
   const containerRef = useRef<HTMLDivElement>(null);
+  const canvasHostRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const globeGroupRef = useRef<THREE.Group | null>(null);
   const oceanRef = useRef<THREE.Mesh | null>(null);
@@ -331,7 +332,8 @@ export function GlobeView({
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
+    const canvasHost = canvasHostRef.current;
+    if (!container || !canvasHost) return;
 
     // --- Scene ---
     const scene = new THREE.Scene();
@@ -346,11 +348,12 @@ export function GlobeView({
     camera.position.z = zoomRef.current.current;
 
     // --- Renderer ---
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(container.clientWidth, container.clientHeight);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(canvasHost.clientWidth, canvasHost.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setClearColor(0x0a0e17, 1);
-    container.appendChild(renderer.domElement);
+    renderer.setClearColor(0x000000, 0);
+    renderer.domElement.className = "absolute inset-0 h-full w-full";
+    canvasHost.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
     // --- Globe group (everything rotates together) ---
@@ -695,14 +698,14 @@ export function GlobeView({
 
     // --- Resize ---
     const onResize = () => {
-      const w = container.clientWidth;
-      const h = container.clientHeight;
+      const w = canvasHost.clientWidth;
+      const h = canvasHost.clientHeight;
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
     };
     const resizeObs = new ResizeObserver(onResize);
-    resizeObs.observe(container);
+    resizeObs.observe(canvasHost);
 
     // --- Drag to rotate (pointer-first, touch fallback for older browsers) ---
     let activePointerId: number | null = null;
@@ -1029,7 +1032,7 @@ export function GlobeView({
     const el = renderer.domElement;
     const hasPointerSupport = typeof PointerEvent !== "undefined";
     el.style.touchAction = "none";
-    container.style.touchAction = "none";
+    canvasHost.style.touchAction = "none";
     el.addEventListener("pointerdown", onDown);
     window.addEventListener("pointermove", onMove, { passive: false });
     window.addEventListener("pointerup", onUp);
@@ -1042,13 +1045,13 @@ export function GlobeView({
     }
     el.addEventListener("click", onClk);
     el.addEventListener("wheel", onWheel, { passive: false });
-    container.addEventListener("wheel", onWheel, { passive: false });
+    canvasHost.addEventListener("wheel", onWheel, { passive: false });
     el.addEventListener("gesturestart", onGesture, { passive: false });
     el.addEventListener("gesturechange", onGesture, { passive: false });
     el.addEventListener("gestureend", onGesture, { passive: false });
-    container.addEventListener("gesturestart", onGesture, { passive: false });
-    container.addEventListener("gesturechange", onGesture, { passive: false });
-    container.addEventListener("gestureend", onGesture, { passive: false });
+    canvasHost.addEventListener("gesturestart", onGesture, { passive: false });
+    canvasHost.addEventListener("gesturechange", onGesture, { passive: false });
+    canvasHost.addEventListener("gestureend", onGesture, { passive: false });
 
     return () => {
       cancelAnimationFrame(frameRef.current);
@@ -1065,14 +1068,14 @@ export function GlobeView({
       }
       el.removeEventListener("click", onClk);
       el.removeEventListener("wheel", onWheel);
-      container.removeEventListener("wheel", onWheel);
+      canvasHost.removeEventListener("wheel", onWheel);
       el.removeEventListener("gesturestart", onGesture);
       el.removeEventListener("gesturechange", onGesture);
       el.removeEventListener("gestureend", onGesture);
-      container.removeEventListener("gesturestart", onGesture);
-      container.removeEventListener("gesturechange", onGesture);
-      container.removeEventListener("gestureend", onGesture);
-      container.removeChild(el);
+      canvasHost.removeEventListener("gesturestart", onGesture);
+      canvasHost.removeEventListener("gesturechange", onGesture);
+      canvasHost.removeEventListener("gestureend", onGesture);
+      canvasHost.removeChild(el);
       renderer.dispose();
       glowTexture.dispose();
       surfaceTexture?.dispose();
@@ -1101,9 +1104,14 @@ export function GlobeView({
     <div
       ref={containerRef}
       className="w-full h-full relative cursor-grab active:cursor-grabbing"
+      style={{
+        backgroundImage:
+          "radial-gradient(920px 520px at 12% -8%, rgba(188, 34, 52, 0.5), transparent 60%), radial-gradient(820px 460px at 88% 108%, rgba(156, 22, 44, 0.42), transparent 56%), linear-gradient(160deg, #34070f 0%, #25060c 45%, #160408 100%)",
+      }}
     >
+      <div ref={canvasHostRef} className="absolute inset-0" aria-hidden="true" />
       {hotspot && hotspotAlerts.length >= HOTSPOT_MIN_ALERTS && (
-        <div className="absolute top-2 left-2 md:top-4 md:left-4 w-[calc(100%-1rem)] md:w-[290px] max-h-[58%] md:max-h-[52%] rounded-xl border border-siem-accent/25 bg-siem-panel/58 backdrop-blur-md shadow-lg shadow-black/35 overflow-hidden">
+        <div className="absolute z-10 top-2 left-2 md:top-4 md:left-4 w-[calc(100%-1rem)] md:w-[290px] max-h-[58%] md:max-h-[52%] rounded-xl border border-siem-accent/25 bg-siem-panel/58 backdrop-blur-md shadow-lg shadow-black/35 overflow-hidden">
           <div className="px-3 py-2 border-b border-siem-border/80 flex items-center justify-between">
             <span className="text-[10px] uppercase tracking-widest text-siem-accent font-bold">
               Dense Alert Zone
@@ -1168,7 +1176,7 @@ export function GlobeView({
         </div>
       )}
       {/* Legend */}
-      <div className="hidden sm:flex absolute bottom-4 left-4 items-center gap-4 bg-siem-panel/80 backdrop-blur-sm px-3 py-2 rounded-lg border border-siem-border">
+      <div className="hidden sm:flex absolute z-10 bottom-4 left-4 items-center gap-4 bg-siem-panel/80 backdrop-blur-sm px-3 py-2 rounded-lg border border-siem-border">
         {(
           [
             ["critical", "bg-red-500"],
@@ -1187,10 +1195,10 @@ export function GlobeView({
           </div>
         ))}
       </div>
-      <div className="hidden md:block absolute top-4 left-1/2 -translate-x-1/2 text-[10px] text-siem-muted/50 uppercase tracking-widest pointer-events-none">
+      <div className="hidden md:block absolute z-10 top-4 left-1/2 -translate-x-1/2 text-[10px] text-siem-muted/50 uppercase tracking-widest pointer-events-none">
         Drag to rotate &middot; Scroll to zoom &middot; Click a continent to filter
       </div>
-      <div className="absolute bottom-3 right-3 md:bottom-4 md:right-4 flex items-center gap-1.5 bg-siem-panel/80 backdrop-blur-sm px-2 py-2 rounded-lg border border-siem-border">
+      <div className="absolute z-10 bottom-3 right-3 md:bottom-4 md:right-4 flex items-center gap-1.5 bg-siem-panel/80 backdrop-blur-sm px-2 py-2 rounded-lg border border-siem-border">
         <button
           onClick={() => adjustZoom(-ZOOM_STEP * 1.2)}
           className="w-8 h-8 md:w-7 md:h-7 rounded border border-siem-border bg-white/5 text-siem-text hover:bg-siem-accent/10 hover:text-siem-accent transition-colors text-sm font-bold"
@@ -1208,7 +1216,7 @@ export function GlobeView({
           -
         </button>
       </div>
-      <div className="hidden md:flex absolute top-4 right-4 items-center gap-1.5 bg-siem-panel/80 backdrop-blur-sm px-2.5 py-2 rounded-lg border border-siem-border">
+      <div className="hidden md:flex absolute z-10 top-4 right-4 items-center gap-1.5 bg-siem-panel/80 backdrop-blur-sm px-2.5 py-2 rounded-lg border border-siem-border">
         <button
           onClick={() => onRegionChange("all")}
           className={`px-2 py-1 text-[10px] uppercase tracking-wider rounded border transition-colors ${
@@ -1233,7 +1241,7 @@ export function GlobeView({
           </button>
         ))}
       </div>
-      <div className="md:hidden absolute top-3 right-3 w-[150px] bg-siem-panel/85 backdrop-blur-sm px-2 py-1.5 rounded-lg border border-siem-border">
+      <div className="md:hidden absolute z-10 top-3 right-3 w-[150px] bg-siem-panel/85 backdrop-blur-sm px-2 py-1.5 rounded-lg border border-siem-border">
         <select
           value={regionFilter}
           onChange={(e) => onRegionChange(e.target.value)}
