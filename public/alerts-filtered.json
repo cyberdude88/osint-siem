@@ -14,7 +14,7 @@
     "title": "Keeping pace with e-evidence: New report examines Europe’s digital forensic capabilities",
     "canonical_url": "https://www.europol.europa.eu/media-press/newsroom/news/keeping-pace-e-evidence-new-report-examines-europes-digital-forensic-capabilities",
     "first_seen": "2026-10-18T09:54:33.712Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_appeal",
     "severity": "high",
@@ -44,6 +44,49 @@
     }
   },
   {
+    "alert_id": "dailysabah-tr-1410c5091386",
+    "source_id": "dailysabah-tr",
+    "source": {
+      "source_id": "dailysabah-tr",
+      "authority_name": "Daily Sabah Turkey",
+      "country": "Turkey",
+      "country_code": "TR",
+      "region": "Asia",
+      "authority_type": "public_safety_program",
+      "base_url": "https://www.dailysabah.com"
+    },
+    "title": "Türkiye launches nationwide cyber alert over critical PHP flaws",
+    "canonical_url": "https://www.dailysabah.com/business/tech/turkiye-launches-nationwide-cyber-alert-over-critical-php-flaws",
+    "first_seen": "2026-10-21T21:16:00.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "critical",
+    "region_tag": "TR",
+    "lat": 41.06388,
+    "lng": 28.69769,
+    "freshness_hours": 3,
+    "reporting": {
+      "label": "Daily Sabah Contact",
+      "url": "https://www.dailysabah.com/contact"
+    },
+    "triage": {
+      "relevance_score": 0.4,
+      "threshold": 0.42,
+      "confidence": "low",
+      "disposition": "filtered_review",
+      "publication_type": "public_safety_bulletin",
+      "weak_signals": [
+        "+0.10 contains response/reporting actions",
+        "-0.12 general institutional/news language",
+        "-0.08 weak incident evidence relative to narrative cues"
+      ],
+      "metadata": {
+        "tags": []
+      }
+    }
+  },
+  {
     "alert_id": "postcourier-pg-bd360000c36a",
     "source_id": "postcourier-pg",
     "source": {
@@ -58,14 +101,14 @@
     "title": "Social Democratic Party opens new Secretariat Office and launches website",
     "canonical_url": "https://www.postcourier.com.pg/social-democratic-party-opens-new-secretariat-office-and-launches-website/",
     "first_seen": "2026-10-21T17:17:15.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "PG",
     "lat": -5.973,
     "lng": 147.00783,
-    "freshness_hours": 4,
+    "freshness_hours": 7,
     "reporting": {
       "label": "PNG Police",
       "url": "https://www.rpngc.gov.pg/",
@@ -106,14 +149,14 @@
     "title": "Generative AI Is Erasing Behavioral Tells, Weakening Behavior-Only Detection, Proofpoint Reports",
     "canonical_url": "https://thehackernews.com/2026/10/generative-ai-is-erasing-behavioral.html",
     "first_seen": "2026-10-21T11:53:34.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "private_sector",
     "severity": "high",
     "region_tag": "US",
     "lat": 37.48922,
     "lng": -121.50722,
-    "freshness_hours": 9,
+    "freshness_hours": 12,
     "reporting": {
       "label": "Read Full Report",
       "url": "https://thehackernews.com",
@@ -151,14 +194,14 @@
     "title": "Vietnam, Denmark upgrade ties to Comprehensive Strategic Partnership",
     "canonical_url": "https://e.vnexpress.net/news/news/politics/vietnam-denmark-upgrade-ties-to-comprehensive-strategic-partnership-5134886.html",
     "first_seen": "2026-10-21T00:59:10.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "VN",
     "lat": 13.91653,
     "lng": 108.32363,
-    "freshness_hours": 20,
+    "freshness_hours": 23,
     "reporting": {
       "label": "Vietnam Police Tips",
       "url": "https://congan.com.vn/",
@@ -195,14 +238,14 @@
     "title": "California Department of Justice Releases Report on Officer-Involved Shooting of Martin Sebastian",
     "canonical_url": "https://oag.ca.gov/news/press-releases/california-department-justice-releases-report-officer-involved-shooting-martin",
     "first_seen": "2026-10-20T16:28:08.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_appeal",
     "severity": "high",
     "region_tag": "US",
     "lat": 36.34558,
     "lng": -119.8037,
-    "freshness_hours": 28,
+    "freshness_hours": 31,
     "reporting": {
       "label": "Report to CA Attorney General",
       "url": "https://oag.ca.gov/contact/consumer-complaint-against-business-or-company",
@@ -241,58 +284,14 @@
     "title": "'Null and void:' Egypt condemns Turkey-Libya maritime deal, reaffirms pact with Greece",
     "canonical_url": "https://www.middleeasteye.net/live-blog/live-blog-update/null-and-void-egypt-condemns-turkey-libya-maritime-deal-reaffirms-pact",
     "first_seen": "2026-10-21T20:36:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "ME",
     "lat": 38.90517,
     "lng": 21.40987,
-    "freshness_hours": 1,
-    "reporting": {
-      "label": "Middle East Eye Tips",
-      "url": "https://www.middleeasteye.net/contact"
-    },
-    "triage": {
-      "relevance_score": 0.38,
-      "threshold": 0.42,
-      "confidence": "low",
-      "disposition": "filtered_review",
-      "publication_type": "public_safety_bulletin",
-      "weak_signals": [
-        "+0.08 specific impact/timeline/system details",
-        "-0.12 general institutional/news language",
-        "-0.08 weak incident evidence relative to narrative cues"
-      ],
-      "metadata": {
-        "author": "Fleur Hargreaves",
-        "tags": []
-      }
-    }
-  },
-  {
-    "alert_id": "middleeasteye-10d730f8ec4c",
-    "source_id": "middleeasteye",
-    "source": {
-      "source_id": "middleeasteye",
-      "authority_name": "Middle East Eye",
-      "country": "Qatar",
-      "country_code": "QA",
-      "region": "Asia",
-      "authority_type": "public_safety_program",
-      "base_url": "https://www.middleeasteye.net"
-    },
-    "title": "Turkey, Qatar, Pakistan and Indonesia forge ‘Badr’ deal to jointly produce weapons",
-    "canonical_url": "https://www.middleeasteye.net/live-blog/live-blog-update/turkey-qatar-pakistan-and-indonesia-forge-badr-deal-jointly-produce",
-    "first_seen": "2026-10-21T16:14:54.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
-    "status": "filtered",
-    "category": "public_safety",
-    "severity": "medium",
-    "region_tag": "ME",
-    "lat": -0.96563,
-    "lng": 113.97559,
-    "freshness_hours": 5,
+    "freshness_hours": 3,
     "reporting": {
       "label": "Middle East Eye Tips",
       "url": "https://www.middleeasteye.net/contact"
@@ -329,7 +328,7 @@
     "title": "See all News",
     "canonical_url": "https://www.worldbank.org/en/news/all?topic_exact=Education+and+Skills&#x26;displayconttype_exact=Press+Release&#x26;displayconttype_exact=Statement&#x26;displayconttype_exact=Speeches+and+Transcripts&#x26;displayconttype_exact=Factsheet&#x26;displayconttype_exact=Brief&#x26;lang_exact=English",
     "first_seen": "2026-09-28T18:09:48.959Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "education_digital_capacity",
     "severity": "medium",
@@ -372,7 +371,7 @@
     "title": "Protecting citizens, preserving rights",
     "canonical_url": "https://www.europol.europa.eu/media-press/newsroom/news/protecting-citizens-preserving-rights",
     "first_seen": "2026-10-18T09:54:33.712Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_appeal",
     "severity": "high",
@@ -415,14 +414,14 @@
     "title": "Calgary Community Associations mark milestones and create new ways to connect",
     "canonical_url": "https://newsroom.calgary.ca/calgary-community-associations-mark-milestones-and-create-new-ways-to-connect/",
     "first_seen": "2026-10-20T17:00:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_appeal",
     "severity": "high",
     "region_tag": "CA",
     "lat": 50.50188,
     "lng": -113.86687,
-    "freshness_hours": 28,
+    "freshness_hours": 31,
     "reporting": {
       "label": "Submit a Tip to Calgary Police",
       "url": "https://www.calgarypolice.ca/contact-us",
@@ -462,14 +461,14 @@
     "title": "Child rapist sentenced after eight-year campaign of abuse",
     "canonical_url": "https://www.nationalcrimeagency.gov.uk/news/child-rapist-sentenced-after-eight-year-campaign-of-abuse",
     "first_seen": "2026-10-20T13:27:36.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_appeal",
     "severity": "medium",
     "region_tag": "GB",
     "lat": 51.7046,
     "lng": 0.32529,
-    "freshness_hours": 31,
+    "freshness_hours": 34,
     "reporting": {
       "label": "Report to NCA",
       "url": "https://www.nationalcrimeagency.gov.uk/what-we-do/crime-threats/cyber-crime/reporting-cyber-crime",
@@ -509,14 +508,14 @@
     "title": "Special Event Security, Part Two: How the FBI Keeps the Public Safe at Gatherings",
     "canonical_url": "https://www.fbi.gov/news/stories/special-event-security-part-two",
     "first_seen": "2026-07-15T10:00:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_appeal",
     "severity": "high",
     "region_tag": "US",
     "lat": 39.46467,
     "lng": -77.35031,
-    "freshness_hours": 2363,
+    "freshness_hours": 2366,
     "reporting": {
       "label": "Report to FBI",
       "url": "https://tips.fbi.gov/",
@@ -554,14 +553,14 @@
     "title": "Special Event Security",
     "canonical_url": "https://www.fbi.gov/news/stories/special-event-security",
     "first_seen": "2026-07-07T02:00:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_appeal",
     "severity": "high",
     "region_tag": "US",
     "lat": 39.14669,
     "lng": -77.62659,
-    "freshness_hours": 2563,
+    "freshness_hours": 2566,
     "reporting": {
       "label": "Report to FBI",
       "url": "https://tips.fbi.gov/",
@@ -599,14 +598,14 @@
     "title": "FBI Kicks Off Summer Heat 2.0 with Massive HSTF Takedown",
     "canonical_url": "https://www.fbi.gov/news/stories/fbi-kicks-off-summer-heat-2-0-with-massive-hstf-takedown",
     "first_seen": "2026-06-03T16:30:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_appeal",
     "severity": "high",
     "region_tag": "US",
     "lat": 38.63924,
     "lng": -77.14671,
-    "freshness_hours": 3364,
+    "freshness_hours": 3367,
     "reporting": {
       "label": "Report to FBI",
       "url": "https://tips.fbi.gov/",
@@ -630,6 +629,306 @@
     }
   },
   {
+    "alert_id": "scmp-hk-efd652a2c24d",
+    "source_id": "scmp-hk",
+    "source": {
+      "source_id": "scmp-hk",
+      "authority_name": "SCMP Hong Kong",
+      "country": "Hong Kong",
+      "country_code": "HK",
+      "region": "Asia",
+      "authority_type": "public_safety_program",
+      "base_url": "https://www.scmp.com"
+    },
+    "title": "Websites go dark worldwide as AI exposes critical security flaws",
+    "canonical_url": "https://www.scmp.com/news/world/article/3371694/websites-go-dark-worldwide-ai-exposes-critical-security-flaws",
+    "first_seen": "2026-10-21T22:10:59.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "critical",
+    "region_tag": "HK",
+    "lat": 22.05407,
+    "lng": 114.68254,
+    "freshness_hours": 2,
+    "reporting": {
+      "label": "Report Crime in Hong Kong",
+      "url": "https://www.police.gov.hk/ppp_en/contact_us.html",
+      "phone": "999 (Emergency)"
+    },
+    "triage": {
+      "relevance_score": 0.34,
+      "threshold": 0.42,
+      "confidence": "low",
+      "disposition": "filtered_review",
+      "publication_type": "news_media",
+      "weak_signals": [
+        "-0.16 publication type leans general-news"
+      ],
+      "metadata": {
+        "author": "Agence France-Presse",
+        "tags": []
+      }
+    }
+  },
+  {
+    "alert_id": "straitstimes-sg-ae3274e08426",
+    "source_id": "straitstimes-sg",
+    "source": {
+      "source_id": "straitstimes-sg",
+      "authority_name": "Straits Times Singapore",
+      "country": "Singapore",
+      "country_code": "SG",
+      "region": "Asia",
+      "authority_type": "public_safety_program",
+      "base_url": "https://www.straitstimes.com"
+    },
+    "title": "Haze in Singapore: Air quality improves overnight with ‘normal’ PM2.5 readings across the island",
+    "canonical_url": "https://www.straitstimes.com/singapore/haze-in-singapore-air-quality-improves-overnight-with-normal-pm2-5-readings-across-the-island",
+    "first_seen": "2026-10-21T22:05:14.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "medium",
+    "region_tag": "SG",
+    "lat": 0.96504,
+    "lng": 104.00451,
+    "freshness_hours": 2,
+    "reporting": {
+      "label": "Report Crime in Singapore",
+      "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
+      "phone": "999 (Emergency)"
+    },
+    "triage": {
+      "relevance_score": 0.34,
+      "threshold": 0.42,
+      "confidence": "low",
+      "disposition": "filtered_review",
+      "publication_type": "news_media",
+      "weak_signals": [
+        "-0.16 publication type leans general-news"
+      ],
+      "metadata": {
+        "tags": []
+      }
+    }
+  },
+  {
+    "alert_id": "yonhap-kr-6f302cac348f",
+    "source_id": "yonhap-kr",
+    "source": {
+      "source_id": "yonhap-kr",
+      "authority_name": "Yonhap News Korea",
+      "country": "South Korea",
+      "country_code": "KR",
+      "region": "Asia",
+      "authority_type": "public_safety_program",
+      "base_url": "https://en.yna.co.kr"
+    },
+    "title": "Top headlines in major S. Korean newspapers",
+    "canonical_url": "https://en.yna.co.kr/view/AEN20261022000500320",
+    "first_seen": "2026-10-21T22:02:35.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "medium",
+    "region_tag": "KR",
+    "lat": 37.57069,
+    "lng": 126.55201,
+    "freshness_hours": 2,
+    "reporting": {
+      "label": "Report Crime in South Korea",
+      "url": "https://www.police.go.kr/eng/index.do",
+      "phone": "112 (Emergency)"
+    },
+    "triage": {
+      "relevance_score": 0.34,
+      "threshold": 0.42,
+      "confidence": "low",
+      "disposition": "filtered_review",
+      "publication_type": "news_media",
+      "weak_signals": [
+        "-0.16 publication type leans general-news"
+      ],
+      "metadata": {
+        "author": "Kang Yoon-seung",
+        "tags": []
+      }
+    }
+  },
+  {
+    "alert_id": "cna-sg-crime-a6278c4951aa",
+    "source_id": "cna-sg-crime",
+    "source": {
+      "source_id": "cna-sg-crime",
+      "authority_name": "CNA Singapore Crime",
+      "country": "Singapore",
+      "country_code": "SG",
+      "region": "Asia",
+      "authority_type": "public_safety_program",
+      "base_url": "https://www.channelnewsasia.com"
+    },
+    "title": "A football meme sparked boycott calls for an Indonesian grooming brand. What can be learnt from Kahf’s misstep?",
+    "canonical_url": "https://www.channelnewsasia.com/asia/kahf-boycott-malaysia-indonesia-consumers-6461156",
+    "first_seen": "2026-10-21T22:00:00.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "medium",
+    "region_tag": "SG",
+    "lat": -0.63647,
+    "lng": 113.86692,
+    "freshness_hours": 2,
+    "reporting": {
+      "label": "Report Crime in Singapore",
+      "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
+      "phone": "999 (Emergency) / 1800-255-0000 (Police Hotline)"
+    },
+    "triage": {
+      "relevance_score": 0.34,
+      "threshold": 0.42,
+      "confidence": "low",
+      "disposition": "filtered_review",
+      "publication_type": "news_media",
+      "weak_signals": [
+        "-0.16 publication type leans general-news"
+      ],
+      "metadata": {
+        "tags": [
+          "Asia"
+        ]
+      }
+    }
+  },
+  {
+    "alert_id": "yonhap-kr-2407dc8b7365",
+    "source_id": "yonhap-kr",
+    "source": {
+      "source_id": "yonhap-kr",
+      "authority_name": "Yonhap News Korea",
+      "country": "South Korea",
+      "country_code": "KR",
+      "region": "Asia",
+      "authority_type": "public_safety_program",
+      "base_url": "https://en.yna.co.kr"
+    },
+    "title": "N.K. leader's sister warns of 'new counter means' at border with S. Korea",
+    "canonical_url": "https://en.yna.co.kr/view/AEN20261022001100320",
+    "first_seen": "2026-10-21T21:46:57.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "medium",
+    "region_tag": "KR",
+    "lat": 37.42361,
+    "lng": 126.40915,
+    "freshness_hours": 2,
+    "reporting": {
+      "label": "Report Crime in South Korea",
+      "url": "https://www.police.go.kr/eng/index.do",
+      "phone": "112 (Emergency)"
+    },
+    "triage": {
+      "relevance_score": 0.34,
+      "threshold": 0.42,
+      "confidence": "low",
+      "disposition": "filtered_review",
+      "publication_type": "news_media",
+      "weak_signals": [
+        "-0.16 publication type leans general-news"
+      ],
+      "metadata": {
+        "author": "Kang Yoon-seung",
+        "tags": []
+      }
+    }
+  },
+  {
+    "alert_id": "yonhap-kr-33bc5e69ce90",
+    "source_id": "yonhap-kr",
+    "source": {
+      "source_id": "yonhap-kr",
+      "authority_name": "Yonhap News Korea",
+      "country": "South Korea",
+      "country_code": "KR",
+      "region": "Asia",
+      "authority_type": "public_safety_program",
+      "base_url": "https://en.yna.co.kr"
+    },
+    "title": "(URGENT) N.K. leader's sister says loudspeakers against S. Korea \"will be on standby\" in \"matter of days\"",
+    "canonical_url": "https://en.yna.co.kr/view/AEN20261022001000320",
+    "first_seen": "2026-10-21T21:15:29.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "high",
+    "region_tag": "KR",
+    "lat": 37.68596,
+    "lng": 126.70639,
+    "freshness_hours": 3,
+    "reporting": {
+      "label": "Report Crime in South Korea",
+      "url": "https://www.police.go.kr/eng/index.do",
+      "phone": "112 (Emergency)"
+    },
+    "triage": {
+      "relevance_score": 0.34,
+      "threshold": 0.42,
+      "confidence": "low",
+      "disposition": "filtered_review",
+      "publication_type": "news_media",
+      "weak_signals": [
+        "-0.16 publication type leans general-news"
+      ],
+      "metadata": {
+        "author": "Kang Yoon-seung",
+        "tags": []
+      }
+    }
+  },
+  {
+    "alert_id": "straitstimes-sg-2aa47e0c6be7",
+    "source_id": "straitstimes-sg",
+    "source": {
+      "source_id": "straitstimes-sg",
+      "authority_name": "Straits Times Singapore",
+      "country": "Singapore",
+      "country_code": "SG",
+      "region": "Asia",
+      "authority_type": "public_safety_program",
+      "base_url": "https://www.straitstimes.com"
+    },
+    "title": "Causeway Point to house social and reading hub with SingLit showcase and pre-loved books in 2028",
+    "canonical_url": "https://www.straitstimes.com/singapore/community/causeway-point-to-house-reading-hub-with-singlit-showcase-and-pre-loved-books-in-2028",
+    "first_seen": "2026-10-21T21:00:00.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "medium",
+    "region_tag": "SG",
+    "lat": 1.34729,
+    "lng": 103.56835,
+    "freshness_hours": 3,
+    "reporting": {
+      "label": "Report Crime in Singapore",
+      "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
+      "phone": "999 (Emergency)"
+    },
+    "triage": {
+      "relevance_score": 0.34,
+      "threshold": 0.42,
+      "confidence": "low",
+      "disposition": "filtered_review",
+      "publication_type": "news_media",
+      "weak_signals": [
+        "-0.16 publication type leans general-news"
+      ],
+      "metadata": {
+        "tags": []
+      }
+    }
+  },
+  {
     "alert_id": "yonhap-kr-a95a013df066",
     "source_id": "yonhap-kr",
     "source": {
@@ -644,14 +943,14 @@
     "title": "S. Korea, U.S. conclude multinational maritime mine warfare exercise off Busan",
     "canonical_url": "https://en.yna.co.kr/view/AEN20261022000300315",
     "first_seen": "2026-10-21T20:25:56.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "KR",
     "lat": 37.78187,
     "lng": 127.59984,
-    "freshness_hours": 1,
+    "freshness_hours": 3,
     "reporting": {
       "label": "Report Crime in South Korea",
       "url": "https://www.police.go.kr/eng/index.do",
@@ -687,14 +986,14 @@
     "title": "TIME RUNS OUT",
     "canonical_url": "https://www.postcourier.com.pg/time-runs-out/",
     "first_seen": "2026-10-21T19:11:06.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "PG",
     "lat": -5.73613,
     "lng": 146.88281,
-    "freshness_hours": 2,
+    "freshness_hours": 5,
     "reporting": {
       "label": "PNG Police",
       "url": "https://www.rpngc.gov.pg/",
@@ -735,14 +1034,14 @@
     "title": "Meta to pay New Mexico a historic US$25 billion in Cambridge Analytica Facebook case",
     "canonical_url": "https://www.scmp.com/news/world/united-states-canada/article/3371689/meta-pay-new-mexico-historic-us25-billion-cambridge-analytica-case",
     "first_seen": "2026-10-21T19:08:19.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "HK",
     "lat": 39.94814,
     "lng": -98.12824,
-    "freshness_hours": 2,
+    "freshness_hours": 5,
     "reporting": {
       "label": "Report Crime in Hong Kong",
       "url": "https://www.police.gov.hk/ppp_en/contact_us.html",
@@ -778,14 +1077,14 @@
     "title": "Baby abused to death by parents was not referred to child protection or social services: MSF",
     "canonical_url": "https://www.straitstimes.com/singapore/community/baby-abused-to-death-by-parents-was-not-referred-to-child-protection-or-social-services-msf",
     "first_seen": "2026-10-21T18:07:50.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "high",
     "region_tag": "SG",
     "lat": 1.37786,
     "lng": 103.69345,
-    "freshness_hours": 3,
+    "freshness_hours": 6,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -820,14 +1119,14 @@
     "title": "Trump faces fresh questions over ties to ‘humanitarian’ Putin",
     "canonical_url": "https://www.scmp.com/news/world/united-states-canada/article/3371687/trump-faces-fresh-questions-over-ties-humanitarian-putin",
     "first_seen": "2026-10-21T17:08:51.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "HK",
     "lat": 39.9122,
     "lng": -98.74156,
-    "freshness_hours": 4,
+    "freshness_hours": 7,
     "reporting": {
       "label": "Report Crime in Hong Kong",
       "url": "https://www.police.gov.hk/ppp_en/contact_us.html",
@@ -863,14 +1162,14 @@
     "title": "Nvidia adds Samsung Electro-Mechanics to substrate supply chain, plans capacity expansion in S. Korea",
     "canonical_url": "https://en.yna.co.kr/view/AEN20261021011300315",
     "first_seen": "2026-10-21T15:53:54.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "KR",
     "lat": 37.81727,
     "lng": 126.16553,
-    "freshness_hours": 5,
+    "freshness_hours": 8,
     "reporting": {
       "label": "Report Crime in South Korea",
       "url": "https://www.police.go.kr/eng/index.do",
@@ -906,14 +1205,14 @@
     "title": "Over 3,000 taxpayers made false claims for employment expenses; IRAS warns of misleading tax advice",
     "canonical_url": "https://www.straitstimes.com/singapore/over-3000-taxpayers-made-false-claims-for-employment-expenses-iras-warns-of-misleading-messages",
     "first_seen": "2026-10-21T15:06:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "SG",
     "lat": 1.12494,
     "lng": 103.69383,
-    "freshness_hours": 6,
+    "freshness_hours": 9,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -948,14 +1247,14 @@
     "title": "Riots unnerve France’s US$80 billion tourism sector: ‘it’s catastrophic’",
     "canonical_url": "https://www.scmp.com/news/world/europe/article/3371679/riots-unnerve-frances-us80-billion-tourism-sector-its-catastrophic",
     "first_seen": "2026-10-21T13:42:22.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "HK",
     "lat": 46.42213,
     "lng": 1.63852,
-    "freshness_hours": 7,
+    "freshness_hours": 10,
     "reporting": {
       "label": "Report Crime in Hong Kong",
       "url": "https://www.police.gov.hk/ppp_en/contact_us.html",
@@ -991,14 +1290,14 @@
     "title": "(LEAD) Lee meets with WHO chief to discuss cooperation in healthcare",
     "canonical_url": "https://en.yna.co.kr/view/AEN20261021002551315",
     "first_seen": "2026-10-21T13:19:26.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "KR",
     "lat": 37.23829,
     "lng": 126.26133,
-    "freshness_hours": 8,
+    "freshness_hours": 11,
     "reporting": {
       "label": "Report Crime in South Korea",
       "url": "https://www.police.go.kr/eng/index.do",
@@ -1034,14 +1333,14 @@
     "title": "Constitutional Court allows Rep. Lee Jin-sook to attend parliamentary audit",
     "canonical_url": "https://en.yna.co.kr/view/AEN20261021011100320",
     "first_seen": "2026-10-21T13:02:24.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "info",
     "region_tag": "KR",
     "lat": 37.33789,
     "lng": 126.20049,
-    "freshness_hours": 8,
+    "freshness_hours": 11,
     "reporting": {
       "label": "Report Crime in South Korea",
       "url": "https://www.police.go.kr/eng/index.do",
@@ -1077,14 +1376,14 @@
     "title": "Singapore rises to 14th spot in global rule of law ranking; 2nd for absence of corruption",
     "canonical_url": "https://www.straitstimes.com/singapore/courts-crime/spore-rises-to-14th-spot-in-global-rule-of-law-ranking-2nd-for-absence-of-corruption",
     "first_seen": "2026-10-21T13:00:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "SG",
     "lat": 1.30972,
     "lng": 104.01147,
-    "freshness_hours": 8,
+    "freshness_hours": 11,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -1119,14 +1418,14 @@
     "title": "The EU will ‘pull its punches’ on China despite growing trade war talk: analysts",
     "canonical_url": "https://www.scmp.com/economy/china-economy/article/3371655/eu-will-pull-its-punches-china-despite-growing-trade-war-talk-analysts",
     "first_seen": "2026-10-21T12:00:10.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "HK",
     "lat": 35.75594,
     "lng": 103.92485,
-    "freshness_hours": 9,
+    "freshness_hours": 12,
     "reporting": {
       "label": "Report Crime in Hong Kong",
       "url": "https://www.police.gov.hk/ppp_en/contact_us.html",
@@ -1162,14 +1461,14 @@
     "title": "Why is it difficult to identify companies linked to fires? How can S’pore’s haze law be strengthened?",
     "canonical_url": "https://www.straitstimes.com/singapore/environment/why-is-it-difficult-to-identify-companies-linked-to-fires-how-can-spores-haze-law-be-strengthened",
     "first_seen": "2026-10-21T12:00:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "SG",
     "lat": 1.25347,
     "lng": 104.062,
-    "freshness_hours": 9,
+    "freshness_hours": 12,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -1204,14 +1503,14 @@
     "title": "Prabowo accuses MSCI of trying to intimidate Indonesia after market rout",
     "canonical_url": "https://www.channelnewsasia.com/asia/prabowo-accuses-msci-intimidate-indonesia-market-rout-6478796",
     "first_seen": "2026-10-21T11:54:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "SG",
     "lat": -1.05396,
     "lng": 113.73358,
-    "freshness_hours": 9,
+    "freshness_hours": 12,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -1248,14 +1547,14 @@
     "title": "Macron takes veiled shot at Trump, Netanyahu over ‘stupid’ France riot remarks",
     "canonical_url": "https://www.scmp.com/news/world/europe/article/3371667/macron-takes-veiled-shot-trump-netanyahu-over-stupid-france-riot-remarks",
     "first_seen": "2026-10-21T11:45:43.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "HK",
     "lat": 46.38388,
     "lng": 1.59848,
-    "freshness_hours": 9,
+    "freshness_hours": 12,
     "reporting": {
       "label": "Report Crime in Hong Kong",
       "url": "https://www.police.gov.hk/ppp_en/contact_us.html",
@@ -1291,14 +1590,14 @@
     "title": "(2nd LD) N. Korea to resume propaganda loudspeaker broadcasts toward S. Korea: N.K. leader's sister",
     "canonical_url": "https://en.yna.co.kr/view/AEN20261021009152315",
     "first_seen": "2026-10-21T11:44:07.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "info",
     "region_tag": "KR",
     "lat": 37.99859,
     "lng": 127.56282,
-    "freshness_hours": 9,
+    "freshness_hours": 12,
     "reporting": {
       "label": "Report Crime in South Korea",
       "url": "https://www.police.go.kr/eng/index.do",
@@ -1334,14 +1633,14 @@
     "title": "Prabowo berates countries that &#039;insult&#039; Indonesia over wildfires",
     "canonical_url": "https://www.channelnewsasia.com/asia/president-prabowo-berates-countries-insult-indonesia-wildfires-haze-6478676",
     "first_seen": "2026-10-21T10:42:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "SG",
     "lat": -0.67022,
     "lng": 114.26974,
-    "freshness_hours": 10,
+    "freshness_hours": 13,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -1378,14 +1677,14 @@
     "title": "World needs ‘bridge builders’ to make the transition to new multipolar order: President Tharman",
     "canonical_url": "https://www.straitstimes.com/singapore/politics/world-needs-bridge-builders-to-make-the-transition-to-new-multi-polar-order-president-tharman",
     "first_seen": "2026-10-21T10:38:02.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "SG",
     "lat": 1.58294,
     "lng": 103.84085,
-    "freshness_hours": 10,
+    "freshness_hours": 13,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -1420,14 +1719,14 @@
     "title": "(URGENT) N. Korea to resume propaganda loudspeaker broadcasts toward S. Korea: N.K. leader's sister",
     "canonical_url": "https://en.yna.co.kr/view/AEN20261021010600320",
     "first_seen": "2026-10-21T10:33:04.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "info",
     "region_tag": "KR",
     "lat": 37.17866,
     "lng": 127.26376,
-    "freshness_hours": 10,
+    "freshness_hours": 13,
     "reporting": {
       "label": "Report Crime in South Korea",
       "url": "https://www.police.go.kr/eng/index.do",
@@ -1463,14 +1762,14 @@
     "title": "Some S’pore vets see up to 15% increase in respiratory or eye-related cases during haze",
     "canonical_url": "https://www.straitstimes.com/singapore/up-to-15-increase-in-respiratory-or-eye-related-vet-visits-in-singapore-during-haze",
     "first_seen": "2026-10-21T10:20:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "SG",
     "lat": 1.29892,
     "lng": 103.97614,
-    "freshness_hours": 11,
+    "freshness_hours": 14,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -1505,14 +1804,14 @@
     "title": "Putin says Russia to restart peace deal talks with US and Ukraine",
     "canonical_url": "https://www.scmp.com/news/world/russia-central-asia/article/3371659/putin-holds-ukraine-peace-talks-trumps-envoy-witkoff-frees-american-hubbard",
     "first_seen": "2026-10-21T10:17:27.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "HK",
     "lat": 48.4707,
     "lng": 31.39765,
-    "freshness_hours": 11,
+    "freshness_hours": 14,
     "reporting": {
       "label": "Report Crime in Hong Kong",
       "url": "https://www.police.gov.hk/ppp_en/contact_us.html",
@@ -1548,14 +1847,14 @@
     "title": "(LEAD) Busan authorities guide shark out of canal on third attempt",
     "canonical_url": "https://en.yna.co.kr/view/AEN20261021001751315",
     "first_seen": "2026-10-21T10:09:05.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "KR",
     "lat": 37.42029,
     "lng": 126.34832,
-    "freshness_hours": 11,
+    "freshness_hours": 14,
     "reporting": {
       "label": "Report Crime in South Korea",
       "url": "https://www.police.go.kr/eng/index.do",
@@ -1591,14 +1890,14 @@
     "title": "(3rd LD) National museum chief resigns over misattributed work from private collection",
     "canonical_url": "https://en.yna.co.kr/view/AEN20261021004253315",
     "first_seen": "2026-10-21T10:00:14.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "KR",
     "lat": 37.04158,
     "lng": 127.09879,
-    "freshness_hours": 11,
+    "freshness_hours": 14,
     "reporting": {
       "label": "Report Crime in South Korea",
       "url": "https://www.police.go.kr/eng/index.do",
@@ -1634,14 +1933,14 @@
     "title": "Inside the Nanning Ponzi scheme: Why smart people get scammed",
     "canonical_url": "https://www.straitstimes.com/singapore/inside-the-nanning-ponzi-scheme-why-smart-people-get-scammed",
     "first_seen": "2026-10-21T10:00:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "high",
     "region_tag": "SG",
     "lat": 1.48952,
     "lng": 103.8593,
-    "freshness_hours": 11,
+    "freshness_hours": 14,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -1676,14 +1975,14 @@
     "title": "UOB’s award against Lippo rises again to $82.4 million after court corrects judgment",
     "canonical_url": "https://www.straitstimes.com/singapore/housing/uobs-award-against-lippo-rises-again-to-82-5-million-after-court-corrects-judgement",
     "first_seen": "2026-10-21T09:45:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "SG",
     "lat": 1.20002,
     "lng": 104.00112,
-    "freshness_hours": 11,
+    "freshness_hours": 14,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -1718,14 +2017,14 @@
     "title": "Singapore invests another $135m for coastal protection, flood resilience research",
     "canonical_url": "https://www.straitstimes.com/singapore/environment/singapore-invests-another-135m-for-coastal-protection-flood-resilience-research",
     "first_seen": "2026-10-21T09:35:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "SG",
     "lat": 0.92536,
     "lng": 103.74453,
-    "freshness_hours": 11,
+    "freshness_hours": 14,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -1760,14 +2059,14 @@
     "title": "Cat A premium rises to $132,004 in first tender after COE review announced; Cat B climbs to $131,901",
     "canonical_url": "https://www.straitstimes.com/singapore/transport/cat-a-premium-rises-to-132004-in-first-tender-after-coe-review-announced-cat-b-climbs-to-131901",
     "first_seen": "2026-10-21T09:29:03.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "SG",
     "lat": 1.14179,
     "lng": 103.87359,
-    "freshness_hours": 11,
+    "freshness_hours": 14,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -1802,14 +2101,14 @@
     "title": "Tokyo, Osaka temperatures top 30°C later in year than ever before",
     "canonical_url": "https://www.channelnewsasia.com/east-asia/tokyo-osaka-record-high-temperatures-midsummer-6478356",
     "first_seen": "2026-10-21T09:17:46.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "SG",
     "lat": 35.59028,
     "lng": 139.6838,
-    "freshness_hours": 12,
+    "freshness_hours": 15,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -1846,14 +2145,14 @@
     "title": "Taiwan regulator blocks Grab&#039;s purchase of Foodpanda delivery business in Taiwan",
     "canonical_url": "https://www.channelnewsasia.com/business/taiwan-blocks-grab-purchase-foodpanda-delivery-business-6478246",
     "first_seen": "2026-10-21T09:01:46.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "SG",
     "lat": 23.89113,
     "lng": 120.84164,
-    "freshness_hours": 12,
+    "freshness_hours": 15,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -1890,14 +2189,14 @@
     "title": "Repeat offender jailed for drug offences, attempted housebreaking and theft",
     "canonical_url": "https://www.straitstimes.com/singapore/courts-crime/repeat-offender-jailed-for-drug-offences-attempted-housebreaking-and-theft",
     "first_seen": "2026-10-21T08:40:43.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "SG",
     "lat": 1.65061,
     "lng": 103.79018,
-    "freshness_hours": 12,
+    "freshness_hours": 15,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -1932,14 +2231,14 @@
     "title": "FirstDate dating pilot by GovTech raises age limit to 45",
     "canonical_url": "https://www.straitstimes.com/singapore/community/firstdate-dating-pilot-by-govtech-raises-age-limit-to-45",
     "first_seen": "2026-10-21T08:40:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "SG",
     "lat": 1.23925,
     "lng": 103.8671,
-    "freshness_hours": 12,
+    "freshness_hours": 15,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -1974,14 +2273,14 @@
     "title": "Top U.S. envoy cites 'turbulence' in S. Korea-U.S. alliance amid rift in security, trade priorities",
     "canonical_url": "https://en.yna.co.kr/view/AEN20261021010000315",
     "first_seen": "2026-10-21T08:24:24.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "KR",
     "lat": 37.02379,
     "lng": 127.18501,
-    "freshness_hours": 12,
+    "freshness_hours": 15,
     "reporting": {
       "label": "Report Crime in South Korea",
       "url": "https://www.police.go.kr/eng/index.do",
@@ -2017,14 +2316,14 @@
     "title": "Yonhap News Summary",
     "canonical_url": "https://en.yna.co.kr/view/AEN20261021010100320",
     "first_seen": "2026-10-21T08:22:32.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "KR",
     "lat": 37.98238,
     "lng": 126.81968,
-    "freshness_hours": 13,
+    "freshness_hours": 15,
     "reporting": {
       "label": "Report Crime in South Korea",
       "url": "https://www.police.go.kr/eng/index.do",
@@ -2060,14 +2359,14 @@
     "title": "(LEAD) Appeals court slashes ex-justice minister's sentence to 9 yrs over martial law role",
     "canonical_url": "https://en.yna.co.kr/view/AEN20261021008752315",
     "first_seen": "2026-10-21T08:02:43.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "KR",
     "lat": 37.36936,
     "lng": 126.97649,
-    "freshness_hours": 13,
+    "freshness_hours": 16,
     "reporting": {
       "label": "Report Crime in South Korea",
       "url": "https://www.police.go.kr/eng/index.do",
@@ -2089,49 +2388,6 @@
     }
   },
   {
-    "alert_id": "yonhap-kr-02ed5fc476e4",
-    "source_id": "yonhap-kr",
-    "source": {
-      "source_id": "yonhap-kr",
-      "authority_name": "Yonhap News Korea",
-      "country": "South Korea",
-      "country_code": "KR",
-      "region": "Asia",
-      "authority_type": "public_safety_program",
-      "base_url": "https://en.yna.co.kr"
-    },
-    "title": "(LEAD) N.K. leader's sister, military marshal inspect border fortification site, warn of 'overwhelming' responses",
-    "canonical_url": "https://en.yna.co.kr/view/AEN20261021009151315",
-    "first_seen": "2026-10-21T07:57:34.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
-    "status": "filtered",
-    "category": "public_safety",
-    "severity": "medium",
-    "region_tag": "KR",
-    "lat": 36.91677,
-    "lng": 126.85289,
-    "freshness_hours": 13,
-    "reporting": {
-      "label": "Report Crime in South Korea",
-      "url": "https://www.police.go.kr/eng/index.do",
-      "phone": "112 (Emergency)"
-    },
-    "triage": {
-      "relevance_score": 0.34,
-      "threshold": 0.42,
-      "confidence": "low",
-      "disposition": "filtered_review",
-      "publication_type": "news_media",
-      "weak_signals": [
-        "-0.16 publication type leans general-news"
-      ],
-      "metadata": {
-        "author": "Oh Seok-min",
-        "tags": []
-      }
-    }
-  },
-  {
     "alert_id": "scmp-hk-e47c38d5619a",
     "source_id": "scmp-hk",
     "source": {
@@ -2146,14 +2402,14 @@
     "title": "Liberty, equality, tear gas: no nation does mass protests quite like France",
     "canonical_url": "https://www.scmp.com/news/world/europe/article/3371632/liberty-equality-tear-gas-no-nation-does-mass-protests-quite-france",
     "first_seen": "2026-10-21T07:55:25.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "HK",
     "lat": 46.40137,
     "lng": 1.86992,
-    "freshness_hours": 13,
+    "freshness_hours": 16,
     "reporting": {
       "label": "Report Crime in Hong Kong",
       "url": "https://www.police.gov.hk/ppp_en/contact_us.html",
@@ -2175,92 +2431,6 @@
     }
   },
   {
-    "alert_id": "yonhap-kr-8e9b2d6fea66",
-    "source_id": "yonhap-kr",
-    "source": {
-      "source_id": "yonhap-kr",
-      "authority_name": "Yonhap News Korea",
-      "country": "South Korea",
-      "country_code": "KR",
-      "region": "Asia",
-      "authority_type": "public_safety_program",
-      "base_url": "https://en.yna.co.kr"
-    },
-    "title": "Prosecutors seek 5-yr prison term for pastor over courthouse riot",
-    "canonical_url": "https://en.yna.co.kr/view/AEN20261021009400315",
-    "first_seen": "2026-10-21T07:54:42.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
-    "status": "filtered",
-    "category": "public_safety",
-    "severity": "medium",
-    "region_tag": "KR",
-    "lat": 37.45743,
-    "lng": 126.40842,
-    "freshness_hours": 13,
-    "reporting": {
-      "label": "Report Crime in South Korea",
-      "url": "https://www.police.go.kr/eng/index.do",
-      "phone": "112 (Emergency)"
-    },
-    "triage": {
-      "relevance_score": 0.34,
-      "threshold": 0.42,
-      "confidence": "low",
-      "disposition": "filtered_review",
-      "publication_type": "news_media",
-      "weak_signals": [
-        "-0.16 publication type leans general-news"
-      ],
-      "metadata": {
-        "author": "Yoo Cheong-mo",
-        "tags": []
-      }
-    }
-  },
-  {
-    "alert_id": "yonhap-kr-6a71db9098e7",
-    "source_id": "yonhap-kr",
-    "source": {
-      "source_id": "yonhap-kr",
-      "authority_name": "Yonhap News Korea",
-      "country": "South Korea",
-      "country_code": "KR",
-      "region": "Asia",
-      "authority_type": "public_safety_program",
-      "base_url": "https://en.yna.co.kr"
-    },
-    "title": "(2nd LD) Seoul stocks rebound over 3 pct on eased AI spending woes",
-    "canonical_url": "https://en.yna.co.kr/view/AEN20261021007052320",
-    "first_seen": "2026-10-21T07:41:55.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
-    "status": "filtered",
-    "category": "public_safety",
-    "severity": "medium",
-    "region_tag": "KR",
-    "lat": 38.06135,
-    "lng": 126.70928,
-    "freshness_hours": 13,
-    "reporting": {
-      "label": "Report Crime in South Korea",
-      "url": "https://www.police.go.kr/eng/index.do",
-      "phone": "112 (Emergency)"
-    },
-    "triage": {
-      "relevance_score": 0.34,
-      "threshold": 0.42,
-      "confidence": "low",
-      "disposition": "filtered_review",
-      "publication_type": "news_media",
-      "weak_signals": [
-        "-0.16 publication type leans general-news"
-      ],
-      "metadata": {
-        "author": "Kim Eun-jung",
-        "tags": []
-      }
-    }
-  },
-  {
     "alert_id": "straitstimes-sg-3e8be3f289ea",
     "source_id": "straitstimes-sg",
     "source": {
@@ -2275,14 +2445,14 @@
     "title": "Singapore and UAE to start talks on economic pact, form joint energy task force",
     "canonical_url": "https://www.straitstimes.com/singapore/singapore-uae-can-do-more-to-connect-their-businesses-and-investors-pm-wong",
     "first_seen": "2026-10-21T07:40:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "SG",
     "lat": 1.41224,
     "lng": 103.68635,
-    "freshness_hours": 13,
+    "freshness_hours": 16,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -2303,49 +2473,6 @@
     }
   },
   {
-    "alert_id": "yonhap-kr-86d3e1ba2c5c",
-    "source_id": "yonhap-kr",
-    "source": {
-      "source_id": "yonhap-kr",
-      "authority_name": "Yonhap News Korea",
-      "country": "South Korea",
-      "country_code": "KR",
-      "region": "Asia",
-      "authority_type": "public_safety_program",
-      "base_url": "https://en.yna.co.kr"
-    },
-    "title": "(LEAD) Samsung Biologics Q3 net income down over 20 pct",
-    "canonical_url": "https://en.yna.co.kr/view/AEN20261021008951320",
-    "first_seen": "2026-10-21T07:38:12.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
-    "status": "filtered",
-    "category": "public_safety",
-    "severity": "medium",
-    "region_tag": "KR",
-    "lat": 37.31229,
-    "lng": 127.04668,
-    "freshness_hours": 13,
-    "reporting": {
-      "label": "Report Crime in South Korea",
-      "url": "https://www.police.go.kr/eng/index.do",
-      "phone": "112 (Emergency)"
-    },
-    "triage": {
-      "relevance_score": 0.34,
-      "threshold": 0.42,
-      "confidence": "low",
-      "disposition": "filtered_review",
-      "publication_type": "news_media",
-      "weak_signals": [
-        "-0.16 publication type leans general-news"
-      ],
-      "metadata": {
-        "author": "Kang Jae-eun",
-        "tags": []
-      }
-    }
-  },
-  {
     "alert_id": "cna-sg-crime-69188f584ac3",
     "source_id": "cna-sg-crime",
     "source": {
@@ -2360,14 +2487,14 @@
     "title": "North Korea tells border troops to take &#039;resolute action&#039; if South threatens their safety",
     "canonical_url": "https://www.channelnewsasia.com/east-asia/north-korea-border-troops-resolute-action-safety-6478126",
     "first_seen": "2026-10-21T07:28:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "SG",
     "lat": 1.44975,
     "lng": 104.1369,
-    "freshness_hours": 13,
+    "freshness_hours": 16,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -2404,14 +2531,14 @@
     "title": "Singapore travellers can now use DBS PayLah! in Taiwan",
     "canonical_url": "https://www.channelnewsasia.com/singapore/taiwan-dbs-paylah-scan-pay-twqr-6478131",
     "first_seen": "2026-10-21T07:26:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "SG",
     "lat": 1.44735,
     "lng": 103.76049,
-    "freshness_hours": 13,
+    "freshness_hours": 16,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -2434,92 +2561,6 @@
     }
   },
   {
-    "alert_id": "yonhap-kr-7ebfb21c8574",
-    "source_id": "yonhap-kr",
-    "source": {
-      "source_id": "yonhap-kr",
-      "authority_name": "Yonhap News Korea",
-      "country": "South Korea",
-      "country_code": "KR",
-      "region": "Asia",
-      "authority_type": "public_safety_program",
-      "base_url": "https://en.yna.co.kr"
-    },
-    "title": "(LEAD) Election official found dead after special counsel questioning",
-    "canonical_url": "https://en.yna.co.kr/view/AEN20261021007351315",
-    "first_seen": "2026-10-21T07:24:45.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
-    "status": "filtered",
-    "category": "public_safety",
-    "severity": "medium",
-    "region_tag": "KR",
-    "lat": 37.80062,
-    "lng": 127.44625,
-    "freshness_hours": 13,
-    "reporting": {
-      "label": "Report Crime in South Korea",
-      "url": "https://www.police.go.kr/eng/index.do",
-      "phone": "112 (Emergency)"
-    },
-    "triage": {
-      "relevance_score": 0.34,
-      "threshold": 0.42,
-      "confidence": "low",
-      "disposition": "filtered_review",
-      "publication_type": "news_media",
-      "weak_signals": [
-        "-0.16 publication type leans general-news"
-      ],
-      "metadata": {
-        "author": "Yi Wonju",
-        "tags": []
-      }
-    }
-  },
-  {
-    "alert_id": "yonhap-kr-1e9c319cefbe",
-    "source_id": "yonhap-kr",
-    "source": {
-      "source_id": "yonhap-kr",
-      "authority_name": "Yonhap News Korea",
-      "country": "South Korea",
-      "country_code": "KR",
-      "region": "Asia",
-      "authority_type": "public_safety_program",
-      "base_url": "https://en.yna.co.kr"
-    },
-    "title": "S. Korean won extends gains against U.S. dollar on strong exports",
-    "canonical_url": "https://en.yna.co.kr/view/AEN20261021009200320",
-    "first_seen": "2026-10-21T07:13:52.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
-    "status": "filtered",
-    "category": "public_safety",
-    "severity": "medium",
-    "region_tag": "KR",
-    "lat": 37.35737,
-    "lng": 127.18124,
-    "freshness_hours": 14,
-    "reporting": {
-      "label": "Report Crime in South Korea",
-      "url": "https://www.police.go.kr/eng/index.do",
-      "phone": "112 (Emergency)"
-    },
-    "triage": {
-      "relevance_score": 0.34,
-      "threshold": 0.42,
-      "confidence": "low",
-      "disposition": "filtered_review",
-      "publication_type": "news_media",
-      "weak_signals": [
-        "-0.16 publication type leans general-news"
-      ],
-      "metadata": {
-        "author": "Deok-Hyun Kim",
-        "tags": []
-      }
-    }
-  },
-  {
     "alert_id": "straitstimes-sg-f6a914c50e96",
     "source_id": "straitstimes-sg",
     "source": {
@@ -2534,14 +2575,14 @@
     "title": "South-east Asia’s digital economy to hit US$368b in 2026, up 17% as AI uplifts growth",
     "canonical_url": "https://www.straitstimes.com/tech/south-east-asias-digital-economy-to-hit-us368b-in-2026-up-17-as-ai-uplifts-growth",
     "first_seen": "2026-10-21T06:26:54.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "SG",
     "lat": 0.83118,
     "lng": 103.74885,
-    "freshness_hours": 14,
+    "freshness_hours": 17,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -2576,14 +2617,14 @@
     "title": "China says APEC finance ministers agree to boost policy coordination",
     "canonical_url": "https://www.channelnewsasia.com/east-asia/china-apec-finance-ministers-agree-boost-policy-coordination-6477976",
     "first_seen": "2026-10-21T05:43:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "SG",
     "lat": 35.66111,
     "lng": 104.18714,
-    "freshness_hours": 15,
+    "freshness_hours": 18,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -2606,90 +2647,6 @@
     }
   },
   {
-    "alert_id": "straitstimes-sg-aa43dbbfe27c",
-    "source_id": "straitstimes-sg",
-    "source": {
-      "source_id": "straitstimes-sg",
-      "authority_name": "Straits Times Singapore",
-      "country": "Singapore",
-      "country_code": "SG",
-      "region": "Asia",
-      "authority_type": "public_safety_program",
-      "base_url": "https://www.straitstimes.com"
-    },
-    "title": "NUS president Tan Eng Chye to step down end-2027, search for successor begins",
-    "canonical_url": "https://www.straitstimes.com/singapore/parenting-education/nus-president-tan-eng-chye-to-step-down-end-2027-search-for-successor-begins",
-    "first_seen": "2026-10-21T05:24:31.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
-    "status": "filtered",
-    "category": "public_safety",
-    "severity": "medium",
-    "region_tag": "SG",
-    "lat": 1.44809,
-    "lng": 103.7464,
-    "freshness_hours": 15,
-    "reporting": {
-      "label": "Report Crime in Singapore",
-      "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
-      "phone": "999 (Emergency)"
-    },
-    "triage": {
-      "relevance_score": 0.34,
-      "threshold": 0.42,
-      "confidence": "low",
-      "disposition": "filtered_review",
-      "publication_type": "news_media",
-      "weak_signals": [
-        "-0.16 publication type leans general-news"
-      ],
-      "metadata": {
-        "tags": []
-      }
-    }
-  },
-  {
-    "alert_id": "straitstimes-sg-987a106c6dc1",
-    "source_id": "straitstimes-sg",
-    "source": {
-      "source_id": "straitstimes-sg",
-      "authority_name": "Straits Times Singapore",
-      "country": "Singapore",
-      "country_code": "SG",
-      "region": "Asia",
-      "authority_type": "public_safety_program",
-      "base_url": "https://www.straitstimes.com"
-    },
-    "title": "Hyflux founder Olivia Lum and 5 others not testifying in trial, will call an expert witness",
-    "canonical_url": "https://www.straitstimes.com/singapore/courts-crime/hyflux-trial-to-proceed-as-founder-olivia-lum-and-five-others-will-not-file-no-case-to-answer",
-    "first_seen": "2026-10-21T05:06:32.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
-    "status": "filtered",
-    "category": "public_safety",
-    "severity": "medium",
-    "region_tag": "SG",
-    "lat": 1.30327,
-    "lng": 103.41986,
-    "freshness_hours": 16,
-    "reporting": {
-      "label": "Report Crime in Singapore",
-      "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
-      "phone": "999 (Emergency)"
-    },
-    "triage": {
-      "relevance_score": 0.34,
-      "threshold": 0.42,
-      "confidence": "low",
-      "disposition": "filtered_review",
-      "publication_type": "news_media",
-      "weak_signals": [
-        "-0.16 publication type leans general-news"
-      ],
-      "metadata": {
-        "tags": []
-      }
-    }
-  },
-  {
     "alert_id": "cna-sg-crime-1e9f420d5085",
     "source_id": "cna-sg-crime",
     "source": {
@@ -2704,14 +2661,14 @@
     "title": "Indonesian anger builds over wildfires, toxic haze",
     "canonical_url": "https://www.channelnewsasia.com/asia/indonesia-protest-haze-wildfires-toxic-smoke-6477656",
     "first_seen": "2026-10-21T03:13:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "SG",
     "lat": -0.57463,
     "lng": 113.92957,
-    "freshness_hours": 18,
+    "freshness_hours": 21,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -2748,14 +2705,14 @@
     "title": "BBC slashes 100 jobs, pulls channels amid ‘immediate cost pressures’",
     "canonical_url": "https://www.scmp.com/news/world/europe/article/3371572/bbc-slashes-100-jobs-pulls-channels-amid-immediate-cost-pressures",
     "first_seen": "2026-10-21T01:59:53.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "HK",
     "lat": 22.10645,
     "lng": 113.75897,
-    "freshness_hours": 19,
+    "freshness_hours": 22,
     "reporting": {
       "label": "Report Crime in Hong Kong",
       "url": "https://www.police.gov.hk/ppp_en/contact_us.html",
@@ -2791,14 +2748,14 @@
     "title": "Ambani&#039;s Jio IPO fully subscribed within hours in record Indian sale",
     "canonical_url": "https://www.channelnewsasia.com/business/india-jio-platforms-ipo-opens-reliance-ambani-6476976",
     "first_seen": "2026-10-21T01:30:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "SG",
     "lat": 20.64509,
     "lng": 79.08058,
-    "freshness_hours": 19,
+    "freshness_hours": 22,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -2835,14 +2792,14 @@
     "title": "Trump administration says it has revoked over 300,000 visas",
     "canonical_url": "https://www.scmp.com/news/world/united-states-canada/article/3371565/trump-administration-says-it-has-revoked-over-300000-visas",
     "first_seen": "2026-10-20T23:53:20.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "HK",
     "lat": 40.16269,
     "lng": -98.98339,
-    "freshness_hours": 21,
+    "freshness_hours": 24,
     "reporting": {
       "label": "Report Crime in Hong Kong",
       "url": "https://www.police.gov.hk/ppp_en/contact_us.html",
@@ -2864,49 +2821,6 @@
     }
   },
   {
-    "alert_id": "scmp-hk-6ba90761e688",
-    "source_id": "scmp-hk",
-    "source": {
-      "source_id": "scmp-hk",
-      "authority_name": "SCMP Hong Kong",
-      "country": "Hong Kong",
-      "country_code": "HK",
-      "region": "Asia",
-      "authority_type": "public_safety_program",
-      "base_url": "https://www.scmp.com"
-    },
-    "title": "Musk says SpaceX and Tesla are exploring blockbuster merger deal",
-    "canonical_url": "https://www.scmp.com/news/world/united-states-canada/article/3371564/musk-says-spacex-and-tesla-are-exploring-blockbuster-merger-deal",
-    "first_seen": "2026-10-20T23:35:28.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
-    "status": "filtered",
-    "category": "public_safety",
-    "severity": "medium",
-    "region_tag": "HK",
-    "lat": 39.7431,
-    "lng": -98.14179,
-    "freshness_hours": 21,
-    "reporting": {
-      "label": "Report Crime in Hong Kong",
-      "url": "https://www.police.gov.hk/ppp_en/contact_us.html",
-      "phone": "999 (Emergency)"
-    },
-    "triage": {
-      "relevance_score": 0.34,
-      "threshold": 0.42,
-      "confidence": "low",
-      "disposition": "filtered_review",
-      "publication_type": "news_media",
-      "weak_signals": [
-        "-0.16 publication type leans general-news"
-      ],
-      "metadata": {
-        "author": "Bloomberg",
-        "tags": []
-      }
-    }
-  },
-  {
     "alert_id": "cna-sg-crime-5adf6f466a8a",
     "source_id": "cna-sg-crime",
     "source": {
@@ -2921,14 +2835,14 @@
     "title": "Two years into presidency, Indonesia’s Prabowo faces tough balancing act between ambitious promises and fiscal discipline",
     "canonical_url": "https://www.channelnewsasia.com/asia/indonesia-president-prabowo-subianto-2-years-in-office-economic-gains-challenges-6474906",
     "first_seen": "2026-10-20T10:26:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "SG",
     "lat": -0.418,
     "lng": 114.01729,
-    "freshness_hours": 34,
+    "freshness_hours": 37,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -2965,14 +2879,14 @@
     "title": "Indonesia haze disrupts over 2,600 flights, forces 14 cancellations on Singapore routes",
     "canonical_url": "https://www.channelnewsasia.com/asia/indonesia-haze-flights-cancelled-singapore-palembang-6475151",
     "first_seen": "2026-10-20T10:18:52.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "SG",
     "lat": -0.89007,
     "lng": 113.74173,
-    "freshness_hours": 35,
+    "freshness_hours": 38,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -3009,14 +2923,14 @@
     "title": "China flags APEC&#039;s role as key for a challenged global economy",
     "canonical_url": "https://www.channelnewsasia.com/east-asia/china-apec-role-global-economy-6474826",
     "first_seen": "2026-10-20T08:21:58.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "SG",
     "lat": 36.27215,
     "lng": 104.22253,
-    "freshness_hours": 37,
+    "freshness_hours": 39,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -3053,101 +2967,13 @@
     "title": "Malaysia de-registers main opposition bloc Perikatan Nasional as elections loom",
     "canonical_url": "https://www.channelnewsasia.com/asia/malaysia-perikatan-nasional-deregister-opposition-bersatu-pas-6474751",
     "first_seen": "2026-10-20T08:07:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "SG",
     "lat": 4.26997,
     "lng": 101.77905,
-    "freshness_hours": 37,
-    "reporting": {
-      "label": "Report Crime in Singapore",
-      "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
-      "phone": "999 (Emergency) / 1800-255-0000 (Police Hotline)"
-    },
-    "triage": {
-      "relevance_score": 0.34,
-      "threshold": 0.42,
-      "confidence": "low",
-      "disposition": "filtered_review",
-      "publication_type": "news_media",
-      "weak_signals": [
-        "-0.16 publication type leans general-news"
-      ],
-      "metadata": {
-        "tags": [
-          "Asia"
-        ]
-      }
-    }
-  },
-  {
-    "alert_id": "cna-sg-crime-af217dbf0005",
-    "source_id": "cna-sg-crime",
-    "source": {
-      "source_id": "cna-sg-crime",
-      "authority_name": "CNA Singapore Crime",
-      "country": "Singapore",
-      "country_code": "SG",
-      "region": "Asia",
-      "authority_type": "public_safety_program",
-      "base_url": "https://www.channelnewsasia.com"
-    },
-    "title": "South Korea to withdraw some Ukraine embassy staff after POW row",
-    "canonical_url": "https://www.channelnewsasia.com/east-asia/south-korea-withdraw-ukraine-embassy-staff-6474651",
-    "first_seen": "2026-10-20T06:33:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
-    "status": "filtered",
-    "category": "public_safety",
-    "severity": "medium",
-    "region_tag": "SG",
-    "lat": 35.61393,
-    "lng": 127.56573,
-    "freshness_hours": 38,
-    "reporting": {
-      "label": "Report Crime in Singapore",
-      "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
-      "phone": "999 (Emergency) / 1800-255-0000 (Police Hotline)"
-    },
-    "triage": {
-      "relevance_score": 0.34,
-      "threshold": 0.42,
-      "confidence": "low",
-      "disposition": "filtered_review",
-      "publication_type": "news_media",
-      "weak_signals": [
-        "-0.16 publication type leans general-news"
-      ],
-      "metadata": {
-        "tags": [
-          "East Asia ,Asia ,World"
-        ]
-      }
-    }
-  },
-  {
-    "alert_id": "cna-sg-crime-decbbe985be0",
-    "source_id": "cna-sg-crime",
-    "source": {
-      "source_id": "cna-sg-crime",
-      "authority_name": "CNA Singapore Crime",
-      "country": "Singapore",
-      "country_code": "SG",
-      "region": "Asia",
-      "authority_type": "public_safety_program",
-      "base_url": "https://www.channelnewsasia.com"
-    },
-    "title": "Indonesia to deploy more than 9,000 security officers at protests marking Prabowo&#039;s two years in power",
-    "canonical_url": "https://www.channelnewsasia.com/asia/indonesia-protests-president-prabowo-two-years-power-6474446",
-    "first_seen": "2026-10-20T05:12:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
-    "status": "filtered",
-    "category": "public_safety",
-    "severity": "medium",
-    "region_tag": "SG",
-    "lat": -0.85852,
-    "lng": 114.27603,
     "freshness_hours": 40,
     "reporting": {
       "label": "Report Crime in Singapore",
@@ -3171,32 +2997,32 @@
     }
   },
   {
-    "alert_id": "cna-sg-crime-5db1afc86623",
-    "source_id": "cna-sg-crime",
+    "alert_id": "nhk-jp-3289729a30d1",
+    "source_id": "nhk-jp",
     "source": {
-      "source_id": "cna-sg-crime",
-      "authority_name": "CNA Singapore Crime",
-      "country": "Singapore",
-      "country_code": "SG",
+      "source_id": "nhk-jp",
+      "authority_name": "NHK Japan",
+      "country": "Japan",
+      "country_code": "JP",
       "region": "Asia",
       "authority_type": "public_safety_program",
-      "base_url": "https://www.channelnewsasia.com"
+      "base_url": "https://www3.nhk.or.jp"
     },
-    "title": "Japan slams lack of access to journalist detained in Russia",
-    "canonical_url": "https://www.channelnewsasia.com/world/japan-slams-russia-journalist-detained-6474546",
-    "first_seen": "2026-10-20T05:11:22.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "title": "北日本と東日本中心 9日も大気の状態が非常に不安定の見込み",
+    "canonical_url": "http://www3.nhk.or.jp/news/html/20260808/k10015200211000.html",
+    "first_seen": "2026-08-08T06:35:00.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
-    "region_tag": "SG",
-    "lat": 61.77838,
-    "lng": 106.00764,
-    "freshness_hours": 40,
+    "region_tag": "JP",
+    "lat": 35.36195,
+    "lng": 139.21591,
+    "freshness_hours": 1786,
     "reporting": {
-      "label": "Report Crime in Singapore",
-      "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
-      "phone": "999 (Emergency) / 1800-255-0000 (Police Hotline)"
+      "label": "Report to Japan Police",
+      "url": "https://www.npa.go.jp/english/index.html",
+      "phone": "110 (Emergency)"
     },
     "triage": {
       "relevance_score": 0.34,
@@ -3208,9 +3034,7 @@
         "-0.16 publication type leans general-news"
       ],
       "metadata": {
-        "tags": [
-          "World ,East Asia ,Asia"
-        ]
+        "tags": []
       }
     }
   },
@@ -3229,14 +3053,14 @@
     "title": "愛知県内で水難事故相次ぐ 2人死亡",
     "canonical_url": "http://www3.nhk.or.jp/news/html/20260808/k10015200261000.html",
     "first_seen": "2026-08-08T08:56:28.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "JP",
     "lat": 36.02172,
     "lng": 139.70307,
-    "freshness_hours": 1783,
+    "freshness_hours": 1786,
     "reporting": {
       "label": "Report to Japan Police",
       "url": "https://www.npa.go.jp/english/index.html",
@@ -3271,14 +3095,14 @@
     "title": "台風13号 影響は長時間続く 警戒を 台風15号の動きは?",
     "canonical_url": "http://www3.nhk.or.jp/news/html/20260808/k10015199841000.html",
     "first_seen": "2026-08-07T16:40:17.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "JP",
     "lat": 35.17562,
     "lng": 140.02547,
-    "freshness_hours": 1784,
+    "freshness_hours": 1787,
     "reporting": {
       "label": "Report to Japan Police",
       "url": "https://www.npa.go.jp/english/index.html",
@@ -3313,14 +3137,56 @@
     "title": "熊本地震 死者1人増える 災害関連死の疑い1人含め 死者39人に",
     "canonical_url": "http://www3.nhk.or.jp/news/html/20260808/k10015199981000.html",
     "first_seen": "2026-08-08T02:44:54.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "JP",
     "lat": 35.95857,
     "lng": 139.43485,
-    "freshness_hours": 1785,
+    "freshness_hours": 1788,
+    "reporting": {
+      "label": "Report to Japan Police",
+      "url": "https://www.npa.go.jp/english/index.html",
+      "phone": "110 (Emergency)"
+    },
+    "triage": {
+      "relevance_score": 0.34,
+      "threshold": 0.42,
+      "confidence": "low",
+      "disposition": "filtered_review",
+      "publication_type": "news_media",
+      "weak_signals": [
+        "-0.16 publication type leans general-news"
+      ],
+      "metadata": {
+        "tags": []
+      }
+    }
+  },
+  {
+    "alert_id": "nhk-jp-4d65207525bf",
+    "source_id": "nhk-jp",
+    "source": {
+      "source_id": "nhk-jp",
+      "authority_name": "NHK Japan",
+      "country": "Japan",
+      "country_code": "JP",
+      "region": "Asia",
+      "authority_type": "public_safety_program",
+      "base_url": "https://www3.nhk.or.jp"
+    },
+    "title": "熊本地震 10年前の地震と隣り合う領域で発生か 専門家分析",
+    "canonical_url": "http://www3.nhk.or.jp/news/html/20260808/k10015200121000.html",
+    "first_seen": "2026-08-08T11:53:49.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "medium",
+    "region_tag": "JP",
+    "lat": 35.71168,
+    "lng": 139.226,
+    "freshness_hours": 1788,
     "reporting": {
       "label": "Report to Japan Police",
       "url": "https://www.npa.go.jp/english/index.html",
@@ -3355,14 +3221,14 @@
     "title": "ラグビーリーグワン フィジー出身選手が死亡 熱中症疑いで搬送",
     "canonical_url": "http://www3.nhk.or.jp/news/html/20260808/k10015200291000.html",
     "first_seen": "2026-08-08T11:29:37.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "JP",
     "lat": 35.44425,
     "lng": 140.27995,
-    "freshness_hours": 1785,
+    "freshness_hours": 1788,
     "reporting": {
       "label": "Report to Japan Police",
       "url": "https://www.npa.go.jp/english/index.html",
@@ -3397,14 +3263,14 @@
     "title": "お盆休みで下りの混雑ピーク 高速道路や新幹線は",
     "canonical_url": "http://www3.nhk.or.jp/news/html/20260808/k10015199951000.html",
     "first_seen": "2026-08-08T01:59:06.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "JP",
     "lat": 35.95571,
     "lng": 140.14618,
-    "freshness_hours": 1786,
+    "freshness_hours": 1789,
     "reporting": {
       "label": "Report to Japan Police",
       "url": "https://www.npa.go.jp/english/index.html",
@@ -3439,14 +3305,14 @@
     "title": "【動画】Pickup NEWS（8月8日）",
     "canonical_url": "http://www3.nhk.or.jp/news/html/20260808/k10015199551000.html",
     "first_seen": "2026-08-07T22:13:39.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "JP",
     "lat": 35.47224,
     "lng": 139.60546,
-    "freshness_hours": 1786,
+    "freshness_hours": 1789,
     "reporting": {
       "label": "Report to Japan Police",
       "url": "https://www.npa.go.jp/english/index.html",
@@ -3481,14 +3347,140 @@
     "title": "熊本 各地で9日も厳しい暑さに 局地的な雨も土砂災害注意",
     "canonical_url": "http://www3.nhk.or.jp/news/html/20260808/k10015199781000.html",
     "first_seen": "2026-08-07T21:24:12.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "JP",
     "lat": 35.72869,
     "lng": 140.48258,
-    "freshness_hours": 1787,
+    "freshness_hours": 1790,
+    "reporting": {
+      "label": "Report to Japan Police",
+      "url": "https://www.npa.go.jp/english/index.html",
+      "phone": "110 (Emergency)"
+    },
+    "triage": {
+      "relevance_score": 0.34,
+      "threshold": 0.42,
+      "confidence": "low",
+      "disposition": "filtered_review",
+      "publication_type": "news_media",
+      "weak_signals": [
+        "-0.16 publication type leans general-news"
+      ],
+      "metadata": {
+        "tags": []
+      }
+    }
+  },
+  {
+    "alert_id": "nhk-jp-c62a97300afc",
+    "source_id": "nhk-jp",
+    "source": {
+      "source_id": "nhk-jp",
+      "authority_name": "NHK Japan",
+      "country": "Japan",
+      "country_code": "JP",
+      "region": "Asia",
+      "authority_type": "public_safety_program",
+      "base_url": "https://www3.nhk.or.jp"
+    },
+    "title": "【交通影響 8月8日】九州新幹線の現在の状況をまとめました",
+    "canonical_url": "http://www3.nhk.or.jp/news/html/20260808/k10015200051000.html",
+    "first_seen": "2026-08-08T09:37:29.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "medium",
+    "region_tag": "JP",
+    "lat": 36.09579,
+    "lng": 139.0841,
+    "freshness_hours": 1790,
+    "reporting": {
+      "label": "Report to Japan Police",
+      "url": "https://www.npa.go.jp/english/index.html",
+      "phone": "110 (Emergency)"
+    },
+    "triage": {
+      "relevance_score": 0.34,
+      "threshold": 0.42,
+      "confidence": "low",
+      "disposition": "filtered_review",
+      "publication_type": "news_media",
+      "weak_signals": [
+        "-0.16 publication type leans general-news"
+      ],
+      "metadata": {
+        "tags": []
+      }
+    }
+  },
+  {
+    "alert_id": "nhk-jp-be5dd1236ed3",
+    "source_id": "nhk-jp",
+    "source": {
+      "source_id": "nhk-jp",
+      "authority_name": "NHK Japan",
+      "country": "Japan",
+      "country_code": "JP",
+      "region": "Asia",
+      "authority_type": "public_safety_program",
+      "base_url": "https://www3.nhk.or.jp"
+    },
+    "title": "熊本県内 避難情報 124か所 6591人が避難【8月8日】",
+    "canonical_url": "http://www3.nhk.or.jp/news/html/20260808/k10015200061000.html",
+    "first_seen": "2026-08-08T08:52:08.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "medium",
+    "region_tag": "JP",
+    "lat": 35.84575,
+    "lng": 139.41065,
+    "freshness_hours": 1791,
+    "reporting": {
+      "label": "Report to Japan Police",
+      "url": "https://www.npa.go.jp/english/index.html",
+      "phone": "110 (Emergency)"
+    },
+    "triage": {
+      "relevance_score": 0.34,
+      "threshold": 0.42,
+      "confidence": "low",
+      "disposition": "filtered_review",
+      "publication_type": "news_media",
+      "weak_signals": [
+        "-0.16 publication type leans general-news"
+      ],
+      "metadata": {
+        "tags": []
+      }
+    }
+  },
+  {
+    "alert_id": "nhk-jp-8ed76bc4453d",
+    "source_id": "nhk-jp",
+    "source": {
+      "source_id": "nhk-jp",
+      "authority_name": "NHK Japan",
+      "country": "Japan",
+      "country_code": "JP",
+      "region": "Asia",
+      "authority_type": "public_safety_program",
+      "base_url": "https://www3.nhk.or.jp"
+    },
+    "title": "熊本 氷川町でボランティアが活動開始【8日 被災地の動き】",
+    "canonical_url": "http://www3.nhk.or.jp/news/html/20260808/k10015200101000.html",
+    "first_seen": "2026-08-08T04:15:31.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "medium",
+    "region_tag": "JP",
+    "lat": 35.64065,
+    "lng": 139.44718,
+    "freshness_hours": 1792,
     "reporting": {
       "label": "Report to Japan Police",
       "url": "https://www.npa.go.jp/english/index.html",
@@ -3523,14 +3515,56 @@
     "title": "8日も猛暑日 熱中症対策徹底を 局地的に大雨のおそれも",
     "canonical_url": "http://www3.nhk.or.jp/news/html/20260808/k10015200031000.html",
     "first_seen": "2026-08-08T03:25:05.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "JP",
     "lat": 35.08955,
     "lng": 139.97844,
-    "freshness_hours": 1789,
+    "freshness_hours": 1792,
+    "reporting": {
+      "label": "Report to Japan Police",
+      "url": "https://www.npa.go.jp/english/index.html",
+      "phone": "110 (Emergency)"
+    },
+    "triage": {
+      "relevance_score": 0.34,
+      "threshold": 0.42,
+      "confidence": "low",
+      "disposition": "filtered_review",
+      "publication_type": "news_media",
+      "weak_signals": [
+        "-0.16 publication type leans general-news"
+      ],
+      "metadata": {
+        "tags": []
+      }
+    }
+  },
+  {
+    "alert_id": "nhk-jp-32ae5d595839",
+    "source_id": "nhk-jp",
+    "source": {
+      "source_id": "nhk-jp",
+      "authority_name": "NHK Japan",
+      "country": "Japan",
+      "country_code": "JP",
+      "region": "Asia",
+      "authority_type": "public_safety_program",
+      "base_url": "https://www3.nhk.or.jp"
+    },
+    "title": "新潟 小千谷「記録的短時間大雨」の気象防災速報を発表",
+    "canonical_url": "http://www3.nhk.or.jp/news/html/20260808/k10015200221000.html",
+    "first_seen": "2026-08-08T06:47:00.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "medium",
+    "region_tag": "JP",
+    "lat": 35.4527,
+    "lng": 139.59549,
+    "freshness_hours": 1793,
     "reporting": {
       "label": "Report to Japan Police",
       "url": "https://www.npa.go.jp/english/index.html",
@@ -3565,14 +3599,14 @@
     "title": "新潟 中越で線状降水帯発生のおそれ 直前予測を発表",
     "canonical_url": "http://www3.nhk.or.jp/news/html/20260808/k10015200201000.html",
     "first_seen": "2026-08-08T06:16:55.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "JP",
     "lat": 35.44749,
     "lng": 139.89595,
-    "freshness_hours": 1791,
+    "freshness_hours": 1794,
     "reporting": {
       "label": "Report to Japan Police",
       "url": "https://www.npa.go.jp/english/index.html",
@@ -3607,14 +3641,14 @@
     "title": "千葉 南房総 海水浴場で男性2人が溺れる このうち1人意識なし",
     "canonical_url": "http://www3.nhk.or.jp/news/html/20260808/k10015200141000.html",
     "first_seen": "2026-08-08T04:56:52.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "JP",
     "lat": 35.51756,
     "lng": 139.89255,
-    "freshness_hours": 1792,
+    "freshness_hours": 1795,
     "reporting": {
       "label": "Report to Japan Police",
       "url": "https://www.npa.go.jp/english/index.html",
@@ -3649,14 +3683,14 @@
     "title": "鹿児島 和泊町の避難指示解除",
     "canonical_url": "http://www3.nhk.or.jp/news/html/20260808/k10015200091000.html",
     "first_seen": "2026-08-08T03:58:57.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "JP",
     "lat": 35.32919,
     "lng": 139.19483,
-    "freshness_hours": 1793,
+    "freshness_hours": 1796,
     "reporting": {
       "label": "Report to Japan Police",
       "url": "https://www.npa.go.jp/english/index.html",
@@ -3691,14 +3725,14 @@
     "title": "熊本地震【専門家Q＆A】ボランティア参加するには？注意点は？",
     "canonical_url": "http://www3.nhk.or.jp/news/html/20260808/k10015199991000.html",
     "first_seen": "2026-08-08T03:09:12.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "JP",
     "lat": 35.61179,
     "lng": 139.2644,
-    "freshness_hours": 1794,
+    "freshness_hours": 1797,
     "reporting": {
       "label": "Report to Japan Police",
       "url": "https://www.npa.go.jp/english/index.html",
@@ -3733,14 +3767,56 @@
     "title": "悠仁さま ボーイスカウトのキャンプで豚汁作りや木工体験",
     "canonical_url": "http://www3.nhk.or.jp/news/html/20260808/k10015199941000.html",
     "first_seen": "2026-08-08T02:21:35.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "JP",
     "lat": 35.49518,
     "lng": 139.18009,
-    "freshness_hours": 1795,
+    "freshness_hours": 1797,
+    "reporting": {
+      "label": "Report to Japan Police",
+      "url": "https://www.npa.go.jp/english/index.html",
+      "phone": "110 (Emergency)"
+    },
+    "triage": {
+      "relevance_score": 0.34,
+      "threshold": 0.42,
+      "confidence": "low",
+      "disposition": "filtered_review",
+      "publication_type": "news_media",
+      "weak_signals": [
+        "-0.16 publication type leans general-news"
+      ],
+      "metadata": {
+        "tags": []
+      }
+    }
+  },
+  {
+    "alert_id": "nhk-jp-e74b2e0edbaf",
+    "source_id": "nhk-jp",
+    "source": {
+      "source_id": "nhk-jp",
+      "authority_name": "NHK Japan",
+      "country": "Japan",
+      "country_code": "JP",
+      "region": "Asia",
+      "authority_type": "public_safety_program",
+      "base_url": "https://www3.nhk.or.jp"
+    },
+    "title": "環境省 公費解体円滑化に向け自治体をサポートするチーム発足",
+    "canonical_url": "http://www3.nhk.or.jp/news/html/20260808/k10015199731000.html",
+    "first_seen": "2026-08-07T22:57:26.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "medium",
+    "region_tag": "JP",
+    "lat": 36.12259,
+    "lng": 139.34434,
+    "freshness_hours": 1801,
     "reporting": {
       "label": "Report to Japan Police",
       "url": "https://www.npa.go.jp/english/index.html",
@@ -3775,7 +3851,7 @@
     "title": "Current crises",
     "canonical_url": "https://acleddata.com/global-analysis/current-crises",
     "first_seen": "2026-10-12T16:07:30.346Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "conflict_monitoring",
     "severity": "medium",
@@ -3818,7 +3894,7 @@
     "title": "Global analysis",
     "canonical_url": "https://acleddata.com/global-analysis",
     "first_seen": "2026-10-09T21:51:03.753Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "conflict_monitoring",
     "severity": "medium",
@@ -3861,7 +3937,7 @@
     "title": "Webinars",
     "canonical_url": "https://acleddata.com/global-analysis/events-webinars",
     "first_seen": "2026-10-09T21:51:03.753Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "conflict_monitoring",
     "severity": "medium",
@@ -3904,7 +3980,7 @@
     "title": "See all Feature Stories",
     "canonical_url": "https://www.worldbank.org/en/news/all?topic_exact=Education+and+Skills&#x26;displayconttype_exact=Feature+Story&#x26;displayconttype_exact=Video&#x26;displayconttype_exact=Results&#x26;displayconttype_exact=Immersive+Story&#x26;displayconttype_exact=Podcast",
     "first_seen": "2026-09-28T18:09:48.959Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "education_digital_capacity",
     "severity": "medium",
@@ -3933,6 +4009,240 @@
     }
   },
   {
+    "alert_id": "middleeasteye-c03ee96fcfc2",
+    "source_id": "middleeasteye",
+    "source": {
+      "source_id": "middleeasteye",
+      "authority_name": "Middle East Eye",
+      "country": "Qatar",
+      "country_code": "QA",
+      "region": "Asia",
+      "authority_type": "public_safety_program",
+      "base_url": "https://www.middleeasteye.net"
+    },
+    "title": "Iran, China discuss regional peace, strengthening Global South cooperation",
+    "canonical_url": "https://www.middleeasteye.net/live-blog/live-blog-update/iran-china-discuss-regional-peace-strengthening-global-south-cooperation",
+    "first_seen": "2026-10-21T22:19:13.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "medium",
+    "region_tag": "ME",
+    "lat": 36.07226,
+    "lng": 104.53869,
+    "freshness_hours": 2,
+    "reporting": {
+      "label": "Middle East Eye Tips",
+      "url": "https://www.middleeasteye.net/contact"
+    },
+    "triage": {
+      "relevance_score": 0.3,
+      "threshold": 0.42,
+      "confidence": "medium",
+      "disposition": "filtered_review",
+      "publication_type": "public_safety_bulletin",
+      "weak_signals": [
+        "-0.12 general institutional/news language",
+        "-0.08 weak incident evidence relative to narrative cues"
+      ],
+      "metadata": {
+        "author": "Fleur Hargreaves",
+        "tags": []
+      }
+    }
+  },
+  {
+    "alert_id": "globalnews-ca-1e6c1150277f",
+    "source_id": "globalnews-ca",
+    "source": {
+      "source_id": "globalnews-ca",
+      "authority_name": "Global News Canada",
+      "country": "Canada",
+      "country_code": "CA",
+      "region": "North America",
+      "authority_type": "public_safety_program",
+      "base_url": "https://globalnews.ca"
+    },
+    "title": "Eby says Conservatives acting like they&#8217;ve won, Doerkson fundraising as election nears end",
+    "canonical_url": "https://globalnews.ca/news/12112398/bc-election-october-21/",
+    "first_seen": "2026-10-21T22:14:29.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "medium",
+    "region_tag": "CA",
+    "lat": 45.55103,
+    "lng": -73.21071,
+    "freshness_hours": 2,
+    "reporting": {
+      "label": "Global News Tips",
+      "url": "https://globalnews.ca/pages/contact-us/"
+    },
+    "triage": {
+      "relevance_score": 0.3,
+      "threshold": 0.42,
+      "confidence": "medium",
+      "disposition": "filtered_review",
+      "publication_type": "public_safety_bulletin",
+      "weak_signals": [
+        "-0.12 general institutional/news language",
+        "-0.08 weak incident evidence relative to narrative cues"
+      ],
+      "metadata": {
+        "author": "Globalnews Digital",
+        "tags": [
+          "Politics",
+          "BC Conservatives",
+          "BC election",
+          "BC NDP"
+        ]
+      }
+    }
+  },
+  {
+    "alert_id": "globalnews-ca-5e778ff3a782",
+    "source_id": "globalnews-ca",
+    "source": {
+      "source_id": "globalnews-ca",
+      "authority_name": "Global News Canada",
+      "country": "Canada",
+      "country_code": "CA",
+      "region": "North America",
+      "authority_type": "public_safety_program",
+      "base_url": "https://globalnews.ca"
+    },
+    "title": "Pope Leo needs no further treatment for lung cancer: Vatican",
+    "canonical_url": "https://globalnews.ca/news/12112362/pope-leo-no-further-cancer-treatment/",
+    "first_seen": "2026-10-21T22:04:48.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "medium",
+    "region_tag": "CA",
+    "lat": 45.74985,
+    "lng": -73.8577,
+    "freshness_hours": 2,
+    "reporting": {
+      "label": "Global News Tips",
+      "url": "https://globalnews.ca/pages/contact-us/"
+    },
+    "triage": {
+      "relevance_score": 0.3,
+      "threshold": 0.42,
+      "confidence": "medium",
+      "disposition": "filtered_review",
+      "publication_type": "public_safety_bulletin",
+      "weak_signals": [
+        "-0.12 general institutional/news language",
+        "-0.08 weak incident evidence relative to narrative cues"
+      ],
+      "metadata": {
+        "author": "Globalnews Digital",
+        "tags": [
+          "World",
+          "Cancer",
+          "Lung Cancer",
+          "pope leo"
+        ]
+      }
+    }
+  },
+  {
+    "alert_id": "globalnews-ca-158becd234c7",
+    "source_id": "globalnews-ca",
+    "source": {
+      "source_id": "globalnews-ca",
+      "authority_name": "Global News Canada",
+      "country": "Canada",
+      "country_code": "CA",
+      "region": "North America",
+      "authority_type": "public_safety_program",
+      "base_url": "https://globalnews.ca"
+    },
+    "title": "PSAC announces nationwide strike votes set for November",
+    "canonical_url": "https://globalnews.ca/news/12112316/psac-strike-votes-november/",
+    "first_seen": "2026-10-21T21:50:25.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "medium",
+    "region_tag": "CA",
+    "lat": 45.22321,
+    "lng": -74.34179,
+    "freshness_hours": 2,
+    "reporting": {
+      "label": "Global News Tips",
+      "url": "https://globalnews.ca/pages/contact-us/"
+    },
+    "triage": {
+      "relevance_score": 0.3,
+      "threshold": 0.42,
+      "confidence": "medium",
+      "disposition": "filtered_review",
+      "publication_type": "public_safety_bulletin",
+      "weak_signals": [
+        "-0.12 general institutional/news language",
+        "-0.08 weak incident evidence relative to narrative cues"
+      ],
+      "metadata": {
+        "author": "Globalnews Digital",
+        "tags": [
+          "Canada",
+          "Politics",
+          "PSAC",
+          "Strike",
+          "Strike vote"
+        ]
+      }
+    }
+  },
+  {
+    "alert_id": "middleeasteye-d59cf773287c",
+    "source_id": "middleeasteye",
+    "source": {
+      "source_id": "middleeasteye",
+      "authority_name": "Middle East Eye",
+      "country": "Qatar",
+      "country_code": "QA",
+      "region": "Asia",
+      "authority_type": "public_safety_program",
+      "base_url": "https://www.middleeasteye.net"
+    },
+    "title": "Property sales of illegal Israeli settlement lands challenged in complaint in Canada",
+    "canonical_url": "https://www.middleeasteye.net/news/property-sales-illegal-israeli-settlement-land-challenged-complaint-canada",
+    "first_seen": "2026-10-21T21:30:14.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "medium",
+    "region_tag": "ME",
+    "lat": 56.18467,
+    "lng": -106.79968,
+    "freshness_hours": 2,
+    "reporting": {
+      "label": "Middle East Eye Tips",
+      "url": "https://www.middleeasteye.net/contact"
+    },
+    "triage": {
+      "relevance_score": 0.3,
+      "threshold": 0.42,
+      "confidence": "medium",
+      "disposition": "filtered_review",
+      "publication_type": "public_safety_bulletin",
+      "weak_signals": [
+        "+0.10 contains response/reporting actions",
+        "+0.08 specific impact/timeline/system details",
+        "-0.18 opinion/commentary phrasing",
+        "-0.12 general institutional/news language",
+        "-0.08 weak incident evidence relative to narrative cues"
+      ],
+      "metadata": {
+        "author": "Yasmine El-Sabawi",
+        "tags": []
+      }
+    }
+  },
+  {
     "alert_id": "middleeasteye-c08a285c02ed",
     "source_id": "middleeasteye",
     "source": {
@@ -3947,14 +4257,14 @@
     "title": "US State Department says departure orders for non-emergency embassy staff in Saudi Arabia only",
     "canonical_url": "https://www.middleeasteye.net/live-blog/live-blog-update/us-state-department-says-departure-orders-embassy-staff-saudi-arabia",
     "first_seen": "2026-10-21T20:33:08.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "critical",
     "region_tag": "ME",
     "lat": 23.54705,
     "lng": 45.09102,
-    "freshness_hours": 1,
+    "freshness_hours": 3,
     "reporting": {
       "label": "Middle East Eye Tips",
       "url": "https://www.middleeasteye.net/contact"
@@ -3990,14 +4300,14 @@
     "title": "Netanyahu threatens regime change in Iran",
     "canonical_url": "https://www.middleeasteye.net/live-blog/live-blog-update/netanyahu-threatens-regime-change-iran",
     "first_seen": "2026-10-21T18:49:19.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "ME",
     "lat": 32.87564,
     "lng": 53.74682,
-    "freshness_hours": 2,
+    "freshness_hours": 5,
     "reporting": {
       "label": "Middle East Eye Tips",
       "url": "https://www.middleeasteye.net/contact"
@@ -4019,31 +4329,31 @@
     }
   },
   {
-    "alert_id": "middleeasteye-e2184b73f609",
-    "source_id": "middleeasteye",
+    "alert_id": "rnz-pacific-66adadd66c0a",
+    "source_id": "rnz-pacific",
     "source": {
-      "source_id": "middleeasteye",
-      "authority_name": "Middle East Eye",
-      "country": "Qatar",
-      "country_code": "QA",
-      "region": "Asia",
+      "source_id": "rnz-pacific",
+      "authority_name": "RNZ Pacific",
+      "country": "New Zealand",
+      "country_code": "NZ",
+      "region": "Oceania",
       "authority_type": "public_safety_program",
-      "base_url": "https://www.middleeasteye.net"
+      "base_url": "https://www.rnz.co.nz"
     },
-    "title": "Pezeshkian says countries still working with Iran despite US sanctions",
-    "canonical_url": "https://www.middleeasteye.net/live-blog/live-blog-update/pezeshkian-says-countries-still-working-iran-despite-us-sanctions",
-    "first_seen": "2026-10-21T17:17:56.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "title": "Pacific police chiefs launch PACPOL to tackle transnational crime",
+    "canonical_url": "https://www.rnz.co.nz/news/pacific/2070260/pacific-police-chiefs-launch-pacpol-to-tackle-transnational-crime",
+    "first_seen": "2026-10-21T17:50:03.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
-    "region_tag": "ME",
-    "lat": 32.18537,
-    "lng": 53.72009,
-    "freshness_hours": 4,
+    "region_tag": "NZ",
+    "lat": -14.97918,
+    "lng": 166.45702,
+    "freshness_hours": 6,
     "reporting": {
-      "label": "Middle East Eye Tips",
-      "url": "https://www.middleeasteye.net/contact"
+      "label": "RNZ Pacific Contact",
+      "url": "https://www.rnz.co.nz/about/contact"
     },
     "triage": {
       "relevance_score": 0.3,
@@ -4056,7 +4366,6 @@
         "-0.08 weak incident evidence relative to narrative cues"
       ],
       "metadata": {
-        "author": "Fleur Hargreaves",
         "tags": []
       }
     }
@@ -4076,14 +4385,14 @@
     "title": "Türkiye's mayors push disaster resilience, urban renewal at summit",
     "canonical_url": "https://www.dailysabah.com/turkiye/turkiyes-mayors-push-disaster-resilience-urban-renewal-at-summit/news",
     "first_seen": "2026-10-21T15:59:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "TR",
     "lat": 41.28146,
     "lng": 28.18941,
-    "freshness_hours": 5,
+    "freshness_hours": 8,
     "reporting": {
       "label": "Daily Sabah Contact",
       "url": "https://www.dailysabah.com/contact"
@@ -4118,56 +4427,14 @@
     "title": "Turkish minister calls on OECD to raise voice for Gaza",
     "canonical_url": "https://www.dailysabah.com/politics/turkish-minister-calls-on-oecd-to-raise-voice-for-gaza/news",
     "first_seen": "2026-10-21T13:14:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "TR",
     "lat": 41.20739,
     "lng": 28.46198,
-    "freshness_hours": 8,
-    "reporting": {
-      "label": "Daily Sabah Contact",
-      "url": "https://www.dailysabah.com/contact"
-    },
-    "triage": {
-      "relevance_score": 0.3,
-      "threshold": 0.42,
-      "confidence": "medium",
-      "disposition": "filtered_review",
-      "publication_type": "public_safety_bulletin",
-      "weak_signals": [
-        "-0.12 general institutional/news language",
-        "-0.08 weak incident evidence relative to narrative cues"
-      ],
-      "metadata": {
-        "tags": []
-      }
-    }
-  },
-  {
-    "alert_id": "dailysabah-tr-0741b677863c",
-    "source_id": "dailysabah-tr",
-    "source": {
-      "source_id": "dailysabah-tr",
-      "authority_name": "Daily Sabah Turkey",
-      "country": "Turkey",
-      "country_code": "TR",
-      "region": "Asia",
-      "authority_type": "public_safety_program",
-      "base_url": "https://www.dailysabah.com"
-    },
-    "title": "Turkic ‘family’ set for key Ankara summit to tackle challenges",
-    "canonical_url": "https://www.dailysabah.com/politics/diplomacy/turkic-family-set-for-key-ankara-summit-to-tackle-challenges",
-    "first_seen": "2026-10-21T12:45:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
-    "status": "filtered",
-    "category": "public_safety",
-    "severity": "medium",
-    "region_tag": "TR",
-    "lat": 40.77835,
-    "lng": 28.1438,
-    "freshness_hours": 8,
+    "freshness_hours": 11,
     "reporting": {
       "label": "Daily Sabah Contact",
       "url": "https://www.dailysabah.com/contact"
@@ -4202,14 +4469,14 @@
     "title": "Israel joins Pacific Islands Forum as partner",
     "canonical_url": "https://www.rnz.co.nz/news/pacific/2048545/israel-joins-pacific-islands-forum-as-partner",
     "first_seen": "2026-10-20T20:55:50.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "NZ",
     "lat": 30.99446,
     "lng": 35.12842,
-    "freshness_hours": 19,
+    "freshness_hours": 22,
     "reporting": {
       "label": "RNZ Pacific Contact",
       "url": "https://www.rnz.co.nz/about/contact"
@@ -4244,14 +4511,14 @@
     "title": "Solcis launches open compliance layer for AI agents on NVIDIA OpenShell",
     "canonical_url": "https://laotiantimes.com/2026/10/21/solcis-launches-open-compliance-layer-for-ai-agents-on-nvidia-openshell/",
     "first_seen": "2026-10-20T22:00:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "LA",
     "lat": 17.84389,
     "lng": 102.27418,
-    "freshness_hours": 23,
+    "freshness_hours": 26,
     "reporting": {
       "label": "Laotian Times Contact",
       "url": "https://laotiantimes.com/contact/"
@@ -4289,14 +4556,14 @@
     "title": "TempraMed Announces LIFE Offering up to C$8 Million to Accelerate Global Expansion and Fulfilment of Forecasted Demand",
     "canonical_url": "https://laotiantimes.com/2026/10/20/tempramed-announces-life-offering-up-to-c8-million-to-accelerate-global-expansion-and-fulfilment-of-forecasted-demand/",
     "first_seen": "2026-10-20T15:35:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "LA",
     "lat": 18.47534,
     "lng": 102.53087,
-    "freshness_hours": 29,
+    "freshness_hours": 32,
     "reporting": {
       "label": "Laotian Times Contact",
       "url": "https://laotiantimes.com/contact/"
@@ -4320,6 +4587,180 @@
     }
   },
   {
+    "alert_id": "scmp-hk-9d71b00e29b0",
+    "source_id": "scmp-hk",
+    "source": {
+      "source_id": "scmp-hk",
+      "authority_name": "SCMP Hong Kong",
+      "country": "Hong Kong",
+      "country_code": "HK",
+      "region": "Asia",
+      "authority_type": "public_safety_program",
+      "base_url": "https://www.scmp.com"
+    },
+    "title": "Pakistan and the US factor as China looks to sell its J-35 stealth jets",
+    "canonical_url": "https://www.scmp.com/opinion/asia-opinion/article/3371561/pakistan-and-us-factor-china-looks-sell-its-j-35-stealth-jets",
+    "first_seen": "2026-10-21T21:30:06.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "medium",
+    "region_tag": "HK",
+    "lat": 36.13742,
+    "lng": 104.17624,
+    "freshness_hours": 2,
+    "reporting": {
+      "label": "Report Crime in Hong Kong",
+      "url": "https://www.police.gov.hk/ppp_en/contact_us.html",
+      "phone": "999 (Emergency)"
+    },
+    "triage": {
+      "relevance_score": 0.26,
+      "threshold": 0.42,
+      "confidence": "medium",
+      "disposition": "filtered_review",
+      "publication_type": "news_media",
+      "weak_signals": [
+        "-0.16 publication type leans general-news",
+        "+0.10 contains response/reporting actions",
+        "+0.08 specific impact/timeline/system details",
+        "-0.18 opinion/commentary phrasing",
+        "-0.08 weak incident evidence relative to narrative cues"
+      ],
+      "metadata": {
+        "author": "Tang Meng Kit",
+        "tags": []
+      }
+    }
+  },
+  {
+    "alert_id": "middleeasteye-e63604c0a606",
+    "source_id": "middleeasteye",
+    "source": {
+      "source_id": "middleeasteye",
+      "authority_name": "Middle East Eye",
+      "country": "Qatar",
+      "country_code": "QA",
+      "region": "Asia",
+      "authority_type": "public_safety_program",
+      "base_url": "https://www.middleeasteye.net"
+    },
+    "title": "Netanyahu accuses Erdogan of escalating tensions between Israel and Turkey",
+    "canonical_url": "https://www.middleeasteye.net/live-blog/live-blog-update/netanyahu-accuses-erdogan-escalating-tensions-between-israel-and-turkey",
+    "first_seen": "2026-10-21T23:52:42.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "medium",
+    "region_tag": "ME",
+    "lat": 30.9443,
+    "lng": 34.91502,
+    "freshness_hours": 1,
+    "reporting": {
+      "label": "Middle East Eye Tips",
+      "url": "https://www.middleeasteye.net/contact"
+    },
+    "triage": {
+      "relevance_score": 0.24,
+      "threshold": 0.42,
+      "confidence": "medium",
+      "disposition": "filtered_review",
+      "publication_type": "public_safety_bulletin",
+      "weak_signals": [
+        "-0.18 opinion/commentary phrasing",
+        "-0.08 weak incident evidence relative to narrative cues"
+      ],
+      "metadata": {
+        "author": "Mera Aladam",
+        "tags": []
+      }
+    }
+  },
+  {
+    "alert_id": "dailysabah-tr-ce751dc87971",
+    "source_id": "dailysabah-tr",
+    "source": {
+      "source_id": "dailysabah-tr",
+      "authority_name": "Daily Sabah Turkey",
+      "country": "Turkey",
+      "country_code": "TR",
+      "region": "Asia",
+      "authority_type": "public_safety_program",
+      "base_url": "https://www.dailysabah.com"
+    },
+    "title": "Foreign interference in AI age: Lessons from Spain and France",
+    "canonical_url": "https://www.dailysabah.com/opinion/columns/foreign-interference-in-ai-age-lessons-from-spain-and-france",
+    "first_seen": "2026-10-21T21:05:00.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "medium",
+    "region_tag": "TR",
+    "lat": 46.36296,
+    "lng": 2.07311,
+    "freshness_hours": 3,
+    "reporting": {
+      "label": "Daily Sabah Contact",
+      "url": "https://www.dailysabah.com/contact"
+    },
+    "triage": {
+      "relevance_score": 0.24,
+      "threshold": 0.42,
+      "confidence": "medium",
+      "disposition": "filtered_review",
+      "publication_type": "public_safety_bulletin",
+      "weak_signals": [
+        "-0.18 opinion/commentary phrasing",
+        "-0.08 weak incident evidence relative to narrative cues"
+      ],
+      "metadata": {
+        "tags": []
+      }
+    }
+  },
+  {
+    "alert_id": "dailysabah-tr-30040e805a25",
+    "source_id": "dailysabah-tr",
+    "source": {
+      "source_id": "dailysabah-tr",
+      "authority_name": "Daily Sabah Turkey",
+      "country": "Turkey",
+      "country_code": "TR",
+      "region": "Asia",
+      "authority_type": "public_safety_program",
+      "base_url": "https://www.dailysabah.com"
+    },
+    "title": "Limits of change in an Israel without Netanyahu",
+    "canonical_url": "https://www.dailysabah.com/opinion/op-ed/limits-of-change-in-an-israel-without-netanyahu",
+    "first_seen": "2026-10-21T21:05:00.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "medium",
+    "region_tag": "TR",
+    "lat": 30.92511,
+    "lng": 35.31133,
+    "freshness_hours": 3,
+    "reporting": {
+      "label": "Daily Sabah Contact",
+      "url": "https://www.dailysabah.com/contact"
+    },
+    "triage": {
+      "relevance_score": 0.24,
+      "threshold": 0.42,
+      "confidence": "medium",
+      "disposition": "filtered_review",
+      "publication_type": "public_safety_bulletin",
+      "weak_signals": [
+        "-0.18 opinion/commentary phrasing",
+        "-0.08 weak incident evidence relative to narrative cues"
+      ],
+      "metadata": {
+        "tags": []
+      }
+    }
+  },
+  {
     "alert_id": "middleeasteye-46187e57e39a",
     "source_id": "middleeasteye",
     "source": {
@@ -4334,14 +4775,14 @@
     "title": "Iran's Araghchi says Iran prepared to give diplomacy another chance",
     "canonical_url": "https://www.middleeasteye.net/live-blog/live-blog-update/irans-araghchi-says-iran-prepared-give-diplomacy-another-chance",
     "first_seen": "2026-10-21T20:17:52.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "ME",
     "lat": 32.50824,
     "lng": 54.19975,
-    "freshness_hours": 1,
+    "freshness_hours": 4,
     "reporting": {
       "label": "Middle East Eye Tips",
       "url": "https://www.middleeasteye.net/contact"
@@ -4377,14 +4818,14 @@
     "title": "Opinion: Blog: Away From Kolkata, A Delhi Home Keeps The Spirit Of Durga Puja Alive",
     "canonical_url": "https://www.ndtv.com/opinion/blog-away-from-kolkata-a-delhi-home-keeps-the-spirit-of-durga-puja-alive-12216555#publisher=newsstand",
     "first_seen": "2026-10-21T15:10:48.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "IN",
     "lat": 18.7175,
     "lng": 73.26196,
-    "freshness_hours": 6,
+    "freshness_hours": 9,
     "reporting": {
       "label": "NDTV News Tips",
       "url": "https://www.ndtv.com/page/contact-us",
@@ -4420,14 +4861,14 @@
     "title": "Centre tells TV channels to pick panellists carefully, mute or cut feed if debates turn abusive",
     "canonical_url": "https://www.hindustantimes.com/india-news/centre-tells-tv-channels-to-pick-panellists-carefully-mute-or-cut-feed-if-debates-turn-abusive-101792594380752.html",
     "first_seen": "2026-10-21T14:53:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "IN",
     "lat": 20.93923,
     "lng": 78.97408,
-    "freshness_hours": 6,
+    "freshness_hours": 9,
     "reporting": {
       "label": "Hindustan Times Tips",
       "url": "https://www.hindustantimes.com/contact-us",
@@ -4465,14 +4906,14 @@
     "title": "Prince Harry says he still hopes to heal royal family rift",
     "canonical_url": "https://www.dailysabah.com/life/prince-harry-says-he-still-hopes-to-heal-royal-family-rift/news",
     "first_seen": "2026-10-21T13:14:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "TR",
     "lat": 40.77702,
     "lng": 29.37089,
-    "freshness_hours": 8,
+    "freshness_hours": 11,
     "reporting": {
       "label": "Daily Sabah Contact",
       "url": "https://www.dailysabah.com/contact"
@@ -4485,51 +4926,6 @@
       "publication_type": "public_safety_bulletin",
       "weak_signals": [
         "-0.18 opinion/commentary phrasing",
-        "-0.08 weak incident evidence relative to narrative cues"
-      ],
-      "metadata": {
-        "tags": []
-      }
-    }
-  },
-  {
-    "alert_id": "nhk-jp-e74b2e0edbaf",
-    "source_id": "nhk-jp",
-    "source": {
-      "source_id": "nhk-jp",
-      "authority_name": "NHK Japan",
-      "country": "Japan",
-      "country_code": "JP",
-      "region": "Asia",
-      "authority_type": "public_safety_program",
-      "base_url": "https://www3.nhk.or.jp"
-    },
-    "title": "環境省 公費解体円滑化に向け自治体をサポートするチーム発足",
-    "canonical_url": "http://www3.nhk.or.jp/news/html/20260808/k10015199731000.html",
-    "first_seen": "2026-08-07T22:57:26.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
-    "status": "filtered",
-    "category": "public_safety",
-    "severity": "medium",
-    "region_tag": "JP",
-    "lat": 36.12259,
-    "lng": 139.34434,
-    "freshness_hours": 1798,
-    "reporting": {
-      "label": "Report to Japan Police",
-      "url": "https://www.npa.go.jp/english/index.html",
-      "phone": "110 (Emergency)"
-    },
-    "triage": {
-      "relevance_score": 0.22,
-      "threshold": 0.42,
-      "confidence": "medium",
-      "disposition": "filtered_review",
-      "publication_type": "news_media",
-      "weak_signals": [
-        "-0.16 publication type leans general-news",
-        "+0.08 specific impact/timeline/system details",
-        "-0.12 general institutional/news language",
         "-0.08 weak incident evidence relative to narrative cues"
       ],
       "metadata": {
@@ -4552,14 +4948,14 @@
     "title": "Pope Leo doesn’t need further treatment for lung cancer, doctors say",
     "canonical_url": "https://www.scmp.com/news/world/europe/article/3371691/pope-leo-doesnt-need-further-treatment-lung-cancer-doctors-say",
     "first_seen": "2026-10-21T20:23:51.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "HK",
     "lat": 22.4547,
     "lng": 113.65056,
-    "freshness_hours": 1,
+    "freshness_hours": 3,
     "reporting": {
       "label": "Report Crime in Hong Kong",
       "url": "https://www.police.gov.hk/ppp_en/contact_us.html",
@@ -4583,51 +4979,6 @@
     }
   },
   {
-    "alert_id": "yonhap-kr-c2c740c74766",
-    "source_id": "yonhap-kr",
-    "source": {
-      "source_id": "yonhap-kr",
-      "authority_name": "Yonhap News Korea",
-      "country": "South Korea",
-      "country_code": "KR",
-      "region": "Asia",
-      "authority_type": "public_safety_program",
-      "base_url": "https://en.yna.co.kr"
-    },
-    "title": "Players predict wind will be key factor in LPGA event at S. Korean seaside course",
-    "canonical_url": "https://en.yna.co.kr/view/AEN20261021009500315",
-    "first_seen": "2026-10-21T07:50:37.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
-    "status": "filtered",
-    "category": "public_safety",
-    "severity": "medium",
-    "region_tag": "KR",
-    "lat": 38.11483,
-    "lng": 127.00672,
-    "freshness_hours": 13,
-    "reporting": {
-      "label": "Report Crime in South Korea",
-      "url": "https://www.police.go.kr/eng/index.do",
-      "phone": "112 (Emergency)"
-    },
-    "triage": {
-      "relevance_score": 0.14,
-      "threshold": 0.42,
-      "confidence": "high",
-      "disposition": "filtered_review",
-      "publication_type": "news_media",
-      "weak_signals": [
-        "-0.16 publication type leans general-news",
-        "-0.12 general institutional/news language",
-        "-0.08 weak incident evidence relative to narrative cues"
-      ],
-      "metadata": {
-        "author": "Yoo Jee-ho",
-        "tags": []
-      }
-    }
-  },
-  {
     "alert_id": "scmp-hk-7521b017ee49",
     "source_id": "scmp-hk",
     "source": {
@@ -4642,14 +4993,14 @@
     "title": "Days before Brazil’s run-off, Lula and Bolsonaro seek to disqualify each other",
     "canonical_url": "https://www.scmp.com/news/world/americas/article/3371582/days-brazils-run-lula-and-bolsonaro-seek-disqualify-each-other",
     "first_seen": "2026-10-21T03:50:20.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "HK",
     "lat": -14.02487,
     "lng": -51.90168,
-    "freshness_hours": 17,
+    "freshness_hours": 20,
     "reporting": {
       "label": "Report Crime in Hong Kong",
       "url": "https://www.police.gov.hk/ppp_en/contact_us.html",
@@ -4687,14 +5038,14 @@
     "title": "Russian satellite’s close approach to European spacecraft highlights orbital risks",
     "canonical_url": "https://www.scmp.com/news/world/europe/article/3371575/russian-satellites-close-approach-european-spacecraft-highlights-orbital-risks",
     "first_seen": "2026-10-21T02:58:04.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "high",
     "region_tag": "HK",
     "lat": 22.49862,
     "lng": 114.79425,
-    "freshness_hours": 18,
+    "freshness_hours": 21,
     "reporting": {
       "label": "Report Crime in Hong Kong",
       "url": "https://www.police.gov.hk/ppp_en/contact_us.html",
@@ -4732,14 +5083,14 @@
     "title": "Deadline for change: How APEC is accelerating Shenzhen&#039;s makeover - and what could last",
     "canonical_url": "https://www.channelnewsasia.com/east-asia/shenzhen-apec-summit-payment-transport-services-safety-6452521",
     "first_seen": "2026-10-20T22:00:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "SG",
     "lat": 1.48651,
     "lng": 103.41376,
-    "freshness_hours": 23,
+    "freshness_hours": 26,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -4764,6 +5115,278 @@
     }
   },
   {
+    "alert_id": "yonhap-kr-071562c84302",
+    "source_id": "yonhap-kr",
+    "source": {
+      "source_id": "yonhap-kr",
+      "authority_name": "Yonhap News Korea",
+      "country": "South Korea",
+      "country_code": "KR",
+      "region": "Asia",
+      "authority_type": "public_safety_program",
+      "base_url": "https://en.yna.co.kr"
+    },
+    "title": "(EDITORIAL from Korea JoongAng Daily on Oct. 22)",
+    "canonical_url": "https://en.yna.co.kr/view/AEN20261022000800320",
+    "first_seen": "2026-10-21T22:04:00.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "medium",
+    "region_tag": "KR",
+    "lat": 38.11922,
+    "lng": 126.95586,
+    "freshness_hours": 2,
+    "reporting": {
+      "label": "Report Crime in South Korea",
+      "url": "https://www.police.go.kr/eng/index.do",
+      "phone": "112 (Emergency)"
+    },
+    "triage": {
+      "relevance_score": 0.08,
+      "threshold": 0.42,
+      "confidence": "high",
+      "disposition": "filtered_review",
+      "publication_type": "news_media",
+      "weak_signals": [
+        "-0.16 publication type leans general-news",
+        "-0.18 opinion/commentary phrasing",
+        "-0.08 weak incident evidence relative to narrative cues"
+      ],
+      "metadata": {
+        "author": "Kang Yoon-seung",
+        "tags": []
+      }
+    }
+  },
+  {
+    "alert_id": "yonhap-kr-f30b946ecdac",
+    "source_id": "yonhap-kr",
+    "source": {
+      "source_id": "yonhap-kr",
+      "authority_name": "Yonhap News Korea",
+      "country": "South Korea",
+      "country_code": "KR",
+      "region": "Asia",
+      "authority_type": "public_safety_program",
+      "base_url": "https://en.yna.co.kr"
+    },
+    "title": "(EDITORIAL from The Korea Times on Oct. 22)",
+    "canonical_url": "https://en.yna.co.kr/view/AEN20261022000700320",
+    "first_seen": "2026-10-21T22:03:22.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "medium",
+    "region_tag": "KR",
+    "lat": 37.83983,
+    "lng": 127.53641,
+    "freshness_hours": 2,
+    "reporting": {
+      "label": "Report Crime in South Korea",
+      "url": "https://www.police.go.kr/eng/index.do",
+      "phone": "112 (Emergency)"
+    },
+    "triage": {
+      "relevance_score": 0.08,
+      "threshold": 0.42,
+      "confidence": "high",
+      "disposition": "filtered_review",
+      "publication_type": "news_media",
+      "weak_signals": [
+        "-0.16 publication type leans general-news",
+        "-0.18 opinion/commentary phrasing",
+        "-0.08 weak incident evidence relative to narrative cues"
+      ],
+      "metadata": {
+        "author": "Kang Yoon-seung",
+        "tags": []
+      }
+    }
+  },
+  {
+    "alert_id": "yonhap-kr-ee37764a2e2c",
+    "source_id": "yonhap-kr",
+    "source": {
+      "source_id": "yonhap-kr",
+      "authority_name": "Yonhap News Korea",
+      "country": "South Korea",
+      "country_code": "KR",
+      "region": "Asia",
+      "authority_type": "public_safety_program",
+      "base_url": "https://en.yna.co.kr"
+    },
+    "title": "(EDITORIAL from The Korea Herald on Oct. 22)",
+    "canonical_url": "https://en.yna.co.kr/view/AEN20261022000600320",
+    "first_seen": "2026-10-21T22:02:58.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "medium",
+    "region_tag": "KR",
+    "lat": 37.19744,
+    "lng": 126.67178,
+    "freshness_hours": 2,
+    "reporting": {
+      "label": "Report Crime in South Korea",
+      "url": "https://www.police.go.kr/eng/index.do",
+      "phone": "112 (Emergency)"
+    },
+    "triage": {
+      "relevance_score": 0.08,
+      "threshold": 0.42,
+      "confidence": "high",
+      "disposition": "filtered_review",
+      "publication_type": "news_media",
+      "weak_signals": [
+        "-0.16 publication type leans general-news",
+        "-0.18 opinion/commentary phrasing",
+        "-0.08 weak incident evidence relative to narrative cues"
+      ],
+      "metadata": {
+        "author": "Kang Yoon-seung",
+        "tags": []
+      }
+    }
+  },
+  {
+    "alert_id": "cna-sg-crime-c9bb7db41491",
+    "source_id": "cna-sg-crime",
+    "source": {
+      "source_id": "cna-sg-crime",
+      "authority_name": "CNA Singapore Crime",
+      "country": "Singapore",
+      "country_code": "SG",
+      "region": "Asia",
+      "authority_type": "public_safety_program",
+      "base_url": "https://www.channelnewsasia.com"
+    },
+    "title": "Commentary: Troubled AirAsia needs some government indulgence, not a blank cheque",
+    "canonical_url": "https://www.channelnewsasia.com/commentary/malaysia-airasia-trouble-help-tony-fernandes-6474336",
+    "first_seen": "2026-10-21T22:00:00.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "medium",
+    "region_tag": "SG",
+    "lat": 4.02142,
+    "lng": 101.8888,
+    "freshness_hours": 2,
+    "reporting": {
+      "label": "Report Crime in Singapore",
+      "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
+      "phone": "999 (Emergency) / 1800-255-0000 (Police Hotline)"
+    },
+    "triage": {
+      "relevance_score": 0.08,
+      "threshold": 0.42,
+      "confidence": "high",
+      "disposition": "filtered_review",
+      "publication_type": "news_media",
+      "weak_signals": [
+        "-0.16 publication type leans general-news",
+        "-0.18 opinion/commentary phrasing",
+        "-0.08 weak incident evidence relative to narrative cues"
+      ],
+      "metadata": {
+        "tags": [
+          "Commentary ,Asia"
+        ]
+      }
+    }
+  },
+  {
+    "alert_id": "cna-sg-crime-fcb72ae7c96b",
+    "source_id": "cna-sg-crime",
+    "source": {
+      "source_id": "cna-sg-crime",
+      "authority_name": "CNA Singapore Crime",
+      "country": "Singapore",
+      "country_code": "SG",
+      "region": "Asia",
+      "authority_type": "public_safety_program",
+      "base_url": "https://www.channelnewsasia.com"
+    },
+    "title": "Commentary: Rogue Chinese AI really wants to go to the zoo. That’s a problem",
+    "canonical_url": "https://www.channelnewsasia.com/commentary/rogue-chinese-ai-agent-chengdu-zoo-tencent-6478346",
+    "first_seen": "2026-10-21T21:59:00.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "medium",
+    "region_tag": "SG",
+    "lat": 1.1809,
+    "lng": 103.62629,
+    "freshness_hours": 2,
+    "reporting": {
+      "label": "Report Crime in Singapore",
+      "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
+      "phone": "999 (Emergency) / 1800-255-0000 (Police Hotline)"
+    },
+    "triage": {
+      "relevance_score": 0.08,
+      "threshold": 0.42,
+      "confidence": "high",
+      "disposition": "filtered_review",
+      "publication_type": "news_media",
+      "weak_signals": [
+        "-0.16 publication type leans general-news",
+        "-0.18 opinion/commentary phrasing",
+        "-0.08 weak incident evidence relative to narrative cues"
+      ],
+      "metadata": {
+        "tags": [
+          "Commentary ,Asia"
+        ]
+      }
+    }
+  },
+  {
+    "alert_id": "yonhap-kr-cd1713c96cdd",
+    "source_id": "yonhap-kr",
+    "source": {
+      "source_id": "yonhap-kr",
+      "authority_name": "Yonhap News Korea",
+      "country": "South Korea",
+      "country_code": "KR",
+      "region": "Asia",
+      "authority_type": "public_safety_program",
+      "base_url": "https://en.yna.co.kr"
+    },
+    "title": "(Yonhap Interview) Cuba seeks closer ties with S. Korea amid prolonged U.S. embargo: envoy",
+    "canonical_url": "https://en.yna.co.kr/view/AEN20261021007200315",
+    "first_seen": "2026-10-21T21:00:07.000Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
+    "status": "filtered",
+    "category": "public_safety",
+    "severity": "medium",
+    "region_tag": "KR",
+    "lat": 21.88338,
+    "lng": -77.82644,
+    "freshness_hours": 3,
+    "reporting": {
+      "label": "Report Crime in South Korea",
+      "url": "https://www.police.go.kr/eng/index.do",
+      "phone": "112 (Emergency)"
+    },
+    "triage": {
+      "relevance_score": 0.08,
+      "threshold": 0.42,
+      "confidence": "high",
+      "disposition": "filtered_review",
+      "publication_type": "news_media",
+      "weak_signals": [
+        "-0.16 publication type leans general-news",
+        "-0.18 opinion/commentary phrasing",
+        "-0.08 weak incident evidence relative to narrative cues"
+      ],
+      "metadata": {
+        "author": "Oh Seok-min",
+        "tags": []
+      }
+    }
+  },
+  {
     "alert_id": "scmp-hk-1c4c7d9b0145",
     "source_id": "scmp-hk",
     "source": {
@@ -4778,14 +5401,14 @@
     "title": "Can China turn national power into world leadership?",
     "canonical_url": "https://www.scmp.com/opinion/china-opinion/article/3371409/can-china-turn-national-power-world-leadership",
     "first_seen": "2026-10-21T08:30:10.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "HK",
     "lat": 35.94917,
     "lng": 104.0526,
-    "freshness_hours": 12,
+    "freshness_hours": 15,
     "reporting": {
       "label": "Report Crime in Hong Kong",
       "url": "https://www.police.gov.hk/ppp_en/contact_us.html",
@@ -4823,14 +5446,14 @@
     "title": "Burnham’s Britain can learn from Trump in engaging with China",
     "canonical_url": "https://www.scmp.com/opinion/world-opinion/article/3371392/burnhams-britain-can-learn-trump-engaging-china",
     "first_seen": "2026-10-21T01:30:05.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "HK",
     "lat": 35.88784,
     "lng": 104.75187,
-    "freshness_hours": 19,
+    "freshness_hours": 22,
     "reporting": {
       "label": "Report Crime in Hong Kong",
       "url": "https://www.police.gov.hk/ppp_en/contact_us.html",
@@ -4868,14 +5491,14 @@
     "title": "Christina Applegate says she was misdiagnosed with multiple sclerosis",
     "canonical_url": "https://www.scmp.com/news/world/united-states-canada/article/3371569/christina-applegate-says-she-was-misdiagnosed-multiple-sclerosis",
     "first_seen": "2026-10-21T01:29:37.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "HK",
     "lat": 39.96205,
     "lng": -98.27412,
-    "freshness_hours": 19,
+    "freshness_hours": 22,
     "reporting": {
       "label": "Report Crime in Hong Kong",
       "url": "https://www.police.gov.hk/ppp_en/contact_us.html",
@@ -4913,14 +5536,14 @@
     "title": "Commentary: Apple’s iPhone factories won’t make India the next China",
     "canonical_url": "https://www.channelnewsasia.com/commentary/apple-iphone-india-china-supply-chain-6475156",
     "first_seen": "2026-10-20T21:59:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
+    "last_seen": "2026-10-21T23:56:28.371Z",
     "status": "filtered",
     "category": "public_safety",
     "severity": "medium",
     "region_tag": "SG",
     "lat": 20.75724,
     "lng": 78.68245,
-    "freshness_hours": 23,
+    "freshness_hours": 26,
     "reporting": {
       "label": "Report Crime in Singapore",
       "url": "https://eservices.police.gov.sg/content/policehubhome/homepage/police-report.html",
@@ -4941,139 +5564,6 @@
         "tags": [
           "Commentary ,Asia ,Business"
         ]
-      }
-    }
-  },
-  {
-    "alert_id": "scmp-hk-161fa0622b88",
-    "source_id": "scmp-hk",
-    "source": {
-      "source_id": "scmp-hk",
-      "authority_name": "SCMP Hong Kong",
-      "country": "Hong Kong",
-      "country_code": "HK",
-      "region": "Asia",
-      "authority_type": "public_safety_program",
-      "base_url": "https://www.scmp.com"
-    },
-    "title": "Britain’s ban on pro-Palestinian author Sally Rooney makes it a laughing stock",
-    "canonical_url": "https://www.scmp.com/opinion/world-opinion/article/3371369/britains-ban-pro-palestinian-author-sally-rooney-makes-it-laughing-stock",
-    "first_seen": "2026-10-20T21:30:06.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
-    "status": "filtered",
-    "category": "public_safety",
-    "severity": "medium",
-    "region_tag": "HK",
-    "lat": 22.04719,
-    "lng": 113.60393,
-    "freshness_hours": 23,
-    "reporting": {
-      "label": "Report Crime in Hong Kong",
-      "url": "https://www.police.gov.hk/ppp_en/contact_us.html",
-      "phone": "999 (Emergency)"
-    },
-    "triage": {
-      "relevance_score": 0.08,
-      "threshold": 0.42,
-      "confidence": "high",
-      "disposition": "filtered_review",
-      "publication_type": "news_media",
-      "weak_signals": [
-        "-0.16 publication type leans general-news",
-        "-0.18 opinion/commentary phrasing",
-        "-0.08 weak incident evidence relative to narrative cues"
-      ],
-      "metadata": {
-        "author": "Alex Lo",
-        "tags": []
-      }
-    }
-  },
-  {
-    "alert_id": "nhk-jp-4d65207525bf",
-    "source_id": "nhk-jp",
-    "source": {
-      "source_id": "nhk-jp",
-      "authority_name": "NHK Japan",
-      "country": "Japan",
-      "country_code": "JP",
-      "region": "Asia",
-      "authority_type": "public_safety_program",
-      "base_url": "https://www3.nhk.or.jp"
-    },
-    "title": "熊本地震 10年前の地震と隣り合う領域で発生か 専門家分析",
-    "canonical_url": "http://www3.nhk.or.jp/news/html/20260808/k10015200121000.html",
-    "first_seen": "2026-08-08T11:53:49.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
-    "status": "filtered",
-    "category": "public_safety",
-    "severity": "medium",
-    "region_tag": "JP",
-    "lat": 35.71168,
-    "lng": 139.226,
-    "freshness_hours": 1785,
-    "reporting": {
-      "label": "Report to Japan Police",
-      "url": "https://www.npa.go.jp/english/index.html",
-      "phone": "110 (Emergency)"
-    },
-    "triage": {
-      "relevance_score": 0.08,
-      "threshold": 0.42,
-      "confidence": "high",
-      "disposition": "filtered_review",
-      "publication_type": "news_media",
-      "weak_signals": [
-        "-0.16 publication type leans general-news",
-        "-0.18 opinion/commentary phrasing",
-        "-0.08 weak incident evidence relative to narrative cues"
-      ],
-      "metadata": {
-        "tags": []
-      }
-    }
-  },
-  {
-    "alert_id": "nhk-jp-32ae5d595839",
-    "source_id": "nhk-jp",
-    "source": {
-      "source_id": "nhk-jp",
-      "authority_name": "NHK Japan",
-      "country": "Japan",
-      "country_code": "JP",
-      "region": "Asia",
-      "authority_type": "public_safety_program",
-      "base_url": "https://www3.nhk.or.jp"
-    },
-    "title": "新潟 小千谷「記録的短時間大雨」の気象防災速報を発表",
-    "canonical_url": "http://www3.nhk.or.jp/news/html/20260808/k10015200221000.html",
-    "first_seen": "2026-08-08T06:47:00.000Z",
-    "last_seen": "2026-10-21T21:00:20.170Z",
-    "status": "filtered",
-    "category": "public_safety",
-    "severity": "medium",
-    "region_tag": "JP",
-    "lat": 35.4527,
-    "lng": 139.59549,
-    "freshness_hours": 1790,
-    "reporting": {
-      "label": "Report to Japan Police",
-      "url": "https://www.npa.go.jp/english/index.html",
-      "phone": "110 (Emergency)"
-    },
-    "triage": {
-      "relevance_score": 0.08,
-      "threshold": 0.42,
-      "confidence": "high",
-      "disposition": "filtered_review",
-      "publication_type": "news_media",
-      "weak_signals": [
-        "-0.16 publication type leans general-news",
-        "-0.18 opinion/commentary phrasing",
-        "-0.08 weak incident evidence relative to narrative cues"
-      ],
-      "metadata": {
-        "tags": []
       }
     }
   }
